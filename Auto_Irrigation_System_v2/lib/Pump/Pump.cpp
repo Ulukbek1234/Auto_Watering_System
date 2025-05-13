@@ -1,0 +1,54 @@
+#include "Pump.h"
+
+
+Pump::Pump(int pin, float max_liters) 
+{
+    // Construct Pump
+    this->pin = pin;
+    this->max_liters = max_liters;
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, PUMP_OFF);
+}
+
+void Pump::activatePump()
+{
+    DEBUG_PRINTLN("Started pumping");
+    this->status = 1;
+    digitalWrite(this->pin, PUMP_ON);
+}
+
+
+void Pump::activatePump(float liters)
+{
+    DEBUG_PRINTLN("Started pumping liters");
+    if(daily_liter > max_liters)
+    {
+        DEBUG_PRINTLN("Max daily limit reached");
+        return;
+    }
+    daily_liter += liters;
+    float seconds_needed = (60.0 / 1.2) * liters;
+    unsigned long duration_ms = (unsigned long)(seconds_needed * 1000);
+    
+    unsigned long start_time = millis();
+    unsigned long end_time = start_time + duration_ms;
+    
+    this->status = 1;
+    digitalWrite(this->pin, PUMP_ON);
+
+    while (millis() < end_time) {
+        delay(10); // avoid CPU hogging
+    }
+}
+
+void Pump::deactivatePump()
+{
+    DEBUG_PRINTLN("Stopped pumping");
+    this->status = 0;
+    digitalWrite(this->pin, PUMP_OFF);
+}
+
+void Pump::resetDailyLiter()
+{
+    daily_liter = 0.0;
+}
