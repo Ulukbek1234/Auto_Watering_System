@@ -11,7 +11,7 @@ void Zone::addPump(int pin, float max_liters)
     pumps[nr_pumps++] = new Pump(pin, max_liters);
 }
 
-void Zone::addSoilSensor(int pin)
+void Zone::addSoilSensor(uint8_t pin)
 {
     soil_sensors[nr_soil_sensors++] = new SoilSensor(pin);
 }
@@ -27,7 +27,12 @@ void Zone::startAutoIrrigating()
     // multiple pumps can be attached to one sensor
     for(size_t i = 0; i < nr_soil_sensors; i++)
     {
+        DEBUG_PRINT("soil_sensor id: ");
+        DEBUG_PRINTLN(soil_sensors[i]->getPin());
+
+
         soil_sensors[i]->checkRawValues();
+        
         float moister_threshold = 0.1;
 
         // if(soil_sensors[i]->getMoisterPercent() < moister_threshold)

@@ -1,9 +1,9 @@
 #include "SoilSensor.h"
 
-SoilSensor::SoilSensor(int pin) 
+SoilSensor::SoilSensor(uint8_t pin) 
 {
     // Construct SoilSensor
-    pinMode(INPUT, pin);
+    // pinMode(pin, INPUT);
 }
 
 void SoilSensor::checkRawValues()

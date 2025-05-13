@@ -23,7 +23,7 @@ public:
     Zone();
 
     void addPump(int pin, float max_liter);
-    void addSoilSensor(int pin);
+    void addSoilSensor(uint8_t pin);
     void startAutoIrrigating();
     void updateDay();
 
