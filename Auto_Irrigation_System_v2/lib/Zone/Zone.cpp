@@ -25,17 +25,17 @@ void Zone::startAutoIrrigating()
     // TODO change nr_pumps for better solution
     // ISSUE must connect sensors to pumps or vice versa
     // multiple pumps can be attached to one sensor
-    for(size_t i = 0; i < ARRAY_SIZE; i++)
+    for(size_t i = 0; i < nr_soil_sensors; i++)
     {
         soil_sensors[i]->checkRawValues();
-        float moister_threshold = 0.1;        
+        float moister_threshold = 0.1;
 
         // if(soil_sensors[i]->getMoisterPercent() < moister_threshold)
-        {
-            // how long should the pumps activate?
-            pumps[i]->activatePump(0.2);
-            pumps[i]->deactivatePump();
-        }
+        // {
+        //     // how long should the pumps activate?
+        //     pumps[i]->activatePump(0.2);
+        //     pumps[i]->deactivatePump();
+        // }
     }
 }
 
@@ -50,7 +50,7 @@ void Zone::updateDay()
     {
         DEBUG_PRINTLN("DAY PROGRESSED");
         day += 1.0;
-        for(size_t i = 0; i < ARRAY_SIZE; i++)
+        for(size_t i = 0; i < nr_soil_sensors; i++)
         {
             pumps[i]->resetDailyLiter();
         }
@@ -70,7 +70,7 @@ String Zone::getData()
     data_values[index++] = String(day_exact, NR_DEC_POINTS);
 
 
-    for (size_t i = 0; i < ARRAY_SIZE; i++)
+    for (size_t i = 0; i < nr_soil_sensors; i++)
     {
         data_names[index] = "pump_pin";
         data_values[index++] = pumps[i]->getPin();

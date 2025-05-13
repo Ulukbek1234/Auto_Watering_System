@@ -6,7 +6,7 @@
 #include "Pump.h"
 #include "SoilSensor.h"
 
-const int ARRAY_SIZE = 1;
+const int ARRAY_SIZE = 16;
 
 class Zone 
 {
