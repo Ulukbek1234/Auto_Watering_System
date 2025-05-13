@@ -32,15 +32,15 @@ void Zone::startAutoIrrigating()
 
 
         soil_sensors[i]->checkRawValues();
-        
+
         float moister_threshold = 0.1;
 
-        // if(soil_sensors[i]->getMoisterPercent() < moister_threshold)
-        // {
-        //     // how long should the pumps activate?
-        //     pumps[i]->activatePump(0.2);
-        //     pumps[i]->deactivatePump();
-        // }
+        if(soil_sensors[i]->getMoisterPercent() < moister_threshold)
+        {
+            // how long should the pumps activate?
+            pumps[i]->activatePump(0.2);
+            pumps[i]->deactivatePump();
+        }
     }
 }
 
