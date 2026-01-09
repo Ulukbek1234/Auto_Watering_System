@@ -3,7 +3,7 @@
 SoilSensor::SoilSensor(uint8_t pin) 
 {
     // Construct SoilSensor
-    // pinMode(pin, INPUT);
+    pinMode(pin, INPUT);
 }
 
 void SoilSensor::checkRawValues()

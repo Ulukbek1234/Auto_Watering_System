@@ -25,21 +25,27 @@ void Zone::startAutoIrrigating()
     // TODO change nr_pumps for better solution
     // ISSUE must connect sensors to pumps or vice versa
     // multiple pumps can be attached to one sensor
+
+
+    float moisture_percent[nr_soil_sensors] = {0.0f};
     for(size_t i = 0; i < nr_soil_sensors; i++)
     {
-        DEBUG_PRINT("soil_sensor id: ");
+        DEBUG_PRINT("soil_sensor id (Analog): ");
         DEBUG_PRINTLN(soil_sensors[i]->getPin());
 
 
         soil_sensors[i]->checkRawValues();
+        moisture_percent[i] = soil_sensors[i]->getMoisterPercent();
+    }
 
-        float moister_threshold = 0.1;
-
-        if(soil_sensors[i]->getMoisterPercent() < moister_threshold)
+    for(size_t i = 0; i < nr_pumps; i++)
+    {
+        DEBUG_PRINT("moisture_percent for sensor: ");
+        DEBUG_PRINTLN(moisture_percent[i]);
+        if(moisture_percent[i] < MOISTURE_THRESHOLD)
         {
             // how long should the pumps activate?
             pumps[i]->activatePump(0.2);
-            pumps[i]->deactivatePump();
         }
     }
 }
@@ -47,11 +53,15 @@ void Zone::startAutoIrrigating()
 void Zone::updateDay()
 {
     unsigned long millis_uptime = millis();  // Milliseconds since startup
-    day_exact = millis_uptime / 1000.0 / 60 / 60 / 24;  // Convert to days
+    day_exact = millis_uptime / 1000.0 / 60.0 / 60.0 / 24.0;  // Convert to days
     DEBUG_PRINT("Updating day -- Days running: ");
     DEBUG_PRINTLN(day_exact);
-
-    if((day_exact - day) > 1.0)
+    float testing_minute = day_exact * 24.0 * 60.0;
+    DEBUG_PRINT("Testing minute: ");
+    DEBUG_PRINTLN(testing_minute);
+    
+    // if((day_exact - day) > 1.0)
+    if((day_exact - testing_minute) > 1.0)
     {
         DEBUG_PRINTLN("DAY PROGRESSED");
         day += 1.0;
@@ -77,10 +87,6 @@ String Zone::getData()
 
     for (size_t i = 0; i < nr_soil_sensors; i++)
     {
-        data_names[index] = "pump_pin";
-        data_values[index++] = pumps[i]->getPin();
-        data_names[index] = "daily_liter";
-        data_values[index++] = String(pumps[i]->getDailyLiter(), NR_DEC_POINTS);
 
 
         data_names[index] = "soil_sensor_pin";
@@ -88,6 +94,15 @@ String Zone::getData()
         data_names[index] = "moister_percent";
         data_values[index++] = soil_sensors[i]->getMoisterPercent();
     }
+
+    for (size_t i = 0; i < nr_pumps; i++)
+    {
+        data_names[index] = "pump_pin";
+        data_values[index++] = pumps[i]->getPin();
+        data_names[index] = "daily_liter";
+        data_values[index++] = String(pumps[i]->getDailyLiter(), NR_DEC_POINTS);
+    }
+
     return parseDataForWriting(data_names, data_values, index);
 }
 

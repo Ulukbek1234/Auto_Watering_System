@@ -7,6 +7,8 @@
 #include "SoilSensor.h"
 
 const int ARRAY_SIZE = 16;
+const float MOISTURE_THRESHOLD = 0.1;
+
 
 class Zone 
 {

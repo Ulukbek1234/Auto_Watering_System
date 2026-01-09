@@ -8,13 +8,14 @@
 #define PUMP_ON 0
 #define PUMP_OFF 1
 
+const float LITERS_PER_MINUTE = 2.0;
+
 class Pump 
 {
 private:
     int pin;
     int status = 0; // 0 off, 1 on
-    float liters_per_minute = 1.2;
-    float max_liters = 3.0;  
+    float max_liters = 1.0; // Default, changed by init  
     float daily_liter = 0.0;
 public:
     Pump(int pin, float max_liters);

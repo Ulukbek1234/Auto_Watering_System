@@ -21,13 +21,17 @@ void Pump::activatePump()
 void Pump::activatePump(float liters)
 {
     DEBUG_PRINTLN("Started pumping liters");
-    if(daily_liter > max_liters)
+    float diff = (daily_liter - max_liters);
+    DEBUG_PRINT("diff liter: ");
+    DEBUG_PRINTLN(diff);
+
+    if( diff > 0.01f)
     {
         DEBUG_PRINTLN("Max daily limit reached");
         return;
     }
     daily_liter += liters;
-    float seconds_needed = (60.0 / 1.2) * liters;
+    float seconds_needed = (60.0 / LITERS_PER_MINUTE) * liters;
     unsigned long duration_ms = (unsigned long)(seconds_needed * 1000);
     
     unsigned long start_time = millis();
@@ -39,6 +43,7 @@ void Pump::activatePump(float liters)
     while (millis() < end_time) {
         delay(10); // avoid CPU hogging
     }
+    deactivatePump();
 }
 
 void Pump::deactivatePump()
