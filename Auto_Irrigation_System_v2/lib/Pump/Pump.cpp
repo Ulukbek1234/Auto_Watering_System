@@ -21,13 +21,10 @@ void Pump::activatePump()
 void Pump::activatePump(float liters)
 {
     DEBUG_PRINTLN("Started pumping liters");
-    float diff = (daily_liter - max_liters);
-    DEBUG_PRINT("diff liter: ");
-    DEBUG_PRINTLN(diff);
-
-    if( diff > 0.01f)
+    if(limit_reached || (daily_liter - max_liters) > epsilon)
     {
         DEBUG_PRINTLN("Max daily limit reached");
+        limit_reached = true;
         return;
     }
     daily_liter += liters;
@@ -56,4 +53,5 @@ void Pump::deactivatePump()
 void Pump::resetDailyLiter()
 {
     daily_liter = 0.0;
+    limit_reached = false;
 }

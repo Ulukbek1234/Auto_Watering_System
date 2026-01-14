@@ -15,7 +15,7 @@ class Zone
 private:
     int nr_pumps = 0;
     int nr_soil_sensors = 0;
-    float day = 0.0;
+    float day_progressed = 0.0;
     float day_exact = 0.0;
     
     Pump *pumps[ARRAY_SIZE]; 

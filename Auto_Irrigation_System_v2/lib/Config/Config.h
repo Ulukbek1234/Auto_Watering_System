@@ -10,6 +10,6 @@
 const int NR_DEC_POINTS = 8;
 const int DRY_VALUE = 580;
 const int WET_VALUE = 280;
-
+const float epsilon = 0.000001;
 
 #endif

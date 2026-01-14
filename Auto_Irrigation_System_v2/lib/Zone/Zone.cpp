@@ -3,7 +3,6 @@
 Zone::Zone() 
 {
     // Construct Pump
-    Serial.println("Help");
 }
 
 void Zone::addPump(int pin, float max_liters)
@@ -33,7 +32,6 @@ void Zone::startAutoIrrigating()
         DEBUG_PRINT("soil_sensor id (Analog): ");
         DEBUG_PRINTLN(soil_sensors[i]->getPin());
 
-
         soil_sensors[i]->checkRawValues();
         moisture_percent[i] = soil_sensors[i]->getMoisterPercent();
     }
@@ -44,7 +42,6 @@ void Zone::startAutoIrrigating()
         DEBUG_PRINTLN(moisture_percent[i]);
         if(moisture_percent[i] < MOISTURE_THRESHOLD)
         {
-            // how long should the pumps activate?
             pumps[i]->activatePump(0.2);
         }
     }
@@ -55,25 +52,20 @@ void Zone::updateDay()
     unsigned long millis_uptime = millis();  // Milliseconds since startup
     day_exact = millis_uptime / 1000.0 / 60.0 / 60.0 / 24.0;  // Convert to days
     DEBUG_PRINT("Updating day -- Days running: ");
-    DEBUG_PRINTLN(day_exact);
-    float testing_minute = day_exact * 24.0 * 60.0;
-    DEBUG_PRINT("Testing minute: ");
-    DEBUG_PRINTLN(testing_minute);
+    Serial.println(day_exact, 10);
     
-    // if((day_exact - day) > 1.0)
-    if((day_exact - testing_minute) > 1.0)
+    if((day_exact - day_progressed) > 0.01f)
     {
         DEBUG_PRINTLN("DAY PROGRESSED");
-        day += 1.0;
-        for(size_t i = 0; i < nr_soil_sensors; i++)
+        day_progressed += 1.0;
+        for(size_t i = 0; i < nr_pumps; i++)
         {
-            pumps[i]->resetDailyLiter();
+                pumps[i]->resetDailyLiter();
         }
     }
 }
-
-
-
+        
+        
 String Zone::getData()
 {
     String data_names[32];
