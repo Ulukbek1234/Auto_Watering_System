@@ -42,7 +42,7 @@ void Zone::startAutoIrrigating()
         DEBUG_PRINTLN(moisture_percent[i]);
         if(moisture_percent[i] < MOISTURE_THRESHOLD)
         {
-            pumps[i]->activatePump(0.2);
+            pumps[i]->activatePump(0.1);
         }
     }
 }

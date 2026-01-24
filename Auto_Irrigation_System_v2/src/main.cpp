@@ -10,10 +10,10 @@ void setup() {
   pots = new Zone();
   //Serial1.begin(115200); // Esp 32
 
-  // pots->addPump(11, 5);
+  pots->addPump(8, 0.7);
+  pots->addPump(9, 0.7);
   // pots->addPump(10, 5);
-  // pots->addPump(9, 5);
-  pots->addPump(8, 1);
+  // pots->addPump(11, 5);
 
   // pots->addSoilSensor(A0);
   // pots->addSoilSensor(A1);
@@ -22,7 +22,7 @@ void setup() {
 }
 
 void loop() {
-  delay(1000 * 1); // seconds
+  delay(1000 * 10); // seconds
   
   pots->startAutoIrrigating();
   pots->updateDay();
