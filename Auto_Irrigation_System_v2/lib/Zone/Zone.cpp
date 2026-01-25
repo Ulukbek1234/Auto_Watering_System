@@ -53,7 +53,7 @@ void Zone::updateDay()
     unsigned long millis_uptime = millis();  // Milliseconds since startup
     day_exact = millis_uptime / 1000.0 / 60.0 / 60.0 / 24.0;  // Convert to days
     DEBUG_PRINT("Updating day -- Days running: ");
-    Serial.println(day_exact, 10);
+    DEBUG_PRINTLNN(day_exact, 10);
     
     if((day_exact - day_progressed) > 0.01f)
     {
