@@ -4,7 +4,7 @@ import json
 import logging
 import multiprocessing 
 from ..helpers.Utils import read_from_file_lock_safe, write_to_file_lock_safe, split_and_parse_data
-from ..helpers.LoggerConfig import setup_listener, setup_worker_logging
+from ..helpers.Logger import setup_listener, setup_worker_logging
 from pathlib import Path
 
 
