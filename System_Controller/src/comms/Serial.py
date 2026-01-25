@@ -8,10 +8,6 @@ from ..helpers.Logger import setup_listener, setup_worker_logging
 from pathlib import Path
 
 
-{'MOLA_DEFINITION': {'RESP': 100, 'RESP_OK': 101, 'RESP_ERR': 102, 'SET_BOAT_STATE': 200, 'SET_BOAT_SAIL_RUDDER': 201, 'SET_SAIL_CNTR': 204, 'SET_NEXT_WAYP': 205, 'SET_PUSH_WAYP': 206, 'SET_CLR_WAYP': 207, 'GET_TELEM_DATA': 250, 'GET_COMMAND_DATA': 251, '/\n    STATUS_OK': 300, 'STATUS_FAULT': 301, 'STATUS_UNKNOWN': 302, 'STATUS_NO_CONNECTION': 303, 'STATUS_DISABLED': 304, '': 305}}
-
-
-
 
 telem_dict_data = {}
 
@@ -121,14 +117,14 @@ def main(log_queue=None):
             except Exception as e:
                 logging.info(f"ERROR: request telemetry: {e}")
 
-        # # Send commands to the boat
-        # elapsed_boat_command_time = time.time() - last_boat_command_time
-        # if elapsed_boat_command_time > serial_comms.SLAVE_COMMAND_INTER:
-        #     last_boat_command_time = time.time()
-        #     try:
-        #         serial_comms.readAndSendCommandToBoat()
-        #     except Exception as e:
-        #         logging.info(f"ERROR: read and send command to boat: {e}")
+        # Send commands to the boat
+        elapsed_boat_command_time = time.time() - last_boat_command_time
+        if elapsed_boat_command_time > serial_comms.SLAVE_COMMAND_INTER:
+            last_boat_command_time = time.time()
+            try:
+                serial_comms.readAndSendCommandToBoat()
+            except Exception as e:
+                logging.info(f"ERROR: read and send command to boat: {e}")
 
 
 if __name__ == "__main__":
