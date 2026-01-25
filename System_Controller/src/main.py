@@ -44,7 +44,7 @@ import fcntl
 from pprint import pformat
 from .helpers.Utils import read_from_file_lock_safe, write_to_file_lock_safe, split_and_parse_data
 from .helpers.Logger import setup_listener, setup_worker_logging
-from .helpers import ProcessManager
+from .helpers.ProcessManager import ProcessManager
 import logging
 import multiprocessing
 
@@ -86,5 +86,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
