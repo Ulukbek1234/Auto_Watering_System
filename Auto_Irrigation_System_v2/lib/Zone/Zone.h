@@ -28,9 +28,10 @@ public:
     void addSoilSensor(uint8_t pin);
     void startAutoIrrigating();
     void updateDay();
-
+    
     String getData();
     String parseDataForWriting(String data_names[], String data_values[], int size);
+    void resetDayProgression();
 };
 
 #endif

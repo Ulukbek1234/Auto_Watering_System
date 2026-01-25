@@ -5,6 +5,7 @@
 
 Zone *pots;
 
+
 void setup() {
   Serial.begin(9600);
   pots = new Zone();
@@ -21,11 +22,35 @@ void setup() {
   // pots->addSoilSensor(A3);
 }
 
+
+// TODO
+/*
+  - Commands from master
+  - Different modes of irrigation
+    - Max daily limit
+    - Moisture threshold
+    - Time based
+*/
 void loop() {
   delay(1000 * 10); // seconds
+  // Check serial for commands from master here
+  String command = Serial.readStringUntil('\n');
+  if (command.length() > 0) {
+    DEBUG_PRINTLN("Received command: " + command);
+    command.trim();
+    if (command == "SYNCH") {
+      pots->resetDayProgression();
+      DEBUG_PRINTLN("Day progression reset.");
+    } else if (command == "TELEMETRY") {
+      Serial.println(pots->getData());
+      DEBUG_PRINTLN("Sent telemetry data.");
+    }
+    else {
+      DEBUG_PRINTLN("Unknown command.");
+    }
+  }
   
   pots->startAutoIrrigating();
   pots->updateDay();
-  Serial.println(pots->getData());
   DEBUG_PRINTLN("---------------------");
 }

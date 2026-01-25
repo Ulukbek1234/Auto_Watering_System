@@ -3,6 +3,7 @@
 Zone::Zone() 
 {
     // Construct Pump
+
 }
 
 void Zone::addPump(int pin, float max_liters)
@@ -108,3 +109,8 @@ String Zone::parseDataForWriting(String data_names[], String data_values[], int 
     return output;
 }
 
+void Zone::resetDayProgression()
+{
+    day_progressed = 0.0;
+    day_exact = 0.0;
+}

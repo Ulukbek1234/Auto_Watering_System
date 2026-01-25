@@ -18,7 +18,7 @@ private:
     float max_liters = 1.0; // Default, changed by init  
     float daily_liter = 0.0;
     float total_liter = 0.0; // TODO safe to EEPROM
-    bool limit_reached = false;
+    bool limit_reached = true;
 public:
     Pump(int pin, float max_liters);
     void activatePump();

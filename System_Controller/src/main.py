@@ -1,4 +1,6 @@
 # Inital program to run entire watering system
+# run project with `python -m src.main`
+
 
 """ 
 Functional Requirements
@@ -29,6 +31,7 @@ Functional Requirements
             --- Graphs 
         -- Add/ Remove pumps/ sensors
         -- Modify daily liters
+        -- See camera
     - Database 
         -- Access from anywhere?
         -- Logging of everything
