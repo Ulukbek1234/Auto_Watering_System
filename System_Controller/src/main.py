@@ -84,7 +84,7 @@ def main():
         #         read_master_and_perform_command()
         #     except Exception as e:
         #         logging.debug(f"ERROR: performing master command: {e}")
-        time.sleep(1.0)
+        time.sleep(10.0)
         logging.debug("Main loop heartbeat.")
 
 if __name__ == "__main__":
