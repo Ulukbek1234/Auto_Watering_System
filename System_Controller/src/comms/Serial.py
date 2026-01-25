@@ -21,6 +21,7 @@ class SerialComms:
         # GPIO = serial0 
         self.ser = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=1) 
         time.sleep(2)  # wait for the serial connection to initialize
+        self.ser.write(b"SYNCH\n")
 
         # For data bus
         ROOT = Path(__file__).parent.parent
@@ -35,6 +36,7 @@ class SerialComms:
         self.SLAVE_COMMAND_INTER = 5
         self.SLAVE_COMMAND_PATH = DATA_BUS_PATH / "slave_command.txt"
 
+
     def check_response(self, line, command):
         if command in line:
             return True
@@ -46,7 +48,7 @@ class SerialComms:
         
         # Send request for telemetry data
         # ser.write(json.dumps({"Command": 250}).encode())  # 250 == GET_TELEM_DATA
-        self.ser.write(b"Command: 1\n")
+        self.ser.write(b"TELEMETRY\n")
         time.sleep(self.MOLA_DELAY)  # Wait for the device to respond
         
         # Check if data is available in the serial buffer
