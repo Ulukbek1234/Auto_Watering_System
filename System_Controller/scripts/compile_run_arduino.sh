@@ -5,7 +5,7 @@ PROJECT_DIR="/home/ulukpi/Desktop/Auto_Watering_System/Auto_Irrigation_System_v2
 cd "$PROJECT_DIR" || { echo "Directory not found!"; exit 1; }
 
 # Activate PlatformIO official virtual environment
-source ~/.platformio/penv/bin/activate || { echo "PlatformIO venv not found!"; exit 1; }
+source ~/platformio-venv/bin/activate || { echo "PlatformIO venv not found!"; exit 1; }
 
 # Compile
 echo "Compiling the project..."
