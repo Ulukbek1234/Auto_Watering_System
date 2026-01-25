@@ -44,9 +44,13 @@ import fcntl
 from pprint import pformat
 from .helpers.Utils import read_from_file_lock_safe, write_to_file_lock_safe, split_and_parse_data
 from .helpers.Logger import setup_listener, setup_worker_logging
+from .helpers import ProcessManager
+import logging
+import multiprocessing
 
 from pathlib import Path
 
+MASTER_COMMAND_INTER = 10.0  # seconds
         
 def main():
     """Main program loop for the Mola Interface Program."""
@@ -54,9 +58,8 @@ def main():
     log_queue = multiprocessing.Queue()
     listener = setup_listener(log_queue)
     setup_worker_logging(log_queue)
-    logging.info("Starting Mola Interface Program...")
+    logging.info("Starting Interface Program...")
 
-    interface = Interface()
     process_manager = ProcessManager(log_queue)
     
     # Example: Starting initial processes for system communications
@@ -65,25 +68,21 @@ def main():
         ["python", "-m", "src.comms.Serial"]
     )
 
-    # process_manager.start_process("WiFi", "python Comms/WiFi.py")
-    # process_manager.start_process(
-    #     "Client", 
-    #     ["python", "-m", "src.comms.Client"]
-    # )
-
     last_master_command_time = time.time()
 
     while True:
-        # Read command for master and perform command
-        elapsed_telem_time = time.time() - last_master_command_time
-        master_command_parsed = {}
-        if elapsed_telem_time > interface.MASTER_COMMAND_INTER:
-            last_master_command_time = time.time()
-            try:
-                logging.debug(f"Perform read from master_command.txt file")
-                interface.read_master_and_perform_command()
-            except Exception as e:
-                logging.debug(f"ERROR: performing master command: {e}")
+        # # Read command for master and perform command
+        # elapsed_telem_time = time.time() - last_master_command_time
+        # master_command_parsed = {}
+        # if elapsed_telem_time > MASTER_COMMAND_INTER:
+        #     last_master_command_time = time.time()
+        #     try:
+        #         logging.debug(f"Perform read from master_command.txt file")
+        #         read_master_and_perform_command()
+        #     except Exception as e:
+        #         logging.debug(f"ERROR: performing master command: {e}")
+        time.sleep(1.0)
+        logging.debug("Main loop heartbeat.")
 
 if __name__ == "__main__":
     main()

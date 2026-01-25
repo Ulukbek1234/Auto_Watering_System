@@ -50,7 +50,7 @@ class SerialComms:
         
         # Send request for telemetry data
         # ser.write(json.dumps({"Command": 250}).encode())  # 250 == GET_TELEM_DATA
-        self.ser.write(b"Command: 250\n")
+        self.ser.write(b"Command: 1\n")
         time.sleep(self.MOLA_DELAY)  # Wait for the device to respond
         
         # Check if data is available in the serial buffer
@@ -58,8 +58,7 @@ class SerialComms:
         # while ser.in_waiting > 0: # TODO: only for debugging, remove later
             line = self.ser.readline().decode('utf-8', errors='replace').rstrip()
             logging.debug(f"Telem data from Mega: {line}") 
-            if(self.check_response(line, "Command: 100")):
-                return split_and_parse_data(line)
+            return split_and_parse_data(line)
         else:
             logging.info("No telemetry data received.")
 
@@ -122,14 +121,14 @@ def main(log_queue=None):
             except Exception as e:
                 logging.info(f"ERROR: request telemetry: {e}")
 
-        # Send commands to the boat
-        elapsed_boat_command_time = time.time() - last_boat_command_time
-        if elapsed_boat_command_time > serial_comms.SLAVE_COMMAND_INTER:
-            last_boat_command_time = time.time()
-            try:
-                serial_comms.readAndSendCommandToBoat()
-            except Exception as e:
-                logging.info(f"ERROR: read and send command to boat: {e}")
+        # # Send commands to the boat
+        # elapsed_boat_command_time = time.time() - last_boat_command_time
+        # if elapsed_boat_command_time > serial_comms.SLAVE_COMMAND_INTER:
+        #     last_boat_command_time = time.time()
+        #     try:
+        #         serial_comms.readAndSendCommandToBoat()
+        #     except Exception as e:
+        #         logging.info(f"ERROR: read and send command to boat: {e}")
 
 
 if __name__ == "__main__":
