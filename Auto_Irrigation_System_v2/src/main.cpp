@@ -49,6 +49,7 @@ void loop() {
     } else if (command == "TELEMETRY") {
       Serial.println(pots->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
+    // } else if (command.startsWith(""))
     }
     else {
       DEBUG_PRINTLN("Unknown command.");

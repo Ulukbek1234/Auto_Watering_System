@@ -9,7 +9,7 @@ Functional Requirements
             [DONE] Synchronize time
             --- Configure pumps (daily liters, add/ remove pumps)
         -- Telemetry from Mega
-            --- {Date: DD/MM/YYYY, Time: 00:00, Zone: Pots, Nr_Pumps: 1, Nr_Soil_Hum: 0, 
+            [Done] {Date: DD/MM/YYYY, Time: 00:00, Zone: Pots, Nr_Pumps: 1, Nr_Soil_Hum: 0, 
                     {
                         Pumps_ID: 1, 
                         daily_liters: 0.5, // Maximum daily liters

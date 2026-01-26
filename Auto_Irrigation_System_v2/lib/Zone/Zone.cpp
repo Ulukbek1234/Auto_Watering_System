@@ -35,7 +35,6 @@ void Zone::startAutoIrrigating()
         return;
     }
 
-
     float moisture_percent[nr_soil_sensors] = {0.0f};
     for(int i = 0; i < nr_soil_sensors; i++)
     {
@@ -46,37 +45,56 @@ void Zone::startAutoIrrigating()
         moisture_percent[i] = soil_sensors[i]->getMoisterPercent();
     }
 
+    float water_level_percent[nr_water_level_sensors] = {0.0f};
+    for(int i = 0; i < nr_water_level_sensors; i++)
+    {
+        DEBUG_PRINT("water_level_sensor id (Analog): ");
+        DEBUG_PRINTLN(water_level_sensors[i]->getPin());
+
+        water_level_sensors[i]->checkRawValues();
+        water_level_percent[i] = water_level_sensors[i]->getMoisterPercent();
+        if(water_level_percent[i] > 90.0f)
+        {
+            DEBUG_PRINTLN("Water level too high, skipping irrigation.");
+            pumps[i]->deactivatePump();
+        }
+        else 
+        {
+            pumps[i]->activatePump();
+        }
+    }
+
     switch (current_mode)
     {
     case MODE_MANUAL:
         DEBUG_PRINTLN("Zone is in MANUAL mode, not auto irrigating.");        
         break;
     case MODE_FLOOD:
+        //
         DEBUG_PRINTLN("Zone is in FLOOD mode, irrigating all pumps to max daily limit.");
         for(int i = 0; i < nr_pumps; i++)
         {
-            pumps[i]->activatePump(0.1);
-            // TODO check water level sensor to avoid overwatering & dry back
+            pumps[i]->turnOnPump(0.1);
         }
         break;
     case MODE_SOIL:
         DEBUG_PRINTLN("Zone is in SOIL mode, irrigating based on soil moisture.");
         // TODO implement 
+        // for(int i = 0; i < nr_pumps; i++)
+        // {
+        //     DEBUG_PRINT("moisture_percent for sensor: ");
+        //     DEBUG_PRINTLN(moisture_percent[i]);
+        //     if(moisture_percent[i] < MOISTURE_THRESHOLD)
+        //     {
+        //         pumps[i]->activatePump(0.1);
+        //     }
+        // }
         break;
     default:
         break;
     }
 
 
-    for(int i = 0; i < nr_pumps; i++)
-    {
-        DEBUG_PRINT("moisture_percent for sensor: ");
-        DEBUG_PRINTLN(moisture_percent[i]);
-        if(moisture_percent[i] < MOISTURE_THRESHOLD)
-        {
-            pumps[i]->activatePump(0.1);
-        }
-    }
 }
 
 void Zone::updateDay()

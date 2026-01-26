@@ -8,22 +8,22 @@ Pump::Pump(int pin, float max_liters)
     this->max_liters = max_liters;
     pinMode(pin, OUTPUT);
     digitalWrite(pin, PUMP_OFF);
+    activatePump();
 }
 
-void Pump::activatePump()
+void Pump::turnOnPump()
 {
     DEBUG_PRINTLN("Started pumping");
-    this->status = 1;
     digitalWrite(this->pin, PUMP_ON);
 }
 
 
-void Pump::activatePump(float liters)
+void Pump::turnOnPump(float liters)
 {
     DEBUG_PRINTLN("Started pumping liters");
-    if(limit_reached || (daily_liter - max_liters) > epsilon)
+    if((is_active == 0) || limit_reached || (daily_liter - max_liters) > epsilon)
     {
-        DEBUG_PRINTLN("Max daily limit reached");
+        DEBUG_PRINTLN("Max daily limit reached or not active");
         limit_reached = true;
         return;
     }
@@ -34,19 +34,17 @@ void Pump::activatePump(float liters)
     unsigned long start_time = millis();
     unsigned long end_time = start_time + duration_ms;
     
-    this->status = 1;
     digitalWrite(this->pin, PUMP_ON);
 
     while (millis() < end_time) {
         delay(10); // avoid CPU hogging
     }
-    deactivatePump();
+    turnOffPump();
 }
 
-void Pump::deactivatePump()
+void Pump::turnOffPump()
 {
     DEBUG_PRINTLN("Stopped pumping");
-    this->status = 0;
     digitalWrite(this->pin, PUMP_OFF);
 }
 
@@ -54,4 +52,16 @@ void Pump::resetDailyLiter()
 {
     daily_liter = 0.0;
     limit_reached = false;
+}
+
+void Pump::activatePump()
+{
+    DEBUG_PRINTLN("Pump activated");
+    is_active = true;
+}
+
+void Pump::deactivatePump()
+{
+    DEBUG_PRINTLN("Pump deactivated");
+    is_active = false;
 }

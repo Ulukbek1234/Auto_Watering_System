@@ -14,17 +14,20 @@ class Pump
 {
 private:
     int pin;
-    int status = 0; // 0 off, 1 on
+    int is_active = 0; // 0 off, 1 on
     float max_liters = 1.0; // Default, changed by init  
     float daily_liter = 0.0;
     float total_liter = 0.0; // TODO safe to EEPROM
     bool limit_reached = false;
+
 public:
     Pump(int pin, float max_liters);
-    void activatePump();
-    void activatePump(float liters);
-
+    void turnOnPump();
+    void turnOnPump(float liters);
     void deactivatePump();
+    void activatePump();
+
+    void turnOffPump();
     void resetDailyLiter();
     void updateMaxLiters(float new_max) {max_liters = new_max;};
 
@@ -32,6 +35,7 @@ public:
     float getDailyLiter() {return daily_liter;};
     float getTotalLiter() {return total_liter;};
     float getMaxLiter() {return max_liters;};
+    int getIsActive() {return is_active;};
 };
 
 #endif
