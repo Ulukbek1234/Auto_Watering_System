@@ -19,6 +19,7 @@ private:
     
     uint8_t getPin() {return pin;};
     float getMoisterPercent() {return moister_percent;};
+    float getMoisterRaw() {return moister_raw;};
 
 };
 

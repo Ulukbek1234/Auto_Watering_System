@@ -152,6 +152,8 @@ String Zone::getData()
         data_values[index++] = water_level_sensors[i]->getPin();
         data_names[index] = "moister_percent";
         data_values[index++] = water_level_sensors[i]->getMoisterPercent();
+        data_names[index] = "moister_raw";
+        data_values[index++] = String(water_level_sensors[i]->getMoisterPercent(), NR_DEC_POINTS);
     }
 
     return parseDataForWriting(data_names, data_values, index);
