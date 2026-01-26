@@ -21,6 +21,7 @@ void setup() {
   // pots->addSoilSensor(A1);
   // pots->addSoilSensor(A2);
   // pots->addSoilSensor(A3);
+  start_time = millis();
 }
 
 
@@ -51,10 +52,10 @@ void loop() {
     start_time = millis(); // Reset wait time on command received
   }
   
-  // pots->startAutoIrrigating();
+  pots->startAutoIrrigating();
   pots->updateDay();
    
-  
+
   // Non-Blocking delay logic
   if(millis() - start_time >= wait_time)
   {
