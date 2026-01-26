@@ -70,7 +70,6 @@ void Zone::startAutoIrrigating()
         DEBUG_PRINTLN("Zone is in MANUAL mode, not auto irrigating.");        
         break;
     case MODE_FLOOD:
-        //
         DEBUG_PRINTLN("Zone is in FLOOD mode, irrigating all pumps to max daily limit.");
         for(int i = 0; i < nr_pumps; i++)
         {

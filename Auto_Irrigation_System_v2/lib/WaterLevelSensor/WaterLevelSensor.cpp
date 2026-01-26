@@ -3,7 +3,6 @@
 WaterLevelSensor::WaterLevelSensor(uint8_t pin) 
 {
     // Construct WaterLevelSensor
-    pinMode(pin, INPUT);
 }
 
 void WaterLevelSensor::checkRawValues()
