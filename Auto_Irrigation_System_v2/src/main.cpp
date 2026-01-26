@@ -21,7 +21,6 @@ void setup() {
   // pots->addSoilSensor(A1);
   // pots->addSoilSensor(A2);
   // pots->addSoilSensor(A3);
-  start_time = millis();
 }
 
 
@@ -49,7 +48,6 @@ void loop() {
     else {
       DEBUG_PRINTLN("Unknown command.");
     }
-    // start_time = millis(); // Reset wait time on command received
   }
   
   // Non-Blocking delay logic
