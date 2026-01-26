@@ -13,7 +13,7 @@ private:
     int moisture_raw;
     long moisture_percent;
 
-    public:
+public:
     WaterLevelSensor(uint8_t pin);
     void checkRawValues();
     
