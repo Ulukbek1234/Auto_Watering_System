@@ -20,7 +20,6 @@ private:
     uint8_t getPin() {return pin;};
     float getMoisturePercent() {return moisture_percent;};
     float getMoistureRaw() {return moisture_raw;};
-
 };
 
 #endif

@@ -150,10 +150,10 @@ String Zone::getData()
     {
         data_names[index] = "water_level_sensor_pin";
         data_values[index++] = water_level_sensors[i]->getPin();
-        data_names[index] = "moister_percent";
+        data_names[index] = "moisture_percent";
         data_values[index++] = water_level_sensors[i]->getMoisturePercent();
-        data_names[index] = "moister_raw";
-        data_values[index++] = String(water_level_sensors[i]->getMoisturePercent(), NR_DEC_POINTS);
+        data_names[index] = "moisture_raw";
+        data_values[index++] = String(water_level_sensors[i]->getMoistureRaw(), NR_DEC_POINTS);
     }
 
     return parseDataForWriting(data_names, data_values, index);
