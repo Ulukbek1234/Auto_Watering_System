@@ -32,6 +32,13 @@ void setup() {
     - Moisture threshold
     - Time based
 */
+
+enum PumpModes {
+  MODE_OFF = 0,
+  MODE_FLOOD = 1, // Floods tray of pot, until max daily limit reached (also use water level sensor for dry back)
+  MODE_MANUAL = 2 // Manual control from master, (which pump, how much)
+};
+
 void loop() {
   // Check serial for commands from master here
   if(Serial.available() > 0) {

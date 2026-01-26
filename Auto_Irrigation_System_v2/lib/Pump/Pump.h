@@ -30,6 +30,8 @@ public:
 
     int getPin()  {return pin;};
     float getDailyLiter() {return daily_liter;};
+    float getTotalLiter() {return total_liter;};
+    float getMaxLiter() {return max_liters;};
 };
 
 #endif

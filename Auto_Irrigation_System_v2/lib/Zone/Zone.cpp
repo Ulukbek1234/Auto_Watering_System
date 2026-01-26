@@ -55,13 +55,13 @@ void Zone::updateDay()
     DEBUG_PRINT("Updating day -- Days running: ");
     DEBUG_PRINTLNN(day_exact, 10);
     
-    if((day_exact - day_progressed) > 0.01f)
+    if((day_exact - day_progressed) > epsilon)
     {
         DEBUG_PRINTLN("DAY PROGRESSED");
         day_progressed += 1.0;
         for(size_t i = 0; i < nr_pumps; i++)
         {
-                pumps[i]->resetDailyLiter();
+            pumps[i]->resetDailyLiter();
         }
     }
 }
@@ -93,7 +93,9 @@ String Zone::getData()
         data_names[index] = "daily_liter";
         data_values[index++] = String(pumps[i]->getDailyLiter(), NR_DEC_POINTS);
         data_names[index] = "total_liter";
-        data_values[index++] = String(pumps[i]->getDailyLiter(), NR_DEC_POINTS);
+        data_values[index++] = String(pumps[i]->getTotalLiter(), NR_DEC_POINTS);
+        data_names[index] = "max_liter";
+        data_values[index++] = String(pumps[i]->getMaxLiter(), NR_DEC_POINTS);
     }
 
     return parseDataForWriting(data_names, data_values, index);
