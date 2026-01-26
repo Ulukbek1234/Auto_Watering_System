@@ -6,7 +6,7 @@
 Functional Requirements
     - Serial Communication with Mega
         -- Commands to Mega 
-            --- Synchronize time
+            [DONE] Synchronize time
             --- Configure pumps (daily liters, add/ remove pumps)
         -- Telemetry from Mega
             --- {Date: DD/MM/YYYY, Time: 00:00, Zone: Pots, Nr_Pumps: 1, Nr_Soil_Hum: 0, 

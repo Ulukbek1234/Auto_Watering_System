@@ -26,7 +26,7 @@ public:
 
     void deactivatePump();
     void resetDailyLiter();
-
+    void updateMaxLiters(float new_max) {max_liters = new_max;};
 
     int getPin()  {return pin;};
     float getDailyLiter() {return daily_liter;};

@@ -3,7 +3,6 @@
 Zone::Zone() 
 {
     // Construct Pump
-
 }
 
 void Zone::addPump(int pin, float max_liters)
@@ -16,6 +15,11 @@ void Zone::addSoilSensor(uint8_t pin)
     soil_sensors[nr_soil_sensors++] = new SoilSensor(pin);
 }
 
+void Zone::addWaterLevelSensor(uint8_t pin)
+{
+    water_level_sensors[nr_water_level_sensors++] = new WaterLevelSensor(pin);
+}
+
 void Zone::startAutoIrrigating()
 {
     // Check moisture from sensors
@@ -26,9 +30,14 @@ void Zone::startAutoIrrigating()
     // ISSUE must connect sensors to pumps or vice versa
     // multiple pumps can be attached to one sensor
 
+    if (current_mode == MODE_OFF) {
+        DEBUG_PRINTLN("Zone is OFF, not auto irrigating.");
+        return;
+    }
+
 
     float moisture_percent[nr_soil_sensors] = {0.0f};
-    for(size_t i = 0; i < nr_soil_sensors; i++)
+    for(int i = 0; i < nr_soil_sensors; i++)
     {
         DEBUG_PRINT("soil_sensor id (Analog): ");
         DEBUG_PRINTLN(soil_sensors[i]->getPin());
@@ -37,7 +46,29 @@ void Zone::startAutoIrrigating()
         moisture_percent[i] = soil_sensors[i]->getMoisterPercent();
     }
 
-    for(size_t i = 0; i < nr_pumps; i++)
+    switch (current_mode)
+    {
+    case MODE_MANUAL:
+        DEBUG_PRINTLN("Zone is in MANUAL mode, not auto irrigating.");        
+        break;
+    case MODE_FLOOD:
+        DEBUG_PRINTLN("Zone is in FLOOD mode, irrigating all pumps to max daily limit.");
+        for(int i = 0; i < nr_pumps; i++)
+        {
+            pumps[i]->activatePump(0.1);
+            // TODO check water level sensor to avoid overwatering & dry back
+        }
+        break;
+    case MODE_SOIL:
+        DEBUG_PRINTLN("Zone is in SOIL mode, irrigating based on soil moisture.");
+        // TODO implement 
+        break;
+    default:
+        break;
+    }
+
+
+    for(int i = 0; i < nr_pumps; i++)
     {
         DEBUG_PRINT("moisture_percent for sensor: ");
         DEBUG_PRINTLN(moisture_percent[i]);
@@ -59,7 +90,7 @@ void Zone::updateDay()
     {
         DEBUG_PRINTLN("DAY PROGRESSED");
         day_progressed += 1.0;
-        for(size_t i = 0; i < nr_pumps; i++)
+        for(int i = 0; i < nr_pumps; i++)
         {
             pumps[i]->resetDailyLiter();
         }
@@ -78,7 +109,7 @@ String Zone::getData()
     data_values[index++] = String(day_exact, NR_DEC_POINTS);
 
 
-    for (size_t i = 0; i < nr_soil_sensors; i++)
+    for (int i = 0; i < nr_soil_sensors; i++)
     {
         data_names[index] = "soil_sensor_pin";
         data_values[index++] = soil_sensors[i]->getPin();
@@ -86,7 +117,7 @@ String Zone::getData()
         data_values[index++] = soil_sensors[i]->getMoisterPercent();
     }
 
-    for (size_t i = 0; i < nr_pumps; i++)
+    for (int i = 0; i < nr_pumps; i++)
     {
         data_names[index] = "pump_pin";
         data_values[index++] = pumps[i]->getPin();
@@ -96,6 +127,14 @@ String Zone::getData()
         data_values[index++] = String(pumps[i]->getTotalLiter(), NR_DEC_POINTS);
         data_names[index] = "max_liter";
         data_values[index++] = String(pumps[i]->getMaxLiter(), NR_DEC_POINTS);
+    }
+
+    for (int i = 0; i < nr_water_level_sensors; i++)
+    {
+        data_names[index] = "water_level_sensor_pin";
+        data_values[index++] = water_level_sensors[i]->getPin();
+        data_names[index] = "moister_percent";
+        data_values[index++] = water_level_sensors[i]->getMoisterPercent();
     }
 
     return parseDataForWriting(data_names, data_values, index);
@@ -115,4 +154,9 @@ void Zone::resetDayProgression()
 {
     day_progressed = 0.0;
     day_exact = 0.0;
+}
+
+void Zone::setOperationMode(OperationModes mode)
+{
+    current_mode = mode;
 }

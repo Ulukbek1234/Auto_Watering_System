@@ -15,6 +15,5 @@ void WaterLevelSensor::checkRawValues()
     DEBUG_PRINTLN(moister_raw);
     DEBUG_PRINT("WaterLevelSensor moister_percent: ");
     DEBUG_PRINTLN(moister_percent);
-
 }
 

@@ -10,17 +10,20 @@ const unsigned long wait_time = 60000; // 1 minute
 void setup() {
   Serial.begin(9600);
   pots = new Zone();
-  //Serial1.begin(115200); // Esp 32
+  pots->setOperationMode(MODE_FLOOD);
 
   pots->addPump(8, 0.7);
   pots->addPump(9, 0.7);
   // pots->addPump(10, 5);
   // pots->addPump(11, 5);
 
+  pots->addWaterLevelSensor(A0);
+
   // pots->addSoilSensor(A0);
   // pots->addSoilSensor(A1);
   // pots->addSoilSensor(A2);
   // pots->addSoilSensor(A3);
+  start_time = millis();
 }
 
 
@@ -33,11 +36,6 @@ void setup() {
     - Time based
 */
 
-enum PumpModes {
-  MODE_OFF = 0,
-  MODE_FLOOD = 1, // Floods tray of pot, until max daily limit reached (also use water level sensor for dry back)
-  MODE_MANUAL = 2 // Manual control from master, (which pump, how much)
-};
 
 void loop() {
   // Check serial for commands from master here

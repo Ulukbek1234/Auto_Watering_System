@@ -1,5 +1,5 @@
-#ifndef SOIL_SENSOR_H
-#define SOIL_SENSOR_H
+#ifndef WATER_LEVEL_SENSOR_H
+#define WATER_LEVEL_SENSOR_H
 #pragma once
 
 #include "Arduino.h"
