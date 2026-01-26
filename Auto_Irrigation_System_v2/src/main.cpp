@@ -49,10 +49,8 @@ void loop() {
     else {
       DEBUG_PRINTLN("Unknown command.");
     }
-    start_time = millis(); // Reset wait time on command received
+    // start_time = millis(); // Reset wait time on command received
   }
-  
-  
   
   // Non-Blocking delay logic
   if(millis() - start_time >= wait_time)
