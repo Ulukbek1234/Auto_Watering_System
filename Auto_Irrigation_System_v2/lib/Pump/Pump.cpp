@@ -24,7 +24,6 @@ void Pump::turnOnPump(float liters)
     if((is_active == 0) || limit_reached || (daily_liter - max_liters) > epsilon)
     {
         DEBUG_PRINTLN("Max daily limit reached or not active");
-        limit_reached = true;
         return;
     }
     daily_liter += liters;
