@@ -48,11 +48,10 @@ void loop() {
     else {
       DEBUG_PRINTLN("Unknown command.");
     }
-    
     start_time = millis(); // Reset wait time on command received
   }
   
-  pots->startAutoIrrigating();
+  // pots->startAutoIrrigating();
   pots->updateDay();
   
   // Non-Blocking delay logic
