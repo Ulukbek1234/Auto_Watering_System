@@ -52,15 +52,15 @@ void loop() {
     start_time = millis(); // Reset wait time on command received
   }
   
-  pots->startAutoIrrigating();
-  pots->updateDay();
-   
-
+  
+  
   // Non-Blocking delay logic
   if(millis() - start_time >= wait_time)
   {
     start_time = millis();
     DEBUG_PRINTLN("Waiting period over, checking sensors again.");
+    pots->startAutoIrrigating();
+    pots->updateDay();
   }
   DEBUG_PRINTLN("---------------------");
 }
