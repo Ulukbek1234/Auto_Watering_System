@@ -5,7 +5,7 @@
 
 Zone *pots;
 unsigned long start_time = 0;
-const unsigned long wait_time = 60000; // 1 minute
+const unsigned long wait_time = 10000; //TODO remove after debugging //60000; // 1 minute
 
 void setup() {
   Serial.begin(9600);

@@ -52,7 +52,7 @@ void Zone::startAutoIrrigating()
         DEBUG_PRINTLN(water_level_sensors[i]->getPin());
 
         water_level_sensors[i]->checkRawValues();
-        water_level_percent[i] = water_level_sensors[i]->getMoisterPercent();
+        water_level_percent[i] = water_level_sensors[i]->getMoisturePercent();
         if(water_level_percent[i] > 90.0f)
         {
             DEBUG_PRINTLN("Water level too high, skipping irrigation.");
@@ -151,9 +151,9 @@ String Zone::getData()
         data_names[index] = "water_level_sensor_pin";
         data_values[index++] = water_level_sensors[i]->getPin();
         data_names[index] = "moister_percent";
-        data_values[index++] = water_level_sensors[i]->getMoisterPercent();
+        data_values[index++] = water_level_sensors[i]->getMoisturePercent();
         data_names[index] = "moister_raw";
-        data_values[index++] = String(water_level_sensors[i]->getMoisterPercent(), NR_DEC_POINTS);
+        data_values[index++] = String(water_level_sensors[i]->getMoisturePercent(), NR_DEC_POINTS);
     }
 
     return parseDataForWriting(data_names, data_values, index);

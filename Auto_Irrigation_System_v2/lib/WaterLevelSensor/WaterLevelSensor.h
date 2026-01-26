@@ -10,16 +10,16 @@ class WaterLevelSensor
 {
 private:
     uint8_t pin;
-    int moister_raw;
-    float moister_percent;
+    int moisture_raw;
+    float moisture_percent;
 
     public:
     WaterLevelSensor(uint8_t pin);
     void checkRawValues();
     
     uint8_t getPin() {return pin;};
-    float getMoisterPercent() {return moister_percent;};
-    float getMoisterRaw() {return moister_raw;};
+    float getMoisturePercent() {return moisture_percent;};
+    float getMoistureRaw() {return moisture_raw;};
 
 };
 
