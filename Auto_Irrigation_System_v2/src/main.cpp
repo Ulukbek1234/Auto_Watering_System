@@ -53,6 +53,7 @@ void loop() {
   
   // pots->startAutoIrrigating();
   pots->updateDay();
+   
   
   // Non-Blocking delay logic
   if(millis() - start_time >= wait_time)
