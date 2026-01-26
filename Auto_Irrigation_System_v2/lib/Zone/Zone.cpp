@@ -80,8 +80,6 @@ String Zone::getData()
 
     for (size_t i = 0; i < nr_soil_sensors; i++)
     {
-
-
         data_names[index] = "soil_sensor_pin";
         data_values[index++] = soil_sensors[i]->getPin();
         data_names[index] = "moister_percent";
@@ -93,6 +91,8 @@ String Zone::getData()
         data_names[index] = "pump_pin";
         data_values[index++] = pumps[i]->getPin();
         data_names[index] = "daily_liter";
+        data_values[index++] = String(pumps[i]->getDailyLiter(), NR_DEC_POINTS);
+        data_names[index] = "total_liter";
         data_values[index++] = String(pumps[i]->getDailyLiter(), NR_DEC_POINTS);
     }
 

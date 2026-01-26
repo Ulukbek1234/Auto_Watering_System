@@ -4,7 +4,8 @@
 #include "Config.h"
 
 Zone *pots;
-
+unsigned long start_time = 0;
+const unsigned long wait_time = 60000; // 1 minute
 
 void setup() {
   Serial.begin(9600);
@@ -32,10 +33,9 @@ void setup() {
     - Time based
 */
 void loop() {
-  delay(1000 * 60); // seconds
   // Check serial for commands from master here
-  String command = Serial.readStringUntil('\n');
-  if (command.length() > 0) {
+  if(Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
     DEBUG_PRINTLN("Received command: " + command);
     command.trim();
     if (command == "SYNCH") {
@@ -48,9 +48,18 @@ void loop() {
     else {
       DEBUG_PRINTLN("Unknown command.");
     }
+    
+    start_time = millis(); // Reset wait time on command received
   }
   
   pots->startAutoIrrigating();
   pots->updateDay();
+  
+  // Non-Blocking delay logic
+  if(millis() - start_time >= wait_time)
+  {
+    start_time = millis();
+    DEBUG_PRINTLN("Waiting period over, checking sensors again.");
+  }
   DEBUG_PRINTLN("---------------------");
 }
