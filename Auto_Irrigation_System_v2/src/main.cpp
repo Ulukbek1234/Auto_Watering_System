@@ -32,7 +32,7 @@ void setup() {
     - Time based
 */
 void loop() {
-  delay(1000 * 10); // seconds
+  delay(1000 * 60); // seconds
   // Check serial for commands from master here
   String command = Serial.readStringUntil('\n');
   if (command.length() > 0) {
