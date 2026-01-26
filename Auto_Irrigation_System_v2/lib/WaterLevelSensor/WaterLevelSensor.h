@@ -5,21 +5,23 @@
 #include "Arduino.h"
 #include "Config.h"
 
+#define DRY_VALUE 0
+#define WET_VALUE 680
 
 class WaterLevelSensor 
 {
 private:
     uint8_t pin;
     int moisture_raw;
-    float moisture_percent;
+    long moisture_percent;
 
     public:
     WaterLevelSensor(uint8_t pin);
     void checkRawValues();
     
     uint8_t getPin() {return pin;};
-    float getMoisturePercent() {return moisture_percent;};
-    float getMoistureRaw() {return moisture_raw;};
+    long getMoisturePercent() {return moisture_percent;};
+    int getMoistureRaw() {return moisture_raw;};
 };
 
 #endif

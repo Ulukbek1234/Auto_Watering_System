@@ -9,8 +9,6 @@
 #define DEBUG_PRINTLNN(x, y) do { if (DEBUG) Serial.println(x, y); } while (0)
 
 const int NR_DEC_POINTS = 8;
-const int DRY_VALUE = 0;
-const int WET_VALUE = 550;
 const float epsilon = 0.000001;
 
 #endif

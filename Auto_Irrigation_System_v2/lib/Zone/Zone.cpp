@@ -53,7 +53,7 @@ void Zone::startAutoIrrigating()
 
         water_level_sensors[i]->checkRawValues();
         water_level_percent[i] = water_level_sensors[i]->getMoisturePercent();
-        if(water_level_percent[i] > 90.0f)
+        if(water_level_percent[i] > 90)
         {
             DEBUG_PRINTLN("Water level too high, skipping irrigation.");
             pumps[i]->deactivatePump();

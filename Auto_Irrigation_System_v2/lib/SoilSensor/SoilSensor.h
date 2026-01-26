@@ -5,20 +5,22 @@
 #include "Arduino.h"
 #include "Config.h"
 
+#define DRY_VALUE 300
+#define WET_VALUE 700
 
 class SoilSensor 
 {
 private:
     uint8_t pin;
     int moister_raw;
-    float moister_percent;
+    long moister_percent;
 
     public:
     SoilSensor(uint8_t pin);
     void checkRawValues();
     
     uint8_t getPin() {return pin;};
-    float getMoisterPercent() {return moister_percent;};
+    long getMoisterPercent() {return moister_percent;};
 
 };
 
