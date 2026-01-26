@@ -9,7 +9,7 @@ WaterLevelSensor::WaterLevelSensor(uint8_t pin)
 void WaterLevelSensor::checkRawValues()
 {
     moisture_raw = analogRead(pin);
-    moisture_percent = map(moisture_raw, DRY_VALUE, WET_VALUE, 0, 100);
+    moisture_percent = map(moisture_raw, DRY_VALUE_WATER, WET_VALUE_WATER, 0, 100);
 
     DEBUG_PRINT("WaterLevelSensor moister_raw: ");
     DEBUG_PRINTLN(moisture_raw);

@@ -10,7 +10,7 @@ SoilSensor::SoilSensor(uint8_t pin)
 void SoilSensor::checkRawValues()
 {
     moister_raw = analogRead(pin);
-    moister_percent = map(moister_raw, DRY_VALUE, WET_VALUE, 0, 100);
+    moister_percent = map(moister_raw, DRY_VALUE_SOIL, WET_VALUE_SOIL, 0, 100);
 
     DEBUG_PRINT("SoilSensor moister_raw: ");
     DEBUG_PRINTLN(moister_raw);

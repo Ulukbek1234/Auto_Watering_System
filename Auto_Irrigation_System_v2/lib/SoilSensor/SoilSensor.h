@@ -5,8 +5,6 @@
 #include "Arduino.h"
 #include "Config.h"
 
-#define DRY_VALUE 300
-#define WET_VALUE 700
 
 class SoilSensor 
 {

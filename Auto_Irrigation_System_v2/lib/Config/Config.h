@@ -11,4 +11,9 @@
 const int NR_DEC_POINTS = 8;
 const float epsilon = 0.000001;
 
+#define DRY_VALUE_SOIL 300
+#define WET_VALUE_SOIL 700
+#define DRY_VALUE_WATER 0
+#define WET_VALUE_WATER 680
+
 #endif
