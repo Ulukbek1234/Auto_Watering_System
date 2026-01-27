@@ -10,18 +10,18 @@ const unsigned long wait_time = 10000; //TODO remove after debugging //60000; //
 void setup() {
   Serial.begin(9600);
   pots = new Zone();
-  pots->setOperationMode(MODE_FLOOD);
+  pots->setOperationMode(MODE_SOIL);
 
-  pots->addPump(8, 0.7);
-  pots->addPump(9, 0.7);
-  // pots->addPump(10, 5);
+  pots->addPump(8, 0.1);
+  pots->addPump(9, 0.1);
+  pots->addPump(10, 0.1);
   // pots->addPump(11, 5);
 
-  pots->addWaterLevelSensor(A0);
+  // pots->addWaterLevelSensor(A0);
 
-  // pots->addSoilSensor(A0);
-  // pots->addSoilSensor(A1);
-  // pots->addSoilSensor(A2);
+  pots->addSoilSensor(A0);
+  pots->addSoilSensor(A1);
+  pots->addSoilSensor(A2);
   // pots->addSoilSensor(A3);
   start_time = millis();
 }

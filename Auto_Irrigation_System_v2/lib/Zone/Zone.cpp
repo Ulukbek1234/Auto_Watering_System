@@ -78,16 +78,15 @@ void Zone::startAutoIrrigating()
         break;
     case MODE_SOIL:
         DEBUG_PRINTLN("Zone is in SOIL mode, irrigating based on soil moisture.");
-        // TODO implement 
-        // for(int i = 0; i < nr_pumps; i++)
-        // {
-        //     DEBUG_PRINT("moisture_percent for sensor: ");
-        //     DEBUG_PRINTLN(moisture_percent[i]);
-        //     if(moisture_percent[i] < MOISTURE_THRESHOLD)
-        //     {
-        //         pumps[i]->activatePump(0.1);
-        //     }
-        // }
+        for(int i = 0; i < nr_pumps; i++)
+        {
+            DEBUG_PRINT("moisture_percent for sensor: ");
+            DEBUG_PRINTLN(moisture_percent[i]);
+            if(moisture_percent[i] < MOISTURE_THRESHOLD)
+            {
+                pumps[i]->turnOnPump(0.1);
+            }
+        }
         break;
     default:
         break;
