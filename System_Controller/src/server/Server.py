@@ -34,7 +34,7 @@ def log(msg: str) -> None:
 def setup_camera():
     cmds = [
         ["v4l2-ctl", "-d", CAM_DEVICE, "--set-ctrl=auto_exposure=1"],
-        ["v4l2-ctl", "-d", CAM_DEVICE, "--set-ctrl=exposure_time_absolute=2000"],
+        ["v4l2-ctl", "-d", CAM_DEVICE, "--set-ctrl=exposure_time_absolute=4000"],
         ["v4l2-ctl", "-d", CAM_DEVICE, "--set-ctrl=gain=60"],
     ]
     for cmd in cmds:
