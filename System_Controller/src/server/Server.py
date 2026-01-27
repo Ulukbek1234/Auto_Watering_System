@@ -15,9 +15,9 @@ LATEST_JPG = os.path.join(STATIC_DIR, "latest.jpg")
 
 # ---- Camera settings ----
 CAM_DEVICE = "/dev/video0"
-CAPTURE_INTERVAL_SEC = 1.0
+CAPTURE_INTERVAL_SEC = 5.0
 CAPTURE_RESOLUTION = "1280x720"  # e.g. "640x480"
-FSWEBCAM_TIMEOUT_SEC = 3
+FSWEBCAM_TIMEOUT_SEC = CAPTURE_INTERVAL_SEC + 3
 
 # ---- Simple in-memory state ----
 logs: Deque[str] = deque(maxlen=300)
@@ -65,7 +65,7 @@ def capture_loop() -> None:
                 os.replace(tmp_path, LATEST_JPG)
             else:
                 log("Captured image is too small, skipping update.")
-                
+
         except subprocess.TimeoutExpired:
             log("Camera capture timed out (fswebcam).")
         except FileNotFoundError:
