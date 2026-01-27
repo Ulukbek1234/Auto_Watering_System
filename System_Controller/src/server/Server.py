@@ -31,6 +31,18 @@ def log(msg: str) -> None:
     ts = time.strftime("%H:%M:%S")
     logs.appendleft(f"[{ts}] {msg}")
 
+def setup_camera():
+    cmds = [
+        ["v4l2-ctl", "-d", CAM_DEVICE, "--set-ctrl=auto_exposure=1"],
+        ["v4l2-ctl", "-d", CAM_DEVICE, "--set-ctrl=exposure_time_absolute=2000"],
+        ["v4l2-ctl", "-d", CAM_DEVICE, "--set-ctrl=gain=60"],
+    ]
+    for cmd in cmds:
+        try:
+            subprocess.run(cmd, check=True)
+        except Exception as e:
+            log(f"Camera setup failed: {e}")
+
 
 def capture_loop() -> None:
     """
@@ -124,6 +136,7 @@ def start_background_threads() -> None:
 
 if __name__ == "__main__":
     log("Starting Flask app...")
+    setup_camera()
     start_background_threads()
     # host=0.0.0.0 makes it accessible from other devices on your LAN
     app.run(host="0.0.0.0", port=5000, debug=True)
