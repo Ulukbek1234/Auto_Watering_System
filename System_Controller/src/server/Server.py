@@ -60,7 +60,12 @@ def capture_loop() -> None:
                 timeout=FSWEBCAM_TIMEOUT_SEC,
             )
             # Replace latest.jpg
-            os.replace(tmp_path, LATEST_JPG)
+            min_bytes = 20_000  # minimal valid JPEG size
+            if os.path.exists(tmp_path) and os.path.getsize(tmp_path) >= min_bytes:
+                os.replace(tmp_path, LATEST_JPG)
+            else:
+                log("Captured image is too small, skipping update.")
+                
         except subprocess.TimeoutExpired:
             log("Camera capture timed out (fswebcam).")
         except FileNotFoundError:
