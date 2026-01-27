@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Pi Control Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 16px; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .card { border: 1px solid #ddd; border-radius: 12px; padding: 12px; }
+      button { padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc; background: #f7f7f7; cursor: pointer; }
+      button:active { transform: translateY(1px); }
+      #logs { height: 260px; overflow: auto; background: #0b0b0b; color: #eaeaea; padding: 10px; border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+      img { width: 100%; border-radius: 12px; border: 1px solid #ddd; }
+      @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <h2>Raspberry Pi Dashboard</h2>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Controls</h3>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button onclick="sendAction('A')">Action A</button>
+          <button onclick="sendAction('B')">Action B</button>
+          <button onclick="sendAction('C')">Action C</button>
+        </div>
+
+        <h3 style="margin-top:16px;">Live Logs</h3>
+        <div id="logs"></div>
+      </div>
+
+      <div class="card">
+        <h3>USB Camera (refreshed JPG)</h3>
+        <img id="cam" src="/static/latest.jpg" alt="camera feed" />
+
+        <h3 style="margin-top:16px;">Chart</h3>
+        <canvas id="chart" height="140"></canvas>
+      </div>
+    </div>
+
+    <script>
+      async function sendAction(name) {
+        const res = await fetch("/api/action", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        });
+        const j = await res.json();
+        // quick feedback in console
+        console.log("action:", j);
+      }
+
+      // ---- Camera refresh (cache-bust with timestamp) ----
+      setInterval(() => {
+        const cam = document.getElementById("cam");
+        cam.src = "/static/latest.jpg?ts=" + Date.now();
+      }, 1000);
+
+      // ---- Logs polling ----
+      async function refreshLogs() {
+        const res = await fetch("/api/logs?n=80");
+        const j = await res.json();
+        const el = document.getElementById("logs");
+        el.textContent = j.lines.join("\n");
+      }
+      setInterval(refreshLogs, 1000);
+      refreshLogs();
+
+      // ---- Chart.js ----
+      const ctx = document.getElementById("chart").getContext("2d");
+      const chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [{
+            label: "Value",
+            data: [],
+            tension: 0.2,
+            pointRadius: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          animation: false,
+          scales: {
+            x: { display: false },
+            y: { beginAtZero: false }
+          }
+        }
+      });
+
+      async function refreshChart() {
+        const res = await fetch("/api/metrics?n=60");
+        const j = await res.json();
+        const pts = j.points;
+
+        chart.data.labels = pts.map(p => {
+          const d = new Date(p.t * 1000);
+          return d.toLocaleTimeString();
+        });
+        chart.data.datasets[0].data = pts.map(p => p.value);
+        chart.update();
+      }
+      setInterval(refreshChart, 2000);
+      refreshChart();
+    </script>
+  </body>
+</html>
