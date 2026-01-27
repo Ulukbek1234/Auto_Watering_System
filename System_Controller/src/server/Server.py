@@ -14,7 +14,7 @@ STATIC_DIR = os.path.join(APP_DIR, "static")
 LATEST_JPG = os.path.join(STATIC_DIR, "latest.jpg")
 
 # ---- Camera settings ----
-CAM_DEVICE = "/dev/video1"
+CAM_DEVICE = "/dev/video0"
 CAPTURE_INTERVAL_SEC = 1.0
 CAPTURE_RESOLUTION = "1280x720"  # e.g. "640x480"
 FSWEBCAM_TIMEOUT_SEC = 3
