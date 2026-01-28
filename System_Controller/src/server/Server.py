@@ -94,7 +94,7 @@ def metrics_loop() -> None:
 
     while True:
         t = time.time() - start_time
-        telem_data = read_from_file_lock_safe(DATA_BUS_PATH / "telem_data.txt")
+        telem_data = read_from_file_lock_safe(DATA_BUS_PATH / "slave_telem.txt")
         log(telem_data)
         # if telem_data:
         #     parsed_data = split_and_parse_data(telem_data)
