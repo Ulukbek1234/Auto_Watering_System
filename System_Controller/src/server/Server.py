@@ -24,8 +24,10 @@ FSWEBCAM_TIMEOUT_SEC = CAPTURE_INTERVAL_SEC + 3
 logs: Deque[str] = deque(maxlen=300)
 metrics: Deque[Dict[str, Any]] = deque(maxlen=300)
 start_time = time.time()
-DATA_BUS_PATH = ROOT / "data_bus"
+
+# Telem data path
 ROOT = Path(__file__).parent.parent
+DATA_BUS_PATH = ROOT / "data_bus"
 print(f"DATA_BUS_PATH: {DATA_BUS_PATH}")
 
 app = Flask(__name__)
