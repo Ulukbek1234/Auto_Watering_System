@@ -65,10 +65,14 @@ def main():
 
     process_manager = ProcessManager(log_queue)
     
-    # Example: Starting initial processes for system communications
     process_manager.start_process(
         "Serial", 
         ["python", "-m", "src.comms.Serial"]
+    )
+
+    process_manager.start_process(
+        "Server",
+        ["python", "-m", "src.server.Server"]
     )
 
     last_master_command_time = time.time()

@@ -7,9 +7,11 @@ import subprocess
 from collections import deque
 from typing import Deque, Dict, Any
 from pathlib import Path
+import logging
+import multiprocessing
 
 from flask import Flask, jsonify, render_template, request
-from ..helpers.Logger import setup_worker_logging
+from ..helpers.Logger import setup_worker_logging, setup_listener
 from ..helpers.Utils import read_from_file_lock_safe, write_to_file_lock_safe, split_and_parse_data
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -46,7 +48,7 @@ def capture_loop() -> None:
     os.makedirs(STATIC_DIR, exist_ok=True)
     tmp_path = os.path.join(STATIC_DIR, "latest.tmp.jpg")
 
-    log("Camera capture thread started.")
+    logging.info("Camera capture thread started.")
     while True:
         try:
             # fswebcam notes:
@@ -71,14 +73,14 @@ def capture_loop() -> None:
             if os.path.exists(tmp_path) and os.path.getsize(tmp_path) >= min_bytes:
                 os.replace(tmp_path, LATEST_JPG)
             else:
-                log("Captured image is too small, skipping update.")
+                logging.error("Captured image is too small, skipping update.")
 
         except subprocess.TimeoutExpired:
-            log("Camera capture timed out (fswebcam).")
+            logging.error("Camera capture timed out (fswebcam).")
         except FileNotFoundError:
-            log("fswebcam not found. Install it: sudo apt install fswebcam")
+            logging.error("fswebcam not found. Install it: sudo apt install fswebcam")
         except Exception as e:
-            log(f"Camera capture error: {e!r}")
+            logging.error(f"Camera capture error: {e!r}")
 
         time.sleep(CAPTURE_INTERVAL_SEC)
 
@@ -88,7 +90,7 @@ def metrics_loop() -> None:
     Generates example metrics for the chart.
     Replace this with your real sensor readings / values.
     """
-    log("Metrics thread started.")
+    logging.info("Metrics thread started.")
 
     while True:
         t = time.time() - start_time
@@ -114,7 +116,7 @@ def index():
 def action():
     data = request.get_json(silent=True) or {}
     name = str(data.get("name", "unknown"))
-    log(f"Button pressed: {name}")
+    logging.info(f"Button pressed: {name}")
     # TODO: put your hardware actions here (GPIO, scripts, etc.)
     return jsonify({"ok": True, "received": name})
 
@@ -140,9 +142,19 @@ def start_background_threads() -> None:
     threading.Thread(target=capture_loop, daemon=True).start()
     threading.Thread(target=metrics_loop, daemon=True).start()
 
+def main(log_queue=None):
+
+    if log_queue is None:
+        log_queue = multiprocessing.Queue(-1)
+        setup_listener(log_queue)
+
+    setup_worker_logging(log_queue)
+    logging.info("Running Server app...")
+
+    start_background_threads()
+    app.run(host="0.0.0.0", port=5000, debug=True)
+
+
 
 if __name__ == "__main__":
-    log("Starting Flask app...")
-    start_background_threads()
-    # host=0.0.0.0 makes it accessible from other devices on your LAN
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    main()
