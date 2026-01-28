@@ -9,6 +9,8 @@ from typing import Deque, Dict, Any
 from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request
+from ..helpers.Logger import setup_worker_logging
+from ..helpers.Utils import read_from_file_lock_safe, write_to_file_lock_safe, split_and_parse_data
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(APP_DIR, "static")
@@ -28,7 +30,6 @@ start_time = time.time()
 # Telem data path
 ROOT = Path(__file__).parent.parent
 DATA_BUS_PATH = ROOT / "data_bus"
-print(f"DATA_BUS_PATH: {DATA_BUS_PATH}")
 
 app = Flask(__name__)
 
@@ -89,14 +90,19 @@ def metrics_loop() -> None:
     """
     log("Metrics thread started.")
 
-
     while True:
         t = time.time() - start_time
-
-        # Example signal (change this!)
-        value = 50 + 30 * (0.5 + 0.5 * __import__("math").sin(t / 3.0))
-        metrics.append({"t": time.time(), "value": round(value, 2)})
-        time.sleep(1.0)
+        telem_data = read_from_file_lock_safe(DATA_BUS_PATH / "telem_data.txt")
+        log(telem_data)
+        # if telem_data:
+        #     parsed_data = split_and_parse_data(telem_data)
+        #     value = parsed_data.get("SomeMetric", 0)  # Replace "SomeMetric" with actual key
+        #     metrics.append({"t": time.time(), "value": value})
+        #     time.sleep(1.0)
+        # # Example signal (change this!)
+        # value = 50 + 30 * (0.5 + 0.5 * __import__("math").sin(t / 3.0))
+        # metrics.append({"t": time.time(), "value": round(value, 2)})
+        # time.sleep(1.0)
 
 
 @app.route("/")
