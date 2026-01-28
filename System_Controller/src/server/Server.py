@@ -6,6 +6,7 @@ import threading
 import subprocess
 from collections import deque
 from typing import Deque, Dict, Any
+from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request
 
@@ -23,6 +24,9 @@ FSWEBCAM_TIMEOUT_SEC = CAPTURE_INTERVAL_SEC + 3
 logs: Deque[str] = deque(maxlen=300)
 metrics: Deque[Dict[str, Any]] = deque(maxlen=300)
 start_time = time.time()
+DATA_BUS_PATH = ROOT / "data_bus"
+ROOT = Path(__file__).parent.parent
+print(f"DATA_BUS_PATH: {DATA_BUS_PATH}")
 
 app = Flask(__name__)
 
@@ -82,8 +86,11 @@ def metrics_loop() -> None:
     Replace this with your real sensor readings / values.
     """
     log("Metrics thread started.")
+
+
     while True:
         t = time.time() - start_time
+
         # Example signal (change this!)
         value = 50 + 30 * (0.5 + 0.5 * __import__("math").sin(t / 3.0))
         metrics.append({"t": time.time(), "value": round(value, 2)})
