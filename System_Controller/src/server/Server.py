@@ -9,6 +9,8 @@ from typing import Deque, Dict, Any
 from pathlib import Path
 import logging
 import multiprocessing
+import json
+import re
 
 from flask import Flask, jsonify, render_template, request
 from ..helpers.Logger import setup_worker_logging, setup_listener
@@ -36,7 +38,7 @@ DATA_BUS_PATH = ROOT / "data_bus"
 app = Flask(__name__)
 
 
-def log(msg: str) -> None:
+def write_to_web_log(msg: str) -> None:
     ts = time.strftime("%H:%M:%S")
     logs.appendleft(f"[{ts}] {msg}")
 
@@ -95,7 +97,8 @@ def metrics_loop() -> None:
     while True:
         t = time.time() - start_time
         telem_data = read_from_file_lock_safe(DATA_BUS_PATH / "slave_telem.txt")
-        log(telem_data)
+        if telem_data:
+            write_to_web_log(telem_data)
         # if telem_data:
         #     parsed_data = split_and_parse_data(telem_data)
         #     value = parsed_data.get("SomeMetric", 0)  # Replace "SomeMetric" with actual key

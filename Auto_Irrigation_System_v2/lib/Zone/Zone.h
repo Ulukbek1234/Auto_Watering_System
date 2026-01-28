@@ -26,7 +26,9 @@ private:
     int nr_water_level_sensors = 0;
     float day_progressed = 0.0;
     float day_exact = 0.0;
-    
+    float moisture_percent[ARRAY_SIZE] = {0.0f};
+    float water_level_percent[ARRAY_SIZE] = {0.0f};
+
     Pump *pumps[ARRAY_SIZE]; 
     SoilSensor *soil_sensors[ARRAY_SIZE];
     WaterLevelSensor *water_level_sensors[ARRAY_SIZE];
@@ -45,6 +47,7 @@ public:
     String parseDataForWriting(String data_names[], String data_values[], int size);
     void resetDayProgression();
     void setOperationMode(OperationModes mode);
+    void updateSensors();
 };
 
 #endif

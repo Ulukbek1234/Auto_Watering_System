@@ -26,14 +26,14 @@ Functional Requirements
                     }    
                 }
     - Website
-        -- Check current telemetry
-            --- Over time
+        [DONE] Check current telemetry
+            [DONE] Over time
             --- Graphs 
         -- Add/ Remove pumps/ sensors
         -- Modify daily liters
-        -- See camera
+        [DONE] See camera
     - Database 
-        -- Access from anywhere?
+        [DONE] Access from anywhere?
         -- Logging of everything
 """
 

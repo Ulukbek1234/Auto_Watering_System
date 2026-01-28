@@ -34,6 +34,7 @@ void setup() {
     - Max daily limit
     - Moisture threshold
     - Time based
+    - Slave to master commands
 */
 
 

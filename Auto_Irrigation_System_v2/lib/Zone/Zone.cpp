@@ -35,34 +35,7 @@ void Zone::startAutoIrrigating()
         return;
     }
 
-    float moisture_percent[nr_soil_sensors] = {0.0f};
-    for(int i = 0; i < nr_soil_sensors; i++)
-    {
-        DEBUG_PRINT("soil_sensor id (Analog): ");
-        DEBUG_PRINTLN(soil_sensors[i]->getPin());
-
-        soil_sensors[i]->checkRawValues();
-        moisture_percent[i] = soil_sensors[i]->getMoisterPercent();
-    }
-
-    float water_level_percent[nr_water_level_sensors] = {0.0f};
-    for(int i = 0; i < nr_water_level_sensors; i++)
-    {
-        DEBUG_PRINT("water_level_sensor id (Analog): ");
-        DEBUG_PRINTLN(water_level_sensors[i]->getPin());
-
-        water_level_sensors[i]->checkRawValues();
-        water_level_percent[i] = water_level_sensors[i]->getMoisturePercent();
-        if(water_level_percent[i] > 90)
-        {
-            DEBUG_PRINTLN("Water level too high, skipping irrigation.");
-            pumps[i]->deactivatePump();
-        }
-        else 
-        {
-            pumps[i]->activatePump();
-        }
-    }
+    updateSensors();    
 
     switch (current_mode)
     {
@@ -179,4 +152,34 @@ void Zone::resetDayProgression()
 void Zone::setOperationMode(OperationModes mode)
 {
     current_mode = mode;
+}
+
+void Zone::updateSensors()
+{
+    for(int i = 0; i < nr_soil_sensors; i++)
+    {
+        DEBUG_PRINT("soil_sensor id (Analog): ");
+        DEBUG_PRINTLN(soil_sensors[i]->getPin());
+
+        soil_sensors[i]->checkRawValues();
+        moisture_percent[i] = soil_sensors[i]->getMoisterPercent();
+    }
+
+    for(int i = 0; i < nr_water_level_sensors; i++)
+    {
+        DEBUG_PRINT("water_level_sensor id (Analog): ");
+        DEBUG_PRINTLN(water_level_sensors[i]->getPin());
+
+        water_level_sensors[i]->checkRawValues();
+        water_level_percent[i] = water_level_sensors[i]->getMoisturePercent();
+        if(water_level_percent[i] > 90)
+        {
+            DEBUG_PRINTLN("Water level too high, skipping irrigation.");
+            pumps[i]->deactivatePump();
+        }
+        else 
+        {
+            pumps[i]->activatePump();
+        }
+    }
 }
