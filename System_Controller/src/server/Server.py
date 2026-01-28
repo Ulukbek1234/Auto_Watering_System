@@ -102,7 +102,7 @@ def metrics_loop() -> None:
         # # Example signal (change this!)
         # value = 50 + 30 * (0.5 + 0.5 * __import__("math").sin(t / 3.0))
         # metrics.append({"t": time.time(), "value": round(value, 2)})
-        # time.sleep(1.0)
+        time.sleep(1.0)
 
 
 @app.route("/")
