@@ -2,6 +2,7 @@
 
 #include "Zone.h"
 #include "Config.h"
+#include "Utils.h"
 
 Zone *pots;
 unsigned long start_time = 0;
@@ -10,18 +11,18 @@ const unsigned long wait_time = 10000; //TODO remove after debugging //60000; //
 void setup() {
   Serial.begin(9600);
   pots = new Zone();
-  pots->setOperationMode(MODE_SOIL);
+  pots->setOperationMode(MODE_MANUAL);
 
-  // pots->addPump(8, 0.1);
-  // pots->addPump(9, 0.1);
+  pots->addPump(8, 0.1);
+  pots->addPump(9, 0.1);
   pots->addPump(10, 0.1);
   // pots->addPump(11, 5);
 
   // pots->addWaterLevelSensor(A0);
 
-  // pots->addSoilSensor(A0);
-  // pots->addSoilSensor(A1);
-  // pots->addSoilSensor(A2);
+  pots->addSoilSensor(A0);
+  pots->addSoilSensor(A1);
+  pots->addSoilSensor(A2);
   // pots->addSoilSensor(A3);
   start_time = millis();
 }
@@ -50,7 +51,19 @@ void loop() {
     } else if (command == "TELEMETRY") {
       Serial.println(pots->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
-    // } else if (command.startsWith(""))
+    } else if (command.startsWith("SET_MODE")) {
+      int mode = Utils::findDataFromMessage(command, "SET_MODE").toInt();
+      pots->setOperationMode(static_cast<OperationModes>(mode));
+      DEBUG_PRINTLN("Set operation mode to: " + String(mode));
+    } else if (command == "MANUAL_IRRIGATE") {
+      // Which pump and how much?
+      command = command.substring(command.indexOf(',') + 1);
+      Serial.println("Command after extracting MANUAL_IRRIGATE: " + command);
+      
+      int pump_id = Utils::findDataFromMessage(command, "PUMP_ID").toInt();
+      float amount = Utils::findDataFromMessage(command, "AMOUNT").toFloat();
+      pots->manualIrrigation(pump_id, amount);
+      DEBUG_PRINTLN("Started manual irrigating.");
     }
     else {
       DEBUG_PRINTLN("Unknown command.");

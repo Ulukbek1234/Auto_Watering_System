@@ -1,0 +1,27 @@
+#ifndef UTILS_H
+#define UTILS_H
+#pragma once
+#include <Arduino.h>
+// #include <ArduinoJson.h>
+
+
+typedef struct Dictionary 
+{
+    String key_;
+    String value_;
+} Dictionary;
+
+
+class Utils 
+{
+private:
+public:
+    static float floatMap(float x, float in_min, float in_max, float out_min, float out_max);
+    static String parseDataForWriting(String data_names[], String data_values[], int size);
+    static String parseDataForWriting(String data_name, String data_value);
+    static String parseDataForWriting(Dictionary data);
+    static String addCSVHeader(const char *header[], int size);
+    static String findDataFromMessage(String input, String data);
+};
+
+#endif

@@ -70,8 +70,6 @@ class SerialComms:
             logging.debug("No boat command to send.")
             return
         
-        boat_command_parsed = split_and_parse_data(boat_command)
-        
         # Clear output buffer before sending new command
         self.ser.flushOutput()
 
@@ -84,13 +82,6 @@ class SerialComms:
             line = self.ser.readline().decode('utf-8').rstrip()
             logging.debug(f"Response from boat: {line}")
             # Need to check if its correct response
-            sent_command = boat_command_parsed['Command']
-            correct_response = str(sent_command) + ": 101"
-            logging.debug(correct_response)
-            if self.check_response(line, "Command: 100") and self.check_response(line, correct_response):
-                logging.debug("Correct response from Slave")
-            else:
-                logging.debug("Incorrect response from Slave")
         else:
             logging.debug("No response from the boat.")
 

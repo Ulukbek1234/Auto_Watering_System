@@ -120,9 +120,8 @@ def action():
     data = request.get_json(silent=True) or {}
     name = str(data.get("name", "unknown"))
     logging.info(f"Button pressed: {name}")
-    # TODO: put your hardware actions here (GPIO, scripts, etc.)
+    write_to_file_lock_safe(DATA_BUS_PATH / "slave_command.txt", name)
     return jsonify({"ok": True, "received": name})
-
 
 @app.route("/api/logs")
 def api_logs():

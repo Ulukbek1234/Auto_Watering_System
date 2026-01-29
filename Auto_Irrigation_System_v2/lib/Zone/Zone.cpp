@@ -130,18 +130,10 @@ String Zone::getData()
         data_values[index++] = water_level_sensors[i]->getMoistureRaw();
     }
 
-    return parseDataForWriting(data_names, data_values, index);
+    return Utils::parseDataForWriting(data_names, data_values, index);
 }
 
-String Zone::parseDataForWriting(String data_names[], String data_values[], int size)
-{
-    String output;
-    for(int i = 0; i < size; i++)
-    {
-        output += data_names[i] + ": " + data_values[i] + ", ";
-    }
-    return output;
-}
+
 
 void Zone::resetDayProgression()
 {
@@ -182,4 +174,15 @@ void Zone::updateSensors()
             pumps[i]->activatePump();
         }
     }
+}
+
+void Zone::manualIrrigation(int pump_id, float amount)
+{
+    if(pump_id < 0 || pump_id >= nr_pumps)
+    {
+        DEBUG_PRINTLN("Invalid pump ID for manual irrigation.");
+        return;
+    }
+
+    pumps[pump_id]->turnOnPump(amount);
 }
