@@ -64,7 +64,8 @@ class SerialComms:
     def readAndSendCommandToBoat(self):
         logging.info("Getting boat commands and sending")
         boat_command = read_from_file_lock_safe(self.SLAVE_COMMAND_PATH)
-
+        logging.debug(f"Boat command read: {boat_command}")
+        
         # If the command file is empty, no need to send anything
         if len(boat_command.strip()) == 0:
             logging.debug("No boat command to send.")

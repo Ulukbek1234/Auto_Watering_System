@@ -64,6 +64,7 @@ void loop() {
       float amount = Utils::findDataFromMessage(command, "AMOUNT").toFloat();
       pots->manualIrrigation(pump_id, amount);
       DEBUG_PRINTLN("Started manual irrigating.");
+      Serial.println("MANUAL_IRRIGATION_DONE");
     }
     else {
       DEBUG_PRINTLN("Unknown command.");
