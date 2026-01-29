@@ -55,7 +55,7 @@ void loop() {
       int mode = Utils::findDataFromMessage(command, "SET_MODE").toInt();
       pots->setOperationMode(static_cast<OperationModes>(mode));
       DEBUG_PRINTLN("Set operation mode to: " + String(mode));
-    } else if (command == "MANUAL_IRRIGATE") {
+    } else if (command.startsWith("MANUAL_IRRIGATE")) {
       // Which pump and how much?
       command = command.substring(command.indexOf(',') + 1);
       DEBUG_PRINTLNN("Manual irrigate command data: " + command, 0);
