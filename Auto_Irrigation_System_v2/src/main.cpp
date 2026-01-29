@@ -58,7 +58,7 @@ void loop() {
     } else if (command == "MANUAL_IRRIGATE") {
       // Which pump and how much?
       command = command.substring(command.indexOf(',') + 1);
-      Serial.println("Command after extracting MANUAL_IRRIGATE: " + command);
+      DEBUG_PRINTLNN("Manual irrigate command data: " + command, 0);
       
       int pump_id = Utils::findDataFromMessage(command, "PUMP_ID").toInt();
       float amount = Utils::findDataFromMessage(command, "AMOUNT").toFloat();
