@@ -57,7 +57,7 @@ void loop() {
       DEBUG_PRINTLN("Set operation mode to: " + String(mode));
     } else if (command.startsWith("MANUAL_IRRIGATE")) {
       // Which pump and how much?
-      command = command.substring(command.indexOf(',') + 1);
+      command = command.substring(command.indexOf(' ') + 1);
       DEBUG_PRINTLNN("Manual irrigate command data: " + command, 0);
       
       int pump_id = Utils::findDataFromMessage(command, "PUMP_ID").toInt();
