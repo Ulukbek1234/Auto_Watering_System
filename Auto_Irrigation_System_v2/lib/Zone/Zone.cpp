@@ -178,11 +178,5 @@ void Zone::updateSensors()
 
 void Zone::manualIrrigation(int pump_id, float amount)
 {
-    if(pump_id < 0 || pump_id >= nr_pumps)
-    {
-        DEBUG_PRINTLN("Invalid pump ID for manual irrigation.");
-        return;
-    }
-
     pumps[pump_id]->turnOnPump(amount);
 }
