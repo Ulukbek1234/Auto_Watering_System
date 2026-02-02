@@ -21,8 +21,8 @@
 #define epsilon         0.000001f   
 
 // ---------- Sensor calibration ----------
-#define DRY_VALUE_SOIL  600
-#define WET_VALUE_SOIL  200
+#define DRY_VALUE_SOIL  550
+#define WET_VALUE_SOIL  300
 #define DRY_VALUE_WATER 0
 #define WET_VALUE_WATER 680
 
