@@ -29,11 +29,11 @@ class SerialComms:
         logging.debug(f"DATA_BUS_PATH: {DATA_BUS_PATH}")
 
         # For telemetry data
-        self.TELEM_INTER = 5  # telemetry data gets requested every 30 seconds //TODO change back to 30 after debugging
+        self.TELEM_INTER = 15 # telemetry data gets requested every 30 seconds //TODO change back to 30 after debugging
         self.TELEM_PATH = DATA_BUS_PATH / "slave_telem.txt"
 
         # For boat commands
-        self.SLAVE_COMMAND_INTER = 10
+        self.SLAVE_COMMAND_INTER = 1
         self.SLAVE_COMMAND_PATH = DATA_BUS_PATH / "slave_command.txt"
 
 
