@@ -39,7 +39,7 @@ void setup() {
 */
 
 /*
-cmd:man_irr,pump:8,amount:0.3
+cmd:man_irr,pump:9,amount:0.3
 
 */
 
@@ -80,8 +80,6 @@ void loop() {
       // TODO checks if correct format
       Utils::findDataFromMessage(serial_input, "PUMP:", pump_id);
       Utils::findDataFromMessage(serial_input, "AMOUNT:", amount);
-      DEBUG_PRINT("Amount: ");
-      DEBUG_PRINTLN(amount.toFloat());
       pots->manualIrrigation(pump_id.toInt(), amount.toFloat());
       Serial.println("MANUAL_IRRIGATION_DONE");
     } 
