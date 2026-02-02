@@ -38,6 +38,10 @@ void setup() {
     - Slave to master commands
 */
 
+/*
+cmd:man_irr,pump:8,amount:0.3
+
+*/
 
 void loop() {
   // Check serial for commands from master here
@@ -81,7 +85,7 @@ void loop() {
       pots->manualIrrigation(pump_id.toInt(), amount.toFloat());
       DEBUG_PRINTLN("Started manual irrigating.");
       Serial.println("MANUAL_IRRIGATION_DONE");
-    }
+    } 
     else {
       DEBUG_PRINT("Unknown command");
       DEBUG_PRINTLN(command);
