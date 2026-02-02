@@ -48,7 +48,7 @@ class SerialComms:
         
         # Send request for telemetry data
         # ser.write(json.dumps({"Command": 250}).encode())  # 250 == GET_TELEM_DATA
-        self.ser.write(b"TELEMETRY\n")
+        self.ser.write(b"CMD: TELEM,\n")
         time.sleep(self.MOLA_DELAY)  # Wait for the device to respond
         
         # Check if data is available in the serial buffer

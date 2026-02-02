@@ -42,20 +42,24 @@ void setup() {
 void loop() {
   // Check serial for commands from master here
   if(Serial.available() > 0) {
-    String command = Serial.readStringUntil('\n');
-    DEBUG_PRINTLN("Received command: " + command);
+    String serial_input = Serial.readStringUntil('\n');
+    DEBUG_PRINTLN("Received command: " + serial_input);
+    serial_input.trim();
+
+    // TODO clean this up, what a mess
+    String command = Utils::findDataFromMessage(serial_input, "CMD");
     command.trim();
     if (command == "SYNCH") {
       pots->resetDayProgression();
       DEBUG_PRINTLN("Day progression reset.");
-    } else if (command == "TELEMETRY") {
+    } else if (command == "TELEM") {
       Serial.println(pots->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
-    } else if (command.startsWith("SET_MODE")) {
+    } else if (command == "SET_MODE") {
       int mode = Utils::findDataFromMessage(command, "SET_MODE").toInt();
       pots->setOperationMode(static_cast<OperationModes>(mode));
       DEBUG_PRINTLN("Set operation mode to: " + String(mode));
-    } else if (command.startsWith("MANUAL_IRRIGATE")) {
+    } else if (command == "MAN_IRR") {
       // Which pump and how much?
       command = command.substring(command.indexOf(' ') + 1);
       DEBUG_PRINTLNN("Manual irrigate command data: " + command, 0);
