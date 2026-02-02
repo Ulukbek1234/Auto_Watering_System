@@ -18,7 +18,6 @@ enum OperationModes {
     MODE_SOIL = 3 // Automatic based on soil moisture
 };
 
-
 class Zone 
 {
 private:
