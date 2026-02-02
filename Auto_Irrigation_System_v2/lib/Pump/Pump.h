@@ -2,6 +2,7 @@
 #define PUMP_H
 #pragma once
 
+#include <EEPROM.h>
 #include "Arduino.h"
 #include "Config.h"
 
