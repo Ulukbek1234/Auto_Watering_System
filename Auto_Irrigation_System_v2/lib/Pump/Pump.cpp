@@ -13,10 +13,15 @@ Pump::Pump(int pin, float max_liters)
 }
 
 
-void Pump::turnOnPump(float liters)
+void Pump::turnOnPump(float liters, bool override = false)
 {
     DEBUG_PRINTLN("Started pumping liters");
-    if((is_active == 0) || (limit_reached == true) || (daily_liter - max_liters) > epsilon)
+    if (!override &&
+    (
+        is_active == 0 ||
+        limit_reached ||
+        (daily_liter - max_liters) > epsilon
+    ))
     {
         DEBUG_PRINTLN("Max daily limit reached or not active");
         limit_reached = true;
