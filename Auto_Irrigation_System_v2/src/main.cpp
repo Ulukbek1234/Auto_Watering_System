@@ -71,7 +71,8 @@ void loop() {
       Serial.println("MANUAL_IRRIGATION_DONE");
     }
     else {
-      DEBUG_PRINTLN("Unknown command.");
+      DEBUG_PRINT("Unknown command");
+      DEBUG_PRINTLN(command)
     }
   }
   
