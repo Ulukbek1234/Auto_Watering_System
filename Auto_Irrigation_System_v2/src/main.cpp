@@ -47,7 +47,7 @@ void loop() {
     serial_input.toUpperCase();
     serial_input.trim();
     // TODO clean this up, what a mess
-    String command = Utils::findDataFromMessage(serial_input, "CMD");
+    String command = Utils::findDataFromMessage(serial_input, "CMD:");
     if (command == "SYNCH") {
       pots->resetDayProgression();
       DEBUG_PRINTLN("Day progression reset.");
