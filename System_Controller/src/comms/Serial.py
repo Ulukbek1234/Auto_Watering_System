@@ -13,7 +13,7 @@ telem_dict_data = {}
 
 class SerialComms:
     # For synchronization TODO better solution
-    MOLA_DELAY = 0.1  # seconds
+    MOLA_DELAY = 0.5  # seconds
 
     def __init__(self):
         # Establish serial connection with Slave

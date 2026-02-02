@@ -154,7 +154,7 @@ def main(log_queue=None):
     logging.info("Running Server app...")
 
     start_background_threads()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)
 
 
 
