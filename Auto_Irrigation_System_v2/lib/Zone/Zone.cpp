@@ -100,23 +100,25 @@ String Zone::getData()
 
     for (int i = 0; i < nr_soil_sensors; i++)
     {
-        data_names[index] = "soil_sensor_pin";
-        data_values[index++] = soil_sensors[i]->getPin();
-        data_names[index] = "moister_percent";
+        int soil_pin = soil_sensors[i]->getPin();
+        data_names[index] = "soil_sensor_pin_" + soil_pin;
+        data_values[index++] = soil_pin;
+        data_names[index] = "moister_percent_" + soil_pin;
         data_values[index++] = soil_sensors[i]->getMoisterPercent();
     }
 
     for (int i = 0; i < nr_pumps; i++)
     {
+        int pump_pin = pumps[i]->getPin();
         data_names[index] = "pump_pin";
-        data_values[index++] = pumps[i]->getPin();
-        data_names[index] = "daily_liter";
+        data_values[index++] = pump_pin;
+        data_names[index] = "daily_liter_" + pump_pin;
         data_values[index++] = String(pumps[i]->getDailyLiter(), NR_DEC_POINTS);
-        data_names[index] = "total_liter";
+        data_names[index] = "total_liter_" + pump_pin;
         data_values[index++] = String(pumps[i]->getTotalLiter(), NR_DEC_POINTS);
-        data_names[index] = "max_liter";
+        data_names[index] = "max_liter_" + pump_pin;
         data_values[index++] = String(pumps[i]->getMaxLiter(), NR_DEC_POINTS);
-        data_names[index] = "is_active";
+        data_names[index] = "is_active_" + pump_pin;
         data_values[index++] = String(pumps[i]->getIsActive());
     }
 
