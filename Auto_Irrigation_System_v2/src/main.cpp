@@ -50,7 +50,7 @@ void loop() {
     String command = Utils::findDataFromMessage(serial_input, "CMD:");
     if (command == "SYNCH") {
       pots->resetDayProgression();
-      DEBUG_PRINTLN("Day progression reset."); cmd:man_irr,pump_id:8,amount:1.0
+      DEBUG_PRINTLN("Day progression reset.");
     } else if (command == "TELEM") {
       Serial.println(pots->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
