@@ -101,10 +101,12 @@ String Zone::getData()
     for (int i = 0; i < nr_soil_sensors; i++)
     {
         String soil_pin = String(soil_sensors[i]->getPin());
-        data_names[index] = "soil_sensor_pin_" + soil_pin;
+        data_names[index] = "soil_sensor_pin";
         data_values[index++] = soil_pin;
-        data_names[index] = "moister_percent_" + soil_pin;
-        data_values[index++] = soil_sensors[i]->getMoisterPercent();
+        data_names[index] = "moisture_percent_" + soil_pin;
+        data_values[index++] = soil_sensors[i]->getMoisturePercent();
+        data_names[index] = "moisture_raw_" + soil_pin;
+        data_values[index++] = soil_sensors[i]->getMoistureRaw(); 
     }
 
     for (int i = 0; i < nr_pumps; i++)
@@ -125,7 +127,7 @@ String Zone::getData()
     for (int i = 0; i < nr_water_level_sensors; i++)
     {
         String water_pin = String(water_level_sensors[i]->getPin());
-        data_names[index] = "water_level_sensor_pin_" + water_pin;
+        data_names[index] = "water_level_sensor_pin";
         data_values[index++] = water_level_sensors[i]->getPin();
         data_names[index] = "moisture_percent_" + water_pin;
         data_values[index++] = water_level_sensors[i]->getMoisturePercent();
@@ -177,7 +179,7 @@ void Zone::updateSensors()
         DEBUG_PRINTLN(soil_sensors[i]->getPin());
 
         soil_sensors[i]->checkRawValues();
-        moisture_percent[i] = soil_sensors[i]->getMoisterPercent();
+        moisture_percent[i] = soil_sensors[i]->getMoisturePercent();
     }
 
     for(int i = 0; i < nr_water_level_sensors; i++)

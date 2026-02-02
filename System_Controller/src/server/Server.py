@@ -99,14 +99,10 @@ def metrics_loop() -> None:
         telem_data = read_from_file_lock_safe(DATA_BUS_PATH / "slave_telem.txt")
         if telem_data:
             write_to_web_log(telem_data)
-        # if telem_data:
-        #     parsed_data = split_and_parse_data(telem_data)
-        #     value = parsed_data.get("SomeMetric", 0)  # Replace "SomeMetric" with actual key
-        #     metrics.append({"t": time.time(), "value": value})
-        #     time.sleep(1.0)
-        # # Example signal (change this!)
-        # value = 50 + 30 * (0.5 + 0.5 * __import__("math").sin(t / 3.0))
-        # metrics.append({"t": time.time(), "value": round(value, 2)})
+            parsed_data = split_and_parse_data(telem_data)
+
+            value = parsed_data.get(parsed_data["moister_percent_54"], 0)  # Replace "SomeMetric" with actual key
+            metrics.append({"t": time.time(), "value": value})
         time.sleep(10.0)
 
 
