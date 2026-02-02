@@ -144,6 +144,26 @@ void Zone::resetDayProgression()
 void Zone::setOperationMode(OperationModes mode)
 {
     current_mode = mode;
+    switch (current_mode)
+    {
+    case MODE_OFF:
+        for(int i = 0; i < nr_pumps; i++)
+        {
+            pumps[i]->deactivatePump();
+        }
+        break;
+    case MODE_MANUAL:
+    case MODE_FLOOD:
+    case MODE_SOIL:
+        for(int i = 0; i < nr_pumps; i++)
+        {
+            pumps[i]->activatePump();
+        }
+        break;
+    default:
+        break;
+    }
+
 }
 
 void Zone::updateSensors()

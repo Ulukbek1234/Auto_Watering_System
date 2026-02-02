@@ -69,6 +69,8 @@ void loop() {
       if(Utils::findDataFromMessage(serial_input, "NEW_MODE:", mode))
       {
         pots->setOperationMode(static_cast<OperationModes>(mode.toInt()));
+        Serial.print("NEW_MODE_SELECTED: ");
+        Serial.println(mode);
         DEBUG_PRINTLN("Set operation mode to: " + mode);
       } else {
         DEBUG_PRINTLN("Wrong operation mode");
