@@ -181,7 +181,7 @@ void Zone::manualIrrigation(int pump_id, float amount)
     for(int i = 0; i < nr_pumps; i++)
     {
         if(pumps[i]->getPin() == pump_id){
-            pumps[pump_id]->turnOnPump(amount);
+            pumps[i]->turnOnPump(amount);
             return;
         }
     }

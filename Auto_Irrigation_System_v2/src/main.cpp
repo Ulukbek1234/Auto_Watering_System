@@ -74,7 +74,7 @@ void loop() {
         DEBUG_PRINTLN("Wrong operation mode");
       }
     } else if (command == "MAN_IRR") {
-      
+      DEBUG_PRINTLN("Started manual irrigating.");
       String pump_id = "";
       String amount = "";
       // TODO checks if correct format
@@ -83,7 +83,6 @@ void loop() {
       DEBUG_PRINT("Amount: ");
       DEBUG_PRINTLN(amount.toFloat());
       pots->manualIrrigation(pump_id.toInt(), amount.toFloat());
-      DEBUG_PRINTLN("Started manual irrigating.");
       Serial.println("MANUAL_IRRIGATION_DONE");
     } 
     else {
