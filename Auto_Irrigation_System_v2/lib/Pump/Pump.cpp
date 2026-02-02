@@ -10,7 +10,7 @@ Pump::Pump(int pin, float max_liters)
     pinMode(pin, OUTPUT);
     digitalWrite(pin, PUMP_OFF);
     activatePump();
-    total_liter = EEPROM.read(pin);
+    // total_liter = EEPROM.read(pin);
 }
 
 
@@ -29,7 +29,7 @@ void Pump::turnOnPump(float liters, bool override = false)
         return;
     }
     total_liter += liters;
-    EEPROM.write(pin, total_liter);
+    // EEPROM.write(pin, total_liter);
     daily_liter += liters;
     
     float seconds_needed = (60.0 / LITERS_PER_MINUTE) * liters;
