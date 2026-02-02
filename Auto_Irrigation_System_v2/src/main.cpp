@@ -55,7 +55,7 @@ void loop() {
       Serial.println(pots->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
     } else if (command == "SET_MODE") {
-      int mode = Utils::findDataFromMessage(command, "SET_MODE").toInt();
+      int mode = Utils::findDataFromMessage(command, "SET_MODE:").toInt();
       pots->setOperationMode(static_cast<OperationModes>(mode));
       DEBUG_PRINTLN("Set operation mode to: " + String(mode));
     } else if (command == "MAN_IRR") {
@@ -63,8 +63,8 @@ void loop() {
       command = command.substring(command.indexOf(' ') + 1);
       DEBUG_PRINTLN("Manual irrigate command data: " + command);
       
-      int pump_id = Utils::findDataFromMessage(command, "PUMP_ID").toInt();
-      float amount = Utils::findDataFromMessage(command, "AMOUNT").toFloat();
+      int pump_id = Utils::findDataFromMessage(command, "PUMP_ID:").toInt();
+      float amount = Utils::findDataFromMessage(command, "AMOUNT:").toFloat();
       DEBUG_PRINT("Pump_Amount: ");
       DEBUG_PRINTLN(amount);
       pots->manualIrrigation(pump_id, amount);
