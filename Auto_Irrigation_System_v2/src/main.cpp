@@ -83,5 +83,4 @@ void loop() {
     pots->startAutoIrrigating();
     pots->updateDay();
   }
-  DEBUG_PRINTLN("---------------------");
 }
