@@ -65,6 +65,8 @@ void loop() {
       
       int pump_id = Utils::findDataFromMessage(command, "PUMP_ID").toInt();
       float amount = Utils::findDataFromMessage(command, "AMOUNT").toFloat();
+      DEBUG_PRINT("Pump_Amount: ");
+      DEBUG_PRINTLN(amount);
       pots->manualIrrigation(pump_id, amount);
       DEBUG_PRINTLN("Started manual irrigating.");
       Serial.println("MANUAL_IRRIGATION_DONE");
@@ -74,7 +76,6 @@ void loop() {
       DEBUG_PRINTLN(command);
     }
   }
-  
   // Non-Blocking delay logic
   if(millis() - start_time >= wait_time)
   {
