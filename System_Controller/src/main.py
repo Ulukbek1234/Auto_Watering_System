@@ -70,10 +70,10 @@ def main():
         ["python", "-m", "src.comms.Serial"]
     )
 
-    process_manager.start_process(
-        "Server",
-        ["python", "-m", "src.server.Server"]
-    )
+    # process_manager.start_process(
+    #     "Server",
+    #     ["python", "-m", "src.server.Server"]
+    # )
 
     last_master_command_time = time.time()
 
