@@ -16,7 +16,7 @@ Pump::Pump(int pin, float max_liters)
 void Pump::turnOnPump(float liters)
 {
     DEBUG_PRINTLN("Started pumping liters");
-    if((is_active == 0) || (limit_reached == true) || (daily_liter - max_liters) > epsilon)
+    if((is_active == 0) || (daily_liter - max_liters) > epsilon)
     {
         DEBUG_PRINT("limit_reached: ");
         DEBUG_PRINTLN(limit_reached ? "true" : "false");
