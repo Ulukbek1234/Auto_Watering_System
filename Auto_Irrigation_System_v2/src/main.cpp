@@ -71,7 +71,7 @@ void loop() {
     }
     else {
       DEBUG_PRINT("Unknown command");
-      DEBUG_PRINTLN(command)
+      DEBUG_PRINTLN(command);
     }
   }
   
