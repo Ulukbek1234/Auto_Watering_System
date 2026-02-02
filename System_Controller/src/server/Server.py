@@ -40,7 +40,7 @@ app = Flask(__name__)
 
 def write_to_web_log(msg: str) -> None:
     ts = time.strftime("%H:%M:%S")
-    logs.appendleft(f"[{ts}] {msg}")
+    logs.appendleft(f"[{ts}] {msg}\n")
 
 def capture_loop() -> None:
     """
