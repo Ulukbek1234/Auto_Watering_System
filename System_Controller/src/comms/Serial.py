@@ -56,6 +56,7 @@ class SerialComms:
         # while ser.in_waiting > 0: # TODO: only for debugging, remove later
             line = self.ser.readline().decode('utf-8', errors='replace').rstrip()
             logging.debug(f"Telem data from Mega: {line}") 
+            logging.debug(split_and_parse_data(line))
             return split_and_parse_data(line)
         else:
             logging.info("No telemetry data received.")
