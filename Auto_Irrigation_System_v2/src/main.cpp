@@ -74,8 +74,8 @@ void loop() {
       String pump_id = "";
       String amount = "";
       // TODO checks if correct format
-      Utils::findDataFromMessage(command, "PUMP:", pump_id);
-      Utils::findDataFromMessage(command, "AMOUNT:", amount);
+      Utils::findDataFromMessage(serial_input, "PUMP:", pump_id);
+      Utils::findDataFromMessage(serial_input, "AMOUNT:", amount);
       DEBUG_PRINT("Amount: ");
       DEBUG_PRINTLN(amount);
       pots->manualIrrigation(pump_id.toInt(), amount.toFloat());
