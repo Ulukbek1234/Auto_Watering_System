@@ -21,7 +21,7 @@ public:
     static String parseDataForWriting(String data_name, String data_value);
     static String parseDataForWriting(Dictionary data);
     static String addCSVHeader(const char *header[], int size);
-    static String findDataFromMessage(String input, String data);
+    static bool findDataFromMessage(const String& input, const String& key, String& output);
 };
 
 #endif

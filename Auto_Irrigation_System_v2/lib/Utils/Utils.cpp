@@ -39,18 +39,21 @@ String Utils::addCSVHeader(const char *header[], int size)
     return output;
 }
 
-String Utils::findDataFromMessage(String input, String data) {
-    String output;
-    int data_index = input.indexOf(data);
-    if (data_index != -1) {
-        int start_index = data_index + data.length();
-        int comma_index = input.indexOf(',', start_index);
-        if (comma_index != -1) {
-            output = input.substring(start_index, comma_index);
-        } else {
-            // If no comma is found, extract until the end of the string
-            output = input.substring(start_index);
-        }
-    }
-    return output;
+bool Utils::findDataFromMessage(
+    const String& input,
+    const String& key,
+    String& output
+) {
+    int keyIndex = input.indexOf(key);
+    if (keyIndex == -1) return false;
+
+    int start = keyIndex + key.length();
+    int end = input.indexOf(',', start);
+
+    output = (end == -1)
+        ? input.substring(start)
+        : input.substring(start, end);
+
+    output.trim();
+    return true;
 }

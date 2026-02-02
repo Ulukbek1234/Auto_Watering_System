@@ -47,27 +47,38 @@ void loop() {
     serial_input.toUpperCase();
     serial_input.trim();
     // TODO clean this up, what a mess
-    String command = Utils::findDataFromMessage(serial_input, "CMD:");
-    if (command == "SYNCH") {
+    
+    String command = "";
+    bool real_command = Utils::findDataFromMessage(serial_input, "CMD:", command);
+    if(!real_command)
+    {
+      DEBUG_PRINT("No command found: ");
+      DEBUG_PRINTLN(serial_input);
+    } else if (command == "SYNCH") {
       pots->resetDayProgression();
       DEBUG_PRINTLN("Day progression reset.");
     } else if (command == "TELEM") {
       Serial.println(pots->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
     } else if (command == "SET_MODE") {
-      String mode = Utils::findDataFromMessage(command, "NEW_MODE:");
-      pots->setOperationMode(static_cast<OperationModes>(mode.toInt()));
-      DEBUG_PRINTLN("Set operation mode to: " + String(mode));
+      String mode = "";
+      if(Utils::findDataFromMessage(serial_input, "NEW_MODE", mode))
+      {
+        pots->setOperationMode(static_cast<OperationModes>(mode.toInt()));
+        DEBUG_PRINTLN("Set operation mode to: " + mode);
+      } else {
+        DEBUG_PRINTLN("Wrong operation mode");
+      }
     } else if (command == "MAN_IRR") {
-      // Which pump and how much?
-      command = command.substring(command.indexOf(' ') + 1);
-      DEBUG_PRINTLN("Manual irrigate command data: " + command);
       
-      int pump_id = Utils::findDataFromMessage(command, "PUMP:").toInt();
-      String amount = Utils::findDataFromMessage(command, "AMOUNT:");
-      DEBUG_PRINT("Pump_Amount: ");
+      String pump_id = "";
+      String amount = "";
+      // TODO checks if correct format
+      Utils::findDataFromMessage(command, "PUMP:", pump_id);
+      Utils::findDataFromMessage(command, "AMOUNT:", amount);
+      DEBUG_PRINT("Amount: ");
       DEBUG_PRINTLN(amount);
-      // pots->manualIrrigation(pump_id, amount);
+      pots->manualIrrigation(pump_id.toInt(), amount.toFloat());
       DEBUG_PRINTLN("Started manual irrigating.");
       Serial.println("MANUAL_IRRIGATION_DONE");
     }
