@@ -62,7 +62,7 @@ void loop() {
       DEBUG_PRINTLN("Sent telemetry data.");
     } else if (command == "SET_MODE") {
       String mode = "";
-      if(Utils::findDataFromMessage(serial_input, "NEW_MODE", mode))
+      if(Utils::findDataFromMessage(serial_input, "NEW_MODE:", mode))
       {
         pots->setOperationMode(static_cast<OperationModes>(mode.toInt()));
         DEBUG_PRINTLN("Set operation mode to: " + mode);
