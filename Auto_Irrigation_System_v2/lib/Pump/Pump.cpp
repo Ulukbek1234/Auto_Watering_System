@@ -6,15 +6,10 @@ Pump::Pump(int pin, float max_liters)
     // Construct Pump
     this->pin = pin;
     this->max_liters = max_liters;
+    this->limit_reached = false;
     pinMode(pin, OUTPUT);
     digitalWrite(pin, PUMP_OFF);
     activatePump();
-}
-
-void Pump::turnOnPump()
-{
-    DEBUG_PRINTLN("Started pumping");
-    digitalWrite(this->pin, PUMP_ON);
 }
 
 

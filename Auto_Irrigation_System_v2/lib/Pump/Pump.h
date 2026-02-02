@@ -22,7 +22,6 @@ private:
 
 public:
     Pump(int pin, float max_liters);
-    void turnOnPump();
     void turnOnPump(float liters);
     void deactivatePump();
     void activatePump();
