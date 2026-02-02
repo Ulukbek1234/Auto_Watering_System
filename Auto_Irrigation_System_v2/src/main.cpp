@@ -50,12 +50,12 @@ void loop() {
     String command = Utils::findDataFromMessage(serial_input, "CMD:");
     if (command == "SYNCH") {
       pots->resetDayProgression();
-      DEBUG_PRINTLN("Day progression reset.");
+      DEBUG_PRINTLN("Day progression reset."); cmd:man_irr,pump_id:8,amount:1.0
     } else if (command == "TELEM") {
       Serial.println(pots->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
     } else if (command == "SET_MODE") {
-      int mode = Utils::findDataFromMessage(command, "SET_MODE:").toInt();
+      int mode = Utils::findDataFromMessage(command, "NEW_MODE:").toInt();
       pots->setOperationMode(static_cast<OperationModes>(mode));
       DEBUG_PRINTLN("Set operation mode to: " + String(mode));
     } else if (command == "MAN_IRR") {
@@ -63,11 +63,11 @@ void loop() {
       command = command.substring(command.indexOf(' ') + 1);
       DEBUG_PRINTLN("Manual irrigate command data: " + command);
       
-      int pump_id = Utils::findDataFromMessage(command, "PUMP_ID:").toInt();
-      float amount = Utils::findDataFromMessage(command, "AMOUNT:").toFloat();
+      int pump_id = Utils::findDataFromMessage(command, "PUMP:").toInt();
+      String amount = Utils::findDataFromMessage(command, "AMOUNT:");
       DEBUG_PRINT("Pump_Amount: ");
       DEBUG_PRINTLN(amount);
-      pots->manualIrrigation(pump_id, amount);
+      // pots->manualIrrigation(pump_id, amount);
       DEBUG_PRINTLN("Started manual irrigating.");
       Serial.println("MANUAL_IRRIGATION_DONE");
     }
