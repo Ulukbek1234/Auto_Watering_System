@@ -62,7 +62,7 @@ void loop() {
     } else if (command == "MAN_IRR") {
       // Which pump and how much?
       command = command.substring(command.indexOf(' ') + 1);
-      DEBUG_PRINTLNN("Manual irrigate command data: " + command, 0);
+      DEBUG_PRINTLN("Manual irrigate command data: " + command);
       
       int pump_id = Utils::findDataFromMessage(command, "PUMP_ID").toInt();
       float amount = Utils::findDataFromMessage(command, "AMOUNT").toFloat();
