@@ -55,8 +55,8 @@ void loop() {
       Serial.println(pots->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
     } else if (command == "SET_MODE") {
-      int mode = Utils::findDataFromMessage(command, "NEW_MODE:").toInt();
-      pots->setOperationMode(static_cast<OperationModes>(mode));
+      String mode = Utils::findDataFromMessage(command, "NEW_MODE:");
+      pots->setOperationMode(static_cast<OperationModes>(mode.toInt()));
       DEBUG_PRINTLN("Set operation mode to: " + String(mode));
     } else if (command == "MAN_IRR") {
       // Which pump and how much?
