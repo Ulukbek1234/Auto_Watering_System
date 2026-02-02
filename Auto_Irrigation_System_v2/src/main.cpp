@@ -77,7 +77,7 @@ void loop() {
       Utils::findDataFromMessage(serial_input, "PUMP:", pump_id);
       Utils::findDataFromMessage(serial_input, "AMOUNT:", amount);
       DEBUG_PRINT("Amount: ");
-      DEBUG_PRINTLN(amount);
+      DEBUG_PRINTLN(amount.toFloat());
       pots->manualIrrigation(pump_id.toInt(), amount.toFloat());
       DEBUG_PRINTLN("Started manual irrigating.");
       Serial.println("MANUAL_IRRIGATION_DONE");
