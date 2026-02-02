@@ -45,7 +45,7 @@ void loop() {
     String serial_input = Serial.readStringUntil('\n');
     DEBUG_PRINTLN("Received command: " + serial_input);
     serial_input.toUpperCase();
-
+    serial_input.trim();
     // TODO clean this up, what a mess
     String command = Utils::findDataFromMessage(serial_input, "CMD");
     if (command == "SYNCH") {
