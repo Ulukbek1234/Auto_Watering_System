@@ -59,7 +59,7 @@ def configure_camera(dev):
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     # Pick a starting exposure (tune this)
-    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=exposure_time_absolute=50"],
+    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=exposure_time_absolute=0.1"],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     
     subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=gamma=1"],
