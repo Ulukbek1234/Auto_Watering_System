@@ -52,11 +52,11 @@ def configure_camera(dev):
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     # Optional: small brightness lift
-    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=brightness=20"],
+    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=brightness=-20"],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     # Optional: if backlit scenes
-    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=backlight_compensation=3"],
+    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=backlight_compensation=0"],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def capture_loop() -> None:
@@ -64,6 +64,8 @@ def capture_loop() -> None:
     Periodically capture a JPEG from the USB webcam using fswebcam.
     Writes to static/latest.jpg (atomic-ish replace).
     """
+    configure_camera(CAM_DEVICE)
+
     os.makedirs(STATIC_DIR, exist_ok=True)
     tmp_path = os.path.join(STATIC_DIR, "latest.tmp.jpg")
 
@@ -76,7 +78,7 @@ def capture_loop() -> None:
                 "fswebcam",
                 "-d", CAM_DEVICE,
                 "-r", CAPTURE_RESOLUTION,
-                "--no-banner",
+                # "--no-banner",
                 "--jpeg", "85",
                 "--delay", "0.5",
                 "-S", "5",
@@ -113,7 +115,6 @@ def metrics_loop() -> None:
     Replace this with your real sensor readings / values.
     """
     logging.info("Metrics thread started.")
-    configure_camera(CAM_DEVICE)
 
     while True:
         t = time.time() - start_time
