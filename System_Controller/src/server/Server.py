@@ -43,6 +43,17 @@ def write_to_web_log(msg: str) -> None:
     logs.appendleft(f"[{ts}] {msg}\n")
 
 def configure_camera(dev):
+    # Control ranges based on your screenshot (adjust if your camera differs)
+    CTRL_RANGES = {
+        "brightness": (-128, 127),
+        "contrast": (0, 255),
+        "saturation": (0, 200),
+        "hue": (-128, 127),
+        "gamma": (0, 10),
+        "sharpness": (0, 200),
+        "backlight_compensation": (0, 10),
+    }
+
     # Make exposure manual so exposure_time_absolute is not "inactive"
     subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=auto_exposure=1"],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -50,9 +61,12 @@ def configure_camera(dev):
     # Pick a starting exposure (tune this)
     subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=exposure_time_absolute=10"],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    
+    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=gamma=2"],
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     # Optional: small brightness lift
-    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=brightness=0"],
+    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=brightness=-40"],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     # Optional: if backlit scenes
