@@ -48,11 +48,11 @@ def configure_camera(dev):
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     # Pick a starting exposure (tune this)
-    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=exposure_time_absolute=1000"],
+    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=exposure_time_absolute=500"],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     # Optional: small brightness lift
-    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=brightness=40"],
+    subprocess.run(["v4l2-ctl", "-d", dev, "--set-ctrl=brightness=20"],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     # Optional: if backlit scenes
