@@ -147,18 +147,18 @@
       async function refreshTelemData() {
         const res = await fetch("/api/logs?n=1");
         const j = await res.json();
-        alert( JSON.stringify(j) );
         if (j.lines.length > 0) {
           const line = j.lines[0];
-          const match = line.match(/Daily_Liter_8=(\d+)/);
+          alert(line);
+          const match = line.match(/'daily_liter_8': (\d+)/);
           if (match) {
             document.getElementById("daily_liter_8").textContent = match[1];
           }
-          const match2 = line.match(/Daily_Liter_9=(\d+)/);
+          const match2 = line.match(/'daily_liter_9': (\d+)/);
           if (match2) {
             document.getElementById("daily_liter_9").textContent = match2[1];
           }
-          const match3 = line.match(/Daily_Liter_10=(\d+)/);
+          const match3 = line.match(/'daily_liter_10': (\d+)/);
           if (match3) {
             document.getElementById("daily_liter_10").textContent = match3[1];
           }
