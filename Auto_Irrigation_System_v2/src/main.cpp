@@ -5,28 +5,30 @@
 #include "Utils.h"
 
 Zone *pots;
+Zone *auto_pot;
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
 
 void setup() {
   Serial.begin(9600);
   pots = new Zone();
-  pots->setOperationMode(MODE_MANUAL);
+  pots->setOperationMode(MODE_SOIL);
 
   pots->addPump(8, 0.5);
   pots->addPump(9, 0.5);
   pots->addPump(10, 0.2);
-  pots->addPump(11, 0.4);
-
-  // pots->addWaterLevelSensor(A0);
-
+  
   pots->addSoilSensor(A0);
   pots->addSoilSensor(A1);
   pots->addSoilSensor(A2);
-  pots->addSoilSensor(A3);
+  // pots->addWaterLevelSensor(A0);
+  
+  auto_pot = new Zone();
+  auto_pot->setOperationMode(MODE_MANUAL);
+  auto_pot->addPump(11, 0.4);
+  auto_pot->addSoilSensor(A3);
   start_time = millis();
 }
-
 
 // TODO
 /*
@@ -60,6 +62,7 @@ void loop() {
       DEBUG_PRINTLN(serial_input);
     } else if (command == "TELEM") {
       Serial.println(pots->getData());
+      Serial.println(auto_pot->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
     } else if (command == "SET_MODE") {
       String mode = "";
