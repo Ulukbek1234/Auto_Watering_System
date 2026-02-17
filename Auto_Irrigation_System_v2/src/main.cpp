@@ -16,14 +16,14 @@ void setup() {
   pots->addPump(8, 0.3);
   pots->addPump(9, 0.3);
   pots->addPump(10, 0.1);
-  // pots->addPump(11, 5);
+  pots->addPump(11, 0.3);
 
   // pots->addWaterLevelSensor(A0);
 
   pots->addSoilSensor(A0);
   pots->addSoilSensor(A1);
   pots->addSoilSensor(A2);
-  // pots->addSoilSensor(A3);
+  pots->addSoilSensor(A3);
   start_time = millis();
 }
 
