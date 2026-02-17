@@ -43,6 +43,7 @@ def write_to_file_lock_safe(file_path, data):
 
 @staticmethod
 def split_and_parse_data(line):
+    print(line)
     output = {}
     split_data = line.split(", ")
     for item in split_data:
