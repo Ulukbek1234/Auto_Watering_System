@@ -137,7 +137,8 @@ def metrics_loop() -> None:
             write_to_web_log(telem_data)
             parsed_data = split_and_parse_data(telem_data)
 
-            value = parsed_data["moisture_percent_54"] 
+            value = parsed_data.get("moisture_percent_54")
+            print(f"Parsed moisture_percent_54: {value}") 
             metrics.append({"t": time.time(), "value": value})
         time.sleep(10.0)
 

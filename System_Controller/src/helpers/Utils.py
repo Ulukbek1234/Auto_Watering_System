@@ -46,7 +46,6 @@ def split_and_parse_data(line):
     line = line.replace("{", "")
     line = line.replace("}", "")
 
-    print(line)
     output = {}
     split_data = line.split(", ")
     for item in split_data:
