@@ -146,15 +146,15 @@
 
         if (j.lines.length > 0) {
           const line = j.lines[0];
-          log(line);
+          alert(line);
 
           // Remove timestamp
           const cleanLine = line.substring(line.indexOf("{"));
-          log(cleanLine);
+          alert(cleanLine);
           
           // Convert to proper JSON
           const obj = JSON.parse(cleanLine.replace(/'/g, '"'));
-          log(obj);
+          alert(obj);
 
           document.getElementById("daily_liter_8").textContent = obj.daily_liter_8;
         }
