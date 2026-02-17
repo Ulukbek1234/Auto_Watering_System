@@ -41,7 +41,7 @@
 
             <div class="title">Daily_Liter_9</div>
             <div class="value" id="daily_liter_9">--</div>
-            
+
             <div class="title">Daily_Liter_10</div>
             <div class="value" id="daily_liter_10">--</div>
           </div>
@@ -86,7 +86,7 @@
         const el = document.getElementById("logs");
         el.textContent = j.lines.join("\n");
       }
-      setInterval(refreshLogs, 1000);
+      setInterval(refreshLogs, 10000);
       refreshLogs();
 
       // ---- Chart.js ----
