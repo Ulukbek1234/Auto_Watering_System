@@ -131,8 +131,8 @@ String Zone::getData()
         data_values[index++] = String(pumps[i]->getMaxLiter(), NR_DEC_POINTS);
         data_names[index] = "is_active_" + pump_pin;
         data_values[index++] = String(pumps[i]->getIsActive());
-        data_names[index] = "eeprom_val_" + pump_pin;
-        data_values[index++] = eeprom_values[i];
+        // data_names[index] = "eeprom_val_" + pump_pin;
+        // data_values[index++] = eeprom_values[i];
     }
 
     for (int i = 0; i < nr_water_level_sensors; i++)

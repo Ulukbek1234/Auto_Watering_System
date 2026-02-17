@@ -11,12 +11,12 @@ const unsigned long wait_time = 60000; // 1 minute
 void setup() {
   Serial.begin(9600);
   pots = new Zone();
-  pots->setOperationMode(MODE_MANUAL);
+  pots->setOperationMode(MODE_SOIL);
 
-  pots->addPump(8, 0.3);
-  pots->addPump(9, 0.3);
-  pots->addPump(10, 0.1);
-  pots->addPump(11, 0.3);
+  pots->addPump(8, 0.5);
+  pots->addPump(9, 0.5);
+  pots->addPump(10, 0.2);
+  pots->addPump(11, 0.4);
 
   // pots->addWaterLevelSensor(A0);
 
