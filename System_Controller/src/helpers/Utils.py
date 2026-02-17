@@ -45,6 +45,8 @@ def write_to_file_lock_safe(file_path, data):
 def split_and_parse_data(line):
     line = line.replace("{", "")
     line = line.replace("}", "")
+    line = line.replace("'", "")
+
 
     output = {}
     split_data = line.split(", ")
