@@ -86,6 +86,7 @@ void loop() {
       Serial.println("MANUAL_IRRIGATION_DONE");
     } else if (command == "SAV_EEP") {
       pots->saveToEEPROM();
+      Serial.println("SAVING_TO_EEPROM");
     }
     else {
       DEBUG_PRINT("Unknown command");
