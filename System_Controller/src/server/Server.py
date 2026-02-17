@@ -34,9 +34,14 @@ moisture_perc_P56: Deque[Dict[str, Any]] = deque(maxlen=300)
 
 start_time = time.time()
 
-# Telem data path
+# ---- Telem data path ----
 ROOT = Path(__file__).parent.parent
 DATA_BUS_PATH = ROOT / "data_bus"
+
+# ---- Chart points ----
+chart_points_count = 1440  # 1440 for 24h of 1-min data
+chart_data_delay = 60.0  # seconds between data points (matches metrics_loop sleep)
+
 
 app = Flask(__name__)
 
@@ -147,7 +152,7 @@ def metrics_loop() -> None:
             moisture_perc_P54.append({"t": time.time(), "value": perc_54})
             moisture_perc_P55.append({"t": time.time(), "value": perc_55})
             moisture_perc_P56.append({"t": time.time(), "value": perc_56})
-        time.sleep(2.0)
+        time.sleep(chart_data_delay)
 
 
 @app.route("/")
@@ -166,15 +171,15 @@ def action():
 @app.route("/api/logs")
 def api_logs():
     # Return the newest N lines (already stored newest-first)
-    n = int(request.args.get("n", 50))
-    n = max(1, min(n, 300))
+    n = int(request.args.get("n", 0))
+    n = max(1, min(n, chart_points_count))
     return jsonify({"lines": list(logs)[:n]})
 
 
 @app.route("/api/metrics")
 def api_metrics():
-    n = int(request.args.get("n", 60))
-    n = max(5, min(n, 300))
+    n = int(request.args.get("n", 0))
+    n = max(5, min(n, chart_points_count))
 
     pts1 = list(moisture_perc_P54)[-n:]
     pts2 = list(moisture_perc_P55)[-n:]
