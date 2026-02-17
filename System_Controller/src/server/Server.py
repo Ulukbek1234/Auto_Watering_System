@@ -136,6 +136,7 @@ def metrics_loop() -> None:
         if telem_data:
             write_to_web_log(telem_data)
             parsed_data = split_and_parse_data(telem_data)
+            print(f"Parsed telem data: {parsed_data}")
 
             value = parsed_data.get("moisture_percent_54")
             print(f"Parsed moisture_percent_54: {value}") 
