@@ -147,6 +147,7 @@
       async function refreshTelemData() {
         const res = await fetch("/api/logs?n=1");
         const j = await res.json();
+        logging.info("Telem Data Grid refresh: ", j);
         if (j.lines.length > 0) {
           const line = j.lines[0];
           const match = line.match(/Daily_Liter_8=(\d+)/);
