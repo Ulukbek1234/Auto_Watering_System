@@ -11,7 +11,7 @@ const unsigned long wait_time = 60000; // 1 minute
 void setup() {
   Serial.begin(9600);
   pots = new Zone();
-  pots->setOperationMode(MODE_SOIL);
+  pots->setOperationMode(MODE_MANUAL);
 
   pots->addPump(8, 0.5);
   pots->addPump(9, 0.5);
