@@ -28,7 +28,10 @@ FSWEBCAM_TIMEOUT_SEC = CAPTURE_INTERVAL_SEC + 3
 
 # ---- Simple in-memory state ----
 logs: Deque[str] = deque(maxlen=300)
-metrics: Deque[Dict[str, Any]] = deque(maxlen=300)
+moisture_perc_P54: Deque[Dict[str, Any]] = deque(maxlen=300)
+moisture_perc_P55: Deque[Dict[str, Any]] = deque(maxlen=300)
+moisture_perc_P56: Deque[Dict[str, Any]] = deque(maxlen=300)
+
 start_time = time.time()
 
 # Telem data path
@@ -136,10 +139,14 @@ def metrics_loop() -> None:
         if telem_data:
             write_to_web_log(telem_data)
             parsed_data = split_and_parse_data(telem_data)
-            value = parsed_data.get("moisture_percent_54")
-            logging.info(f"Parsed moisture_percent_54: {value}") 
-
-            metrics.append({"t": time.time(), "value": value})
+            perc_54 = parsed_data.get("moisture_percent_54")
+            perc_55 = parsed_data.get("moisture_percent_55")
+            perc_56 = parsed_data.get("moisture_percent_56")
+            logging.info(f"Moisture percentages: P54={perc_54}, P55={perc_55}, P56={perc_56}")
+            
+            moisture_perc_P54.append({"t": time.time(), "value": perc_54})
+            moisture_perc_P55.append({"t": time.time(), "value": perc_55})
+            moisture_perc_P56.append({"t": time.time(), "value": perc_56})
         time.sleep(2.0)
 
 
@@ -166,11 +173,29 @@ def api_logs():
 
 @app.route("/api/metrics")
 def api_metrics():
-    # Return last N metric points oldest->newest for plotting
     n = int(request.args.get("n", 60))
     n = max(5, min(n, 300))
-    pts = list(metrics)[-n:]  # metrics deque is oldest->newest in append order
-    return jsonify({"points": pts})
+
+    pts1 = list(moisture_perc_P54)[-n:]
+    pts2 = list(moisture_perc_P55)[-n:]
+    pts3 = list(moisture_perc_P56)[-n:]
+
+    return jsonify({
+        "datasets": [
+            {
+                "label": "P54",
+                "data": [{"x": p["t"] * 1000, "y": p["value"]} for p in pts1]
+            },
+            {
+                "label": "P55",
+                "data": [{"x": p["t"] * 1000, "y": p["value"]} for p in pts2]
+            },
+            {
+                "label": "P56",
+                "data": [{"x": p["t"] * 1000, "y": p["value"]} for p in pts3]
+            }
+        ]
+    })
 
 
 def start_background_threads() -> None:

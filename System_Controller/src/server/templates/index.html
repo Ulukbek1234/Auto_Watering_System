@@ -5,6 +5,7 @@
     <title>Pi Control Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <style>
       body { font-family: system-ui, sans-serif; margin: 16px; }
       .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -78,34 +79,48 @@
         data: {
           labels: [],
           datasets: [{
-            label: "Value",
+            label: "P54",
             data: [],
             tension: 0.2,
-            pointRadius: 0
+            pointRadius: 0,
+            borderColor: "red"
+          }, {
+            label: "P55",
+            data: [],
+            tension: 0.2,
+            pointRadius: 0,
+            borderColor: "green"
+          }, {
+            label: "P56",
+            data: [],
+            tension: 0.2,
+            pointRadius: 0,
+            borderColor: "blue"
           }]
         },
-        options: {
-          responsive: true,
-          animation: false,
-          scales: {
-            x: { display: false },
-            y: { beginAtZero: false }
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'minute'
+            }
+          },
+          y: {
+            beginAtZero: false
           }
         }
       });
+      
+
 
       async function refreshChart() {
         const res = await fetch("/api/metrics?n=60");
         const j = await res.json();
-        const pts = j.points;
 
-        chart.data.labels = pts.map(p => {
-          const d = new Date(p.t * 1000);
-          return d.toLocaleTimeString();
-        });
-        chart.data.datasets[0].data = pts.map(p => p.value);
+        chart.data.datasets = j.datasets;
         chart.update();
       }
+
       setInterval(refreshChart, 2000);
       refreshChart();
     </script>
