@@ -155,7 +155,7 @@
           // Convert to proper JSON
           const obj = JSON.parse(cleanLine.replace(/'/g, '"'));
           log(obj);
-          
+
           document.getElementById("daily_liter_8").textContent = obj.daily_liter_8;
         }
           // document.getElementById("daily_liter_8").textContent = obj.daily_liter_8;
@@ -176,7 +176,7 @@
           //   document.getElementById("daily_liter_10").textContent = match3[1];
           // }
         }
-      }
+      
 
       setInterval(refreshTelemData, 10000); // Refresh every 10 seconds
       refreshTelemData();
