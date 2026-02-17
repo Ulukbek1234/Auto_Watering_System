@@ -44,6 +44,26 @@
       </div>
     </div>
 
+
+    <div class="grid-container">
+      <div class="card">
+        <div class="title">Daily_Liter_8</div>
+        <div class="value" id="daily_liter_8">--</div>
+      </div>
+
+      <div class="card">
+        <div class="title">Daily_Liter_9</div>
+        <div class="value" id="daily_liter_9">--</div>
+      </div>
+
+      <div class="card">
+        <div class="title">Daily_Liter_10</div>
+        <div class="value" id="daily_liter_10">--</div>
+      </div>
+    </div>
+
+
+
     <script>
       async function sendAction(name) {
         const res = await fetch("/api/action", {
@@ -113,9 +133,7 @@
             }
           }
         }});
-      
-
-
+    
       async function refreshChart() {
         const res = await fetch("/api/metrics?n=60");
         const j = await res.json();
@@ -126,6 +144,32 @@
 
       setInterval(refreshChart, chart_data_delay);
       refreshChart();
+
+
+      // ---- Telem data in grid display ----
+      async function refreshTelemData() {
+        const res = await fetch("/api/logs?n=1");
+        const j = await res.json();
+        if (j.lines.length > 0) {
+          const line = j.lines[0];
+          const match = line.match(/Daily_Liter_8=(\d+)/);
+          if (match) {
+            document.getElementById("daily_liter_8").textContent = match[1];
+          }
+          const match2 = line.match(/Daily_Liter_9=(\d+)/);
+          if (match2) {
+            document.getElementById("daily_liter_9").textContent = match2[1];
+          }
+          const match3 = line.match(/Daily_Liter_10=(\d+)/);
+          if (match3) {
+            document.getElementById("daily_liter_10").textContent = match3[1];
+          }
+        }
+      }
+
+      setInterval(refreshTelemData, 10000); // Refresh every 10 seconds
+      refreshTelemData();
+
     </script>
   </body>
 </html>
