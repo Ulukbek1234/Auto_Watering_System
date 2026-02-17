@@ -104,7 +104,7 @@ String Zone::getData()
     data_names[index] = "current_day";
     data_values[index++] = String(day_exact, NR_DEC_POINTS);
 
-    data_names[index] == "total_day";
+    data_names[index] = "total_day";
     data_values[index++] = String(total_day_progressed, NR_DEC_POINTS);
 
     for (int i = 0; i < nr_soil_sensors; i++)
