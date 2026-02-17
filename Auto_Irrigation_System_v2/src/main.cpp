@@ -62,7 +62,7 @@ void loop() {
       DEBUG_PRINTLN(serial_input);
     } else if (command == "TELEM") {
       Serial.println(pots->getData());
-      Serial.println(auto_pot->getData());
+      // Serial.println(auto_pot->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
     } else if (command == "SET_MODE") {
       String mode = "";
