@@ -173,6 +173,7 @@ def api_logs():
     # Return the newest N lines (already stored newest-first)
     n = int(request.args.get("n", 0))
     n = max(1, min(n, chart_points_count))
+    logging.info(f"Logs requested, n={n}")
     return jsonify({"lines": list(logs)[:n]})
 
 
