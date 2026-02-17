@@ -3,6 +3,7 @@
 Zone::Zone() 
 {
     // Construct Pump
+    EEPROM.get(0, old_total_day_progressed);
 }
 
 void Zone::addPump(int pin, float max_liters)
@@ -210,4 +211,20 @@ void Zone::manualIrrigation(int pump_id, float amount)
             return;
         }
     }
+}
+
+void Zone::saveToEEPROM()
+{
+    // EEPROM addresses
+    // sizeof(float) == 4 bytes
+    // 0-3 total_day_progressed
+    // 4-7 pump_8_total
+    // 8-11 pump_9_total
+    // 12-15 pump_10_total
+    // 16-19 pump_11_total
+
+    updateDay();
+    total_day_progressed = old_total_day_progressed + day_exact;
+    EEPROM.put(0, total_day_progressed);
+
 }
