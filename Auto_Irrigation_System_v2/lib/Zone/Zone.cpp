@@ -3,12 +3,12 @@
 Zone::Zone() 
 {
     // Construct Pump
-    EEPROM.get(0, old_total_day_progressed);
+    // EEPROM.get(0, old_total_day_progressed);
 
-    EEPROM.get(4, eeprom_values[0]);
-    EEPROM.get(8, eeprom_values[1]);
-    EEPROM.get(12, eeprom_values[2]);
-    EEPROM.get(16, eeprom_values[3]);
+    // EEPROM.get(4, eeprom_values[0]);
+    // EEPROM.get(8, eeprom_values[1]);
+    // EEPROM.get(12, eeprom_values[2]);
+    // EEPROM.get(16, eeprom_values[3]);
 }
 
 void Zone::addPump(int pin, float max_liters)
@@ -224,14 +224,14 @@ void Zone::saveToEEPROM()
     // 12-15 pump_10_total
     // 16-19 pump_11_total
 
-    updateDay();
-    EEPROM.put(0, total_day_progressed);
+    // updateDay();
+    // EEPROM.put(0, total_day_progressed);
 
-    for(int i = 0; i < nr_pumps; i++)
-    {
-        // 4 byte offset from total_day_progressed
-        // increment by float size
-        float total_value = eeprom_values[i] + pumps[i]->getTotalLiter();
-        EEPROM.put(4 + (i * 4), total_value);
-    }
+    // for(int i = 0; i < nr_pumps; i++)
+    // {
+    //     // 4 byte offset from total_day_progressed
+    //     // increment by float size
+    //     float total_value = eeprom_values[i] + pumps[i]->getTotalLiter();
+    //     EEPROM.put(4 + (i * 4), total_value);
+    // }
 }
