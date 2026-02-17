@@ -101,8 +101,8 @@ String Zone::getData()
     for (int i = 0; i < nr_soil_sensors; i++)
     {
         String soil_pin = String(soil_sensors[i]->getPin());
-        data_names[index] = "soil_sensor_pin_" + soil_pin;
-        data_values[index++] = soil_pin;
+        // data_names[index] = "soil_sensor_pin_" + soil_pin;
+        // data_values[index++] = soil_pin;
         data_names[index] = "moisture_percent_" + soil_pin;
         data_values[index++] = soil_sensors[i]->getMoisturePercent();
         data_names[index] = "moisture_raw_" + soil_pin;
