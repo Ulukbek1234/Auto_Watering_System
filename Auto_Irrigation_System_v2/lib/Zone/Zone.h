@@ -35,6 +35,8 @@ private:
     SoilSensor *soil_sensors[ARRAY_SIZE];
     WaterLevelSensor *water_level_sensors[ARRAY_SIZE];
 
+    float eeprom_values[4];
+
     OperationModes current_mode = MODE_OFF;
 
 public:
@@ -48,7 +50,6 @@ public:
     
     String getData();
     String parseDataForWriting(String data_names[], String data_values[], int size);
-    void resetDayProgression();
     void setOperationMode(OperationModes mode);
     void updateSensors();
     void manualIrrigation(int pump_id, float amount);

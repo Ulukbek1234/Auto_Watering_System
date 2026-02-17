@@ -4,6 +4,11 @@ Zone::Zone()
 {
     // Construct Pump
     EEPROM.get(0, old_total_day_progressed);
+
+    EEPROM.get(4, eeprom_values[0]);
+    EEPROM.get(8, eeprom_values[1]);
+    EEPROM.get(12, eeprom_values[2]);
+    EEPROM.get(16, eeprom_values[3]);
 }
 
 void Zone::addPump(int pin, float max_liters)
@@ -75,6 +80,7 @@ void Zone::updateDay()
     day_exact = millis_uptime / 1000.0 / 60.0 / 60.0 / 24.0;  // Convert to days
     DEBUG_PRINT("Updating day -- Days running: ");
     DEBUG_PRINTLN(day_exact);
+    total_day_progressed = old_total_day_progressed + day_exact;
     
     if((day_exact - day_progressed) > epsilon)
     {
@@ -98,6 +104,8 @@ String Zone::getData()
     data_names[index] = "current_day";
     data_values[index++] = String(day_exact, NR_DEC_POINTS);
 
+    data_names[index] == "total_day";
+    data_values[index++] = String(total_day_progressed, NR_DEC_POINTS);
 
     for (int i = 0; i < nr_soil_sensors; i++)
     {
@@ -123,6 +131,8 @@ String Zone::getData()
         data_values[index++] = String(pumps[i]->getMaxLiter(), NR_DEC_POINTS);
         data_names[index] = "is_active_" + pump_pin;
         data_values[index++] = String(pumps[i]->getIsActive());
+        data_names[index] = "eeprom_val_" + pump_pin;
+        data_values[index++] = eeprom_values[i];
     }
 
     for (int i = 0; i < nr_water_level_sensors; i++)
@@ -139,13 +149,6 @@ String Zone::getData()
     return Utils::parseDataForWriting(data_names, data_values, index);
 }
 
-
-
-void Zone::resetDayProgression()
-{
-    day_progressed = 0.0;
-    day_exact = 0.0;
-}
 
 void Zone::setOperationMode(OperationModes mode)
 {
@@ -224,7 +227,13 @@ void Zone::saveToEEPROM()
     // 16-19 pump_11_total
 
     updateDay();
-    total_day_progressed = old_total_day_progressed + day_exact;
     EEPROM.put(0, total_day_progressed);
 
+    for(int i = 0; i < nr_pumps; i++)
+    {
+        // 4 byte offset from total_day_progressed
+        // increment by float size
+        float total_value = eeprom_values[i] + pumps[i]->getTotalLiter();
+        EEPROM.put(4 + (i * 4), total_value);
+    }
 }

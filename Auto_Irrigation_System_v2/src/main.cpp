@@ -58,9 +58,6 @@ void loop() {
     {
       DEBUG_PRINT("No command found: ");
       DEBUG_PRINTLN(serial_input);
-    } else if (command == "SYNCH") {
-      pots->resetDayProgression();
-      DEBUG_PRINTLN("Day progression reset.");
     } else if (command == "TELEM") {
       Serial.println(pots->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
