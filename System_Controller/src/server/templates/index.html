@@ -98,18 +98,21 @@
             borderColor: "blue"
           }]
         },
-        scales: {
-          x: {
-            type: 'time',
-            time: {
-              unit: 'minute'
+        options: {
+          responsive: true,
+          animation: false,
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'minute'
+              }
+            },
+            y: {
+              beginAtZero: false
             }
-          },
-          y: {
-            beginAtZero: false
           }
-        }
-      });
+        }});
       
 
 
