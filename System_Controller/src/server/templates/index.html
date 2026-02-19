@@ -14,7 +14,7 @@
       .grid-container { 
         display: grid; 
         grid-template-columns: repeat(4, 1fr); 
-        grid-template-rows: repeat(4, 120px);
+        grid-template-rows: repeat(4, auto);
         gap: 16px; 
         padding: 12px;
         background: transparent;
@@ -40,7 +40,7 @@
           <button onclick="sendAction('CMD:SAV_EEP')">Save to EEPROM</button>
         </div>
 
-        
+        <h3>Telemetry</h3>
         <div class="grid-container">
           <div class="inner_card">
             <div class="title">Current_Day:</div>
