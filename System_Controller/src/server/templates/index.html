@@ -167,7 +167,7 @@
         }});
     
       async function refreshChart() {
-        const res = await fetch("/api/metrics?n=60");
+        const res = await fetch("/api/metrics?n=1440");
         const j = await res.json();
 
         chart.data.datasets = j.datasets;
