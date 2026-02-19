@@ -60,6 +60,7 @@ void commandHandler(String serial_input) {
       }
       Serial.println("");
       DEBUG_PRINTLN("Sent telemetry data.");
+      return;
     } 
     
     String zone_string = "";
