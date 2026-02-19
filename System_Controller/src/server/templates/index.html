@@ -38,8 +38,6 @@
           <button onclick="sendAction('CMD:SAV_EEP')">Save to EEPROM</button>
         </div>
 
-        <h3 style="margin-top:16px;">Telemetry Logs</h3>
-        <div id="logs"></div>
         
         <div class="grid-container">
           <div class="card">
@@ -82,6 +80,11 @@
             <div class="value" id="moisture_percent_P57">--</div>
           </div>
         </div>
+
+        
+        <h3 style="margin-top:16px;">Telemetry Logs</h3>
+        <div id="logs"></div>
+
       </div>
 
       <div class="card">
@@ -193,6 +196,10 @@
           document.getElementById("daily_liter_9").textContent = obj.daily_liter_9;
           document.getElementById("daily_liter_10").textContent = obj.daily_liter_10;
           document.getElementById("daily_liter_11").textContent = obj.daily_liter_11;
+          document.getElementById("moisture_percent_P54").textContent = obj.moisture_percent_54;
+          document.getElementById("moisture_percent_P55").textContent = obj.moisture_percent_55;
+          document.getElementById("moisture_percent_P56").textContent = obj.moisture_percent_56;
+          document.getElementById("moisture_percent_P57").textContent = obj.moisture_percent_57;
           document.getElementById("moisture_percent_P54").textContent = obj.moisture_percent_54;
           document.getElementById("moisture_percent_P55").textContent = obj.moisture_percent_55;
           document.getElementById("moisture_percent_P56").textContent = obj.moisture_percent_56;
