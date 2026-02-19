@@ -56,8 +56,9 @@ void commandHandler(String serial_input) {
 
     if (command == "TELEM") {
       for(int i = 0; i < 2; i++) {
-        Serial.println(all_pots[i]->getData());
+        Serial.print(all_pots[i]->getData());
       }
+      Serial.println("");
       DEBUG_PRINTLN("Sent telemetry data.");
     } 
     
