@@ -64,7 +64,8 @@ void commandHandler(String serial_input) {
     
     int zone = Utils::findDataFromMessage(serial_input, "ZONE:", command) ? command.toInt() : -1;
     if(zone < 0 || zone >= 2) {
-      Serial.println("Invalid zone specified");
+      Serial.print("Invalid zone specified: ");
+      Serial.println(zone);
       return;
     }
 
