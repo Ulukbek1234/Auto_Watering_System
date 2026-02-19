@@ -53,19 +53,21 @@ void commandHandler(String serial_input) {
       DEBUG_PRINTLN(serial_input);
       return;
     } 
-    int zone = Utils::findDataFromMessage(serial_input, "ZONE:", command) ? command.toInt() : -1;
-    if(zone < 0 || zone >= 2) {
-      Serial.println("Invalid zone specified");
-      return;
-    }
-
 
     if (command == "TELEM") {
       for(int i = 0; i < 2; i++) {
         Serial.println(all_pots[i]->getData());
       }
       DEBUG_PRINTLN("Sent telemetry data.");
-    } else if (command == "SET_MODE") {
+    } 
+    
+    int zone = Utils::findDataFromMessage(serial_input, "ZONE:", command) ? command.toInt() : -1;
+    if(zone < 0 || zone >= 2) {
+      Serial.println("Invalid zone specified");
+      return;
+    }
+
+    if (command == "SET_MODE") {
       // TODO which zone selected?
       String mode = "";
       if(Utils::findDataFromMessage(serial_input, "NEW_MODE:", mode))
