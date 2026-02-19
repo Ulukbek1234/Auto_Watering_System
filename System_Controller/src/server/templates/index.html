@@ -7,16 +7,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <style>
-      body { font-family: system-ui, sans-serif; margin: 16px; }
-      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-      .card { border: 1px solid #ddd; border-radius: 12px; padding: 12px; }
+      body { font-family: system-ui, sans-serif; margin: 16px; background: #f4f6f9;}
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px;}
+      .card { border: 1px solid #ddd; border-radius: 12px; padding: 12px;}
+      .inner_card { border: 1px solid #ddd; border-radius: 12px; padding: 12px; background: white;}
       .grid-container { 
         display: grid; 
         grid-template-columns: repeat(4, 1fr); 
-        grid-template-rows: repeat(4, 120px);
-        gap: 12px; 
+        grid-template-rows: repeat(4, auto);
+        gap: 16px; 
+        padding: 12px;
+        background: transparent;
       }
-      button { padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc; background: #f7f7f7; cursor: pointer; }
+      button { padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc; background: white; cursor: pointer; }
       button:active { transform: translateY(1px); }
       #logs { height: 260px; overflow: auto; background: #0b0b0b; color: #eaeaea; padding: 10px; border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
       img { width: 100%; border-radius: 12px; border: 1px solid #ddd; }
@@ -46,32 +49,78 @@
 
         </div>
 
-        <h3 style="margin-top:16px;">Telemetry Logs</h3>
-        <div id="logs"></div>
-        
+        <h3>Telemetry</h3>
         <div class="grid-container">
-          <div class="card">
+          <div class="inner_card">
+            <div class="title">Current_Day:</div>
+            <div class="value" id="current_day">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Total_Days:</div>
+            <div class="value" id="total_days">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Current_Mode:</div>
+            <div class="value" id="current_mode">--</div>
+          </div>
+
+          <div class="inner_card">
+          </div>
+
+          <div class="inner_card">
             <div class="title">Daily_Liter_8:</div>
             <div class="value" id="daily_liter_8">--</div>
           </div>
 
-          <div class="card">
+          <div class="inner_card">
             <div class="title">Daily_Liter_9:</div>
             <div class="value" id="daily_liter_9">--</div>
           </div>
           
-          <div class="card">
+          <div class="inner_card">
             <div class="title">Daily_Liter_10:</div>
             <div class="value" id="daily_liter_10">--</div>
           </div>
+
+          <div class="inner_card">
+            <div class="title">Daily_Liter_11:</div>
+            <div class="value" id="daily_liter_11">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Moisture_P54_%:</div>
+            <div class="value" id="moisture_percent_P54">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Moisture_P55_%:</div>
+            <div class="value" id="moisture_percent_P55">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Moisture_P56_%:</div>
+            <div class="value" id="moisture_percent_P56">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Moisture_P57_%:</div>
+            <div class="value" id="moisture_percent_P57">--</div>
+          </div>
         </div>
+
+        
+        <h3 style="margin-top:16px;">Logs</h3>
+        <div id="logs"></div>
+
       </div>
 
       <div class="card">
-        <h3>USB Camera</h3>
+        <h3>Camera</h3>
         <img id="cam" src="/static/latest.jpg" alt="camera feed" />
 
-        <h3 style="margin-top:16px;">Chart</h3>
+        <h3 style="margin-top:16px;">Moisture Chart</h3>
         <canvas id="chart" height="140"></canvas>
       </div>
     </div>
@@ -99,7 +148,7 @@
         const res = await fetch("/api/logs?n=80");
         const j = await res.json();
         const el = document.getElementById("logs");
-        el.textContent = j.lines.join("\n");
+        el.textContent = j.lines.join("\n\n\n");
       }
       setInterval(refreshLogs, 10000);
       refreshLogs();
@@ -147,7 +196,7 @@
         }});
     
       async function refreshChart() {
-        const res = await fetch("/api/metrics?n=60");
+        const res = await fetch("/api/metrics?n=1440");
         const j = await res.json();
 
         chart.data.datasets = j.datasets;
@@ -172,10 +221,24 @@
           // Convert to proper JSON
           const obj = JSON.parse(cleanLine.replace(/'/g, '"'));
 
+          document.getElementById("current_day").textContent = obj.current_day;
+          document.getElementById("total_days").textContent = obj.total_days;
+          document.getElementById("current_mode").textContent = obj.current_mode;
+          // document.getElementById("daily_liter_11").textContent = obj.daily_liter_11;
+
           document.getElementById("daily_liter_8").textContent = obj.daily_liter_8;
           document.getElementById("daily_liter_9").textContent = obj.daily_liter_9;
           document.getElementById("daily_liter_10").textContent = obj.daily_liter_10;
-        
+          document.getElementById("daily_liter_11").textContent = obj.daily_liter_11;
+          document.getElementById("moisture_percent_P54").textContent = obj.moisture_percent_54;
+          document.getElementById("moisture_percent_P55").textContent = obj.moisture_percent_55;
+          document.getElementById("moisture_percent_P56").textContent = obj.moisture_percent_56;
+          document.getElementById("moisture_percent_P57").textContent = obj.moisture_percent_57;
+          document.getElementById("moisture_percent_P54").textContent = obj.moisture_percent_54;
+          document.getElementById("moisture_percent_P55").textContent = obj.moisture_percent_55;
+          document.getElementById("moisture_percent_P56").textContent = obj.moisture_percent_56;
+          document.getElementById("moisture_percent_P57").textContent = obj.moisture_percent_57;
+
         }
       }
 
