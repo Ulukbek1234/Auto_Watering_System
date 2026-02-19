@@ -6,6 +6,7 @@
 
 Zone *pots;
 Zone *auto_pot;
+Zone all_pots[2]; // TODO dynamic array if more pots needed in future
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
 
@@ -27,6 +28,9 @@ void setup() {
   auto_pot->setOperationMode(MODE_MANUAL);
   auto_pot->addPump(11, 0.4);
   auto_pot->addSoilSensor(A3);
+
+  all_pots[0] = *pots;
+  all_pots[1] = *auto_pot;
   start_time = millis();
 }
 
@@ -40,35 +44,31 @@ void setup() {
     - Slave to master commands
 */
 
-/*
-cmd:man_irr,pump:9,amount:0.3
-
-*/
-
-void loop() {
-  // Check serial for commands from master here
-  if(Serial.available() > 0) {
-    String serial_input = Serial.readStringUntil('\n');
-    DEBUG_PRINTLN("Received command: " + serial_input);
-    serial_input.toUpperCase();
-    serial_input.trim();
-    // TODO clean this up, what a mess
-    
+void commandHandler(String serial_input) {
     String command = "";
     bool real_command = Utils::findDataFromMessage(serial_input, "CMD:", command);
     if(!real_command)
     {
       DEBUG_PRINT("No command found: ");
       DEBUG_PRINTLN(serial_input);
-    } else if (command == "TELEM") {
-      Serial.println(pots->getData());
-      // Serial.println(auto_pot->getData());
+      return;
+    } 
+    int zone = Utils::findDataFromMessage(serial_input, "ZONE:", command) ? command.toInt() : -1;
+    if(zone < 0 || zone >= 2) {
+      Serial.println("Invalid zone specified");
+      return;
+    }
+
+
+    if (command == "TELEM") {
+      Serial.println(all_pots[zone].getData());
       DEBUG_PRINTLN("Sent telemetry data.");
     } else if (command == "SET_MODE") {
+      // TODO which zone selected?
       String mode = "";
       if(Utils::findDataFromMessage(serial_input, "NEW_MODE:", mode))
       {
-        pots->setOperationMode(static_cast<OperationModes>(mode.toInt()));
+        all_pots[zone].setOperationMode(static_cast<OperationModes>(mode.toInt()));
         Serial.print("NEW_MODE_SELECTED: ");
         Serial.println(mode);
         DEBUG_PRINTLN("Set operation mode to: " + mode);
@@ -79,19 +79,29 @@ void loop() {
       DEBUG_PRINTLN("Started manual irrigating.");
       String pump_id = "";
       String amount = "";
-      // TODO checks if correct format (assuming correct)
       Utils::findDataFromMessage(serial_input, "PUMP:", pump_id);
       Utils::findDataFromMessage(serial_input, "AMOUNT:", amount);
-      pots->manualIrrigation(pump_id.toInt(), amount.toFloat());
+      all_pots[zone].manualIrrigation(pump_id.toInt(), amount.toFloat());
       Serial.println("MANUAL_IRRIGATION_DONE");
     } else if (command == "SAV_EEP") {
-      pots->saveToEEPROM();
+      all_pots[zone].saveToEEPROM();
       Serial.println("SAVING_TO_EEPROM");
     }
     else {
       DEBUG_PRINT("Unknown command");
       DEBUG_PRINTLN(command);
     }
+
+}
+
+void loop() {
+  // Check serial for commands from master here
+  if(Serial.available() > 0) {
+    String serial_input = Serial.readStringUntil('\n');
+    DEBUG_PRINTLN("Received command: " + serial_input);
+    serial_input.toUpperCase();
+    serial_input.trim();
+    commandHandler(serial_input);
   }
   // Non-Blocking delay logic
   if(millis() - start_time >= wait_time)

@@ -30,11 +30,20 @@
       <div class="card">
         <h3>Controls</h3>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button onclick="sendAction('CMD:MAN_IRR,PUMP:8,AMOUNT:0.1')">Splash Pump 8</button>
-          <button onclick="sendAction('CMD:MAN_IRR,PUMP:9,AMOUNT:0.1')">Splash Pump 9</button>
-          <button onclick="sendAction('CMD:MAN_IRR,PUMP:10,AMOUNT:0.1')">Splash Pump 10</button>
-          <button onclick="sendAction('CMD:MAN_IRR,PUMP:11,AMOUNT:0.1')">Splash Pump 11</button>
-          <button onclick="sendAction('CMD:SAV_EEP')">Save to EEPROM</button>
+          <button onclick="sendAction('CMD:MAN_IRR,PUMP:8,AMOUNT:0.1,ZONE:0')">Splash Pump 8</button>
+          <button onclick="sendAction('CMD:MAN_IRR,PUMP:9,AMOUNT:0.1,ZONE:0')">Splash Pump 9</button>
+          <button onclick="sendAction('CMD:MAN_IRR,PUMP:10,AMOUNT:0.1,ZONE:0')">Splash Pump 10</button>
+          <button onclick="sendAction('CMD:MAN_IRR,PUMP:11,AMOUNT:0.1,ZONE:1')">Splash Pump 11</button>
+          
+          <button onclick="sendAction('CMD:SAV_EEP,ZONE:0')">Save to EEPROM, Zone 0</button>
+          <button onclick="sendAction('CMD:SAV_EEP,ZONE:1')">Save to EEPROM, Zone 1</button>
+
+          <button onclick="sendAction('CMD:SET_MODE,ZONE:0,NEW_MODE:0')">Set Mode, Zone 0, STOP</button>
+          <button onclick="sendAction('CMD:SET_MODE,ZONE:1,NEW_MODE:0')">Set Mode, Zone 1, STOP</button>
+
+          <button onclick="sendAction('CMD:SET_MODE,ZONE:0,NEW_MODE:3')">Set Mode, Zone 0, SOIL</button>
+          <button onclick="sendAction('CMD:SET_MODE,ZONE:1,NEW_MODE:3')">Set Mode, Zone 1, SOIL</button>
+
         </div>
 
         <h3 style="margin-top:16px;">Telemetry Logs</h3>
