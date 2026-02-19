@@ -55,6 +55,31 @@
             <div class="title">Daily_Liter_10:</div>
             <div class="value" id="daily_liter_10">--</div>
           </div>
+
+          <div class="card">
+            <div class="title">Daily_Liter_11:</div>
+            <div class="value" id="daily_liter_11">--</div>
+          </div>
+
+          <div class="card">
+            <div class="title">Moisture_%_P54:</div>
+            <div class="value" id="moisture_%_P54">--</div>
+          </div>
+
+          <div class="card">
+            <div class="title">Moisture_%_P55:</div>
+            <div class="value" id="moisture_%_P55">--</div>
+          </div>
+
+          <div class="card">
+            <div class="title">Moisture_%_P56:</div>
+            <div class="value" id="moisture_%_P56">--</div>
+          </div>
+
+          <div class="card">
+            <div class="title">Moisture_%_P57:</div>
+            <div class="value" id="moisture_%_P57">--</div>
+          </div>
         </div>
       </div>
 
@@ -62,7 +87,7 @@
         <h3>USB Camera</h3>
         <img id="cam" src="/static/latest.jpg" alt="camera feed" />
 
-        <h3 style="margin-top:16px;">Chart</h3>
+        <h3 style="margin-top:16px;">Moisture Chart</h3>
         <canvas id="chart" height="140"></canvas>
       </div>
     </div>
@@ -166,6 +191,12 @@
           document.getElementById("daily_liter_8").textContent = obj.daily_liter_8;
           document.getElementById("daily_liter_9").textContent = obj.daily_liter_9;
           document.getElementById("daily_liter_10").textContent = obj.daily_liter_10;
+          document.getElementById("daily_liter_11").textContent = obj.daily_liter_11;
+          document.getElementById("moisture_%_54").textContent = obj.moisture_percent_54;
+          document.getElementById("moisture_%_55").textContent = obj.moisture_percent_55;
+          document.getElementById("moisture_%_56").textContent = obj.moisture_percent_56;
+          document.getElementById("moisture_%_57").textContent = obj.moisture_percent_57;
+
         
         }
       }
