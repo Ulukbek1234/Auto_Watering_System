@@ -6,7 +6,7 @@
 
 Zone *pots;
 Zone *auto_pot;
-Zone all_pots[2]; // TODO dynamic array if more pots needed in future
+Zone *all_pots[2]; // TODO dynamic array if more pots needed in future
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
 
@@ -29,8 +29,8 @@ void setup() {
   auto_pot->addPump(11, 0.4);
   auto_pot->addSoilSensor(A3);
 
-  all_pots[0] = *pots;
-  all_pots[1] = *auto_pot;
+  all_pots[0] = pots;
+  all_pots[1] = auto_pot;
   start_time = millis();
 }
 
@@ -61,14 +61,14 @@ void commandHandler(String serial_input) {
 
 
     if (command == "TELEM") {
-      Serial.println(all_pots[zone].getData());
+      Serial.println(all_pots[zone]->getData());
       DEBUG_PRINTLN("Sent telemetry data.");
     } else if (command == "SET_MODE") {
       // TODO which zone selected?
       String mode = "";
       if(Utils::findDataFromMessage(serial_input, "NEW_MODE:", mode))
       {
-        all_pots[zone].setOperationMode(static_cast<OperationModes>(mode.toInt()));
+        all_pots[zone]->setOperationMode(static_cast<OperationModes>(mode.toInt()));
         Serial.print("NEW_MODE_SELECTED: ");
         Serial.println(mode);
         DEBUG_PRINTLN("Set operation mode to: " + mode);
@@ -81,10 +81,10 @@ void commandHandler(String serial_input) {
       String amount = "";
       Utils::findDataFromMessage(serial_input, "PUMP:", pump_id);
       Utils::findDataFromMessage(serial_input, "AMOUNT:", amount);
-      all_pots[zone].manualIrrigation(pump_id.toInt(), amount.toFloat());
+      all_pots[zone]->manualIrrigation(pump_id.toInt(), amount.toFloat());
       Serial.println("MANUAL_IRRIGATION_DONE");
     } else if (command == "SAV_EEP") {
-      all_pots[zone].saveToEEPROM();
+      all_pots[zone]->saveToEEPROM();
       Serial.println("SAVING_TO_EEPROM");
     }
     else {
