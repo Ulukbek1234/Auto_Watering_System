@@ -1,6 +1,6 @@
 #include "Zone.h"
 
-Zone::Zone() 
+Zone::Zone(int id) : zone_id(id)
 {
     // Construct Pump
     // EEPROM.get(0, old_total_day_progressed);
@@ -107,7 +107,7 @@ String Zone::getData()
     data_names[index] = "total_days";
     data_values[index++] = String(total_day_progressed, NR_DEC_POINTS);
 
-    data_names[index] = "current_mode";
+    data_names[index] = "current_mode_" + String(zone_id);
     data_values[index++] = current_mode;
 
     for (int i = 0; i < nr_soil_sensors; i++)

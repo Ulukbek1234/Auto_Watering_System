@@ -21,6 +21,7 @@ enum OperationModes {
 class Zone 
 {
 private:
+    int zone_id = 0;
     int nr_pumps = 0;
     int nr_soil_sensors = 0;
     int nr_water_level_sensors = 0;
@@ -40,7 +41,7 @@ private:
     OperationModes current_mode = MODE_OFF;
 
 public:
-    Zone();
+    Zone(int id);
 
     void addPump(int pin, float max_liter);
     void addSoilSensor(uint8_t pin);
