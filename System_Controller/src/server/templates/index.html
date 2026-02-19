@@ -41,6 +41,24 @@
         
         <div class="grid-container">
           <div class="card">
+            <div class="title">Current_Day:</div>
+            <div class="value" id="current_day">--</div>
+          </div>
+
+          <div class="card">
+            <div class="title">Total_Days:</div>
+            <div class="value" id="total_days">--</div>
+          </div>
+
+          <div class="card">
+            <div class="title">Current_Mode:</div>
+            <div class="value" id="current_mode">--</div>
+          </div>
+
+          <div class="card">
+          </div>
+
+          <div class="card">
             <div class="title">Daily_Liter_8:</div>
             <div class="value" id="daily_liter_8">--</div>
           </div>
@@ -191,6 +209,11 @@
           
           // Convert to proper JSON
           const obj = JSON.parse(cleanLine.replace(/'/g, '"'));
+
+          document.getElementById("current_day").textContent = obj.current_day;
+          document.getElementById("total_days").textContent = obj.total_days;
+          document.getElementById("current_mode").textContent = obj.current_mode;
+          // document.getElementById("daily_liter_11").textContent = obj.daily_liter_11;
 
           document.getElementById("daily_liter_8").textContent = obj.daily_liter_8;
           document.getElementById("daily_liter_9").textContent = obj.daily_liter_9;
