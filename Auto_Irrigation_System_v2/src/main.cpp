@@ -62,7 +62,8 @@ void commandHandler(String serial_input) {
       DEBUG_PRINTLN("Sent telemetry data.");
     } 
     
-    int zone = Utils::findDataFromMessage(serial_input, "ZONE:", command) ? command.toInt() : -1;
+    String zone_string = "";
+    int zone = Utils::findDataFromMessage(serial_input, "ZONE:", zone_string) ? zone_string.toInt() : -1;
     if(zone < 0 || zone >= 2) {
       Serial.print("Invalid zone specified: ");
       Serial.println(zone);
