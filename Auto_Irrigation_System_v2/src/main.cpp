@@ -61,7 +61,9 @@ void commandHandler(String serial_input) {
 
 
     if (command == "TELEM") {
-      Serial.println(all_pots[zone]->getData());
+      for(int i = 0; i < 2; i++) {
+        Serial.println(all_pots[i]->getData());
+      }
       DEBUG_PRINTLN("Sent telemetry data.");
     } else if (command == "SET_MODE") {
       // TODO which zone selected?
