@@ -54,14 +54,28 @@ void commandHandler(String serial_input) {
       return;
     } 
 
+    int nr_zones = 2; // TODO change dynamically
+
     if (command == "TELEM") {
-      for(int i = 0; i < 2; i++) {
+      for(int i = 0; i < nr_zones; i++) {
         Serial.print(all_pots[i]->getData());
       }
       Serial.println("");
       DEBUG_PRINTLN("Sent telemetry data.");
       return;
     } 
+
+    if (command == "SAV_EEP")
+    {
+      int offset = 0;
+      for(int i = 0; i < nr_zones; i++)
+      {
+        offset = all_pots[i]->saveToEEPROM(offset);
+        // offset += 4; maybe required
+      }
+      Serial.println("SAVING_TO_EEPROM");
+      return;
+    }
     
     String zone_string = "";
     int zone = Utils::findDataFromMessage(serial_input, "ZONE:", zone_string) ? zone_string.toInt() : -1;
@@ -91,11 +105,7 @@ void commandHandler(String serial_input) {
       Utils::findDataFromMessage(serial_input, "AMOUNT:", amount);
       all_pots[zone]->manualIrrigation(pump_id.toInt(), amount.toFloat());
       Serial.println("MANUAL_IRRIGATION_DONE");
-    } else if (command == "SAV_EEP") {
-      all_pots[zone]->saveToEEPROM();
-      Serial.println("SAVING_TO_EEPROM");
-    }
-    else {
+    } else {
       DEBUG_PRINT("Unknown command");
       DEBUG_PRINTLN(command);
     }

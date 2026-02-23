@@ -55,7 +55,7 @@ public:
     void setOperationMode(OperationModes mode);
     void updateSensors();
     void manualIrrigation(int pump_id, float amount);
-    void saveToEEPROM();
+    int saveToEEPROM(int absolute_offset);
 };
 
 #endif

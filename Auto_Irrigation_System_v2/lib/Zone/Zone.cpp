@@ -221,16 +221,11 @@ void Zone::manualIrrigation(int pump_id, float amount)
     }
 }
 
-void Zone::saveToEEPROM()
+int Zone::saveToEEPROM(int absolute_offset)
 {
     // EEPROM addresses
     // sizeof(float) == 4 bytes
-    // 0-3 total_day_progressed
-    // 4-7 pump_8_total
-    // 8-11 pump_9_total
-    // 12-15 pump_10_total
-    // 16-19 pump_11_total
-    int offset = zone_id * 4;
+    int offset = absolute_offset;
 
     updateDay();
     EEPROM.put(offset, total_day_progressed);
@@ -244,4 +239,5 @@ void Zone::saveToEEPROM()
         EEPROM.put(offset + (i * 4), total_value);
         offset += 4;
     }
+    return offset;
 }
