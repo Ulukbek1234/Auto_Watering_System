@@ -84,6 +84,7 @@ void commandHandler(String serial_input) {
         all_pots[i]->resetEEPROM();
       }
       Serial.println("RESET_EEPROM");
+      return;
     }
     
     String zone_string = "";
