@@ -116,7 +116,10 @@ void loop() {
   {
     start_time = millis();
     DEBUG_PRINTLN("Waiting period over, checking sensors again.");
-    pots->startAutoIrrigating();
-    pots->updateDay();
+    for(int i = 0; i < 2; i++)
+    {
+      all_pots[i]->startAutoIrrigating();
+      all_pots[i]->updateDay();
+    }
   }
 }
