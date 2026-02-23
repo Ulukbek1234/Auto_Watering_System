@@ -3,12 +3,12 @@
 Zone::Zone(int id) : zone_id(id)
 {
     // Construct Pump
-    // EEPROM.get(0, old_total_day_progressed);
+    EEPROM.get(0, old_total_day_progressed);
 
-    // EEPROM.get(4, eeprom_values[0]);
-    // EEPROM.get(8, eeprom_values[1]);
-    // EEPROM.get(12, eeprom_values[2]);
-    // EEPROM.get(16, eeprom_values[3]);
+    EEPROM.get(4, eeprom_values[0]);
+    EEPROM.get(8, eeprom_values[1]);
+    EEPROM.get(12, eeprom_values[2]);
+    EEPROM.get(16, eeprom_values[3]);
 }
 
 void Zone::addPump(int pin, float max_liters)
@@ -132,8 +132,8 @@ String Zone::getData()
         data_values[index++] = String(pumps[i]->getMaxLiter(), NR_DEC_POINTS);
         // data_names[index] = "is_active_" + pump_pin;
         // data_values[index++] = String(pumps[i]->getIsActive());
-        // data_names[index] = "eeprom_val_" + pump_pin;
-        // data_values[index++] = eeprom_values[i];
+        data_names[index] = "eeprom_val_" + pump_pin;
+        data_values[index++] = eeprom_values[i];
     }
 
     for (int i = 0; i < nr_water_level_sensors; i++)
