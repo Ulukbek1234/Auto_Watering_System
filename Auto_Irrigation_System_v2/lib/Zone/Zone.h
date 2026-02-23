@@ -7,6 +7,7 @@
 #include "SoilSensor.h"
 #include "WaterLevelSensor.h"
 #include "Utils.h"
+#include "EEPROM.h"
 
 const int ARRAY_SIZE = 16;
 const float MOISTURE_THRESHOLD = 0.3;
