@@ -242,5 +242,6 @@ void Zone::saveToEEPROM()
         // increment by float size
         float total_value = eeprom_values[i] + pumps[i]->getTotalLiter();
         EEPROM.put(offset + (i * 4), total_value);
+        offset += 4;
     }
 }
