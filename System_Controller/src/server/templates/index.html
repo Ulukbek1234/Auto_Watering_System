@@ -19,6 +19,14 @@
         padding: 12px;
         background: transparent;
       }
+      .button-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* 3 columns */
+        gap: 16px; 
+        padding: 12px;
+        background: transparent;
+        max-width: 300px;
+      }
       button { padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc; background: white; cursor: pointer; }
       button:active { transform: translateY(1px); }
       #logs { height: 260px; overflow: auto; background: #0b0b0b; color: #eaeaea; padding: 10px; border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
@@ -29,10 +37,10 @@
   <body>
     <h2>Uluks Grow Dashboard</h2>
 
-    <div class="grid-container">
+    <div class="grid">
       <div class="card">
         <h3>Controls</h3>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        </div class = "button-grid">
           <button onclick="sendAction('CMD:MAN_IRR,PUMP:8,AMOUNT:0.1,ZONE:0')">Splash Pump 8</button>
           <button onclick="sendAction('CMD:MAN_IRR,PUMP:9,AMOUNT:0.1,ZONE:0')">Splash Pump 9</button>
           <button onclick="sendAction('CMD:MAN_IRR,PUMP:10,AMOUNT:0.1,ZONE:0')">Splash Pump 10</button>
