@@ -32,17 +32,18 @@ private:
     float old_total_day_progressed = 0.0;
     float moisture_percent[ARRAY_SIZE] = {0.0f};
     float water_level_percent[ARRAY_SIZE] = {0.0f};
-
+    
     Pump *pumps[ARRAY_SIZE]; 
     SoilSensor *soil_sensors[ARRAY_SIZE];
     WaterLevelSensor *water_level_sensors[ARRAY_SIZE];
-
-    float eeprom_values[4];
-
+    
+    float eeprom_values[3];
+    
     OperationModes current_mode = MODE_OFF;
-
+    
 public:
-    Zone(int id);
+    int eeprom_offset = 0;
+    Zone(int id, int absolute_offset);
 
     void addPump(int pin, float max_liter);
     void addSoilSensor(uint8_t pin);

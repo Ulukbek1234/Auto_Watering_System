@@ -1,10 +1,10 @@
 #include "Zone.h"
 
-Zone::Zone(int id) : zone_id(id)
+Zone::Zone(int id, int absolute_offset) : zone_id(id)
 {
     // Construct Pump
+    int offset = absolute_offset;
 
-    int offset = zone_id * 4;
     EEPROM.get(offset, old_total_day_progressed);
     offset += 4;
 
@@ -13,6 +13,7 @@ Zone::Zone(int id) : zone_id(id)
         EEPROM.get(offset, eeprom_values[i]);
         offset += 4;
     }
+    eeprom_offset = offset;
 }
 
 void Zone::addPump(int pin, float max_liters)

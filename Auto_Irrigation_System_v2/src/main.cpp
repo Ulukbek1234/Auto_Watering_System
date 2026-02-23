@@ -12,7 +12,8 @@ const unsigned long wait_time = 60000; // 1 minute
 
 void setup() {
   Serial.begin(9600);
-  pots = new Zone(0);
+  int offset = 0;
+  pots = new Zone(0, offset);
   pots->setOperationMode(MODE_SOIL);
 
   pots->addPump(8, 0.5);
@@ -24,7 +25,8 @@ void setup() {
   pots->addSoilSensor(A2);
   // pots->addWaterLevelSensor(A0);
   
-  auto_pot = new Zone(1);
+  offset = pots->eeprom_offset;
+  auto_pot = new Zone(1, offset);
   auto_pot->setOperationMode(MODE_MANUAL);
   auto_pot->addPump(11, 0.4);
   auto_pot->addSoilSensor(A3);
