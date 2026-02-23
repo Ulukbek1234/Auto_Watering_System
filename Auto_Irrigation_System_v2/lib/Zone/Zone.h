@@ -29,7 +29,7 @@ private:
     float day_progressed = 0.0;
     float day_exact = 0.0;
     float total_day_progressed = 0.0;
-    float old_total_day_progressed = 0.0;
+    float eeprom_total_day_progressed = 0.0;
     float moisture_percent[ARRAY_SIZE] = {0.0f};
     float water_level_percent[ARRAY_SIZE] = {0.0f};
     
@@ -42,7 +42,9 @@ private:
     OperationModes current_mode = MODE_OFF;
     
 public:
-    int eeprom_offset = 0;
+    int eeprom_offset_start = 0;
+    int eeprom_offset_end = 0;
+
     Zone(int id, int absolute_offset);
 
     void addPump(int pin, float max_liter);
@@ -56,7 +58,8 @@ public:
     void setOperationMode(OperationModes mode);
     void updateSensors();
     void manualIrrigation(int pump_id, float amount);
-    int saveToEEPROM(int absolute_offset);
+    void saveToEEPROM();
+    void resetEEPROM();
 };
 
 #endif

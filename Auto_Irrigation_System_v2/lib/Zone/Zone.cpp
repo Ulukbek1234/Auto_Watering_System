@@ -3,17 +3,17 @@
 Zone::Zone(int id, int absolute_offset) : zone_id(id)
 {
     // Construct Pump
-    int offset = absolute_offset;
+    eeprom_offset_start = absolute_offset;
 
-    EEPROM.get(offset, old_total_day_progressed);
-    offset += 4;
+    EEPROM.get(absolute_offset, eeprom_total_day_progressed);
+    absolute_offset += 4;
 
     for(int i = 0; i < 4; i++)
     {
-        EEPROM.get(offset, eeprom_values[i]);
-        offset += 4;
+        EEPROM.get(absolute_offset, eeprom_values[i]);
+        absolute_offset += 4;
     }
-    eeprom_offset = offset;
+    eeprom_offset_end = absolute_offset;
 }
 
 void Zone::addPump(int pin, float max_liters)
@@ -85,7 +85,7 @@ void Zone::updateDay()
     day_exact = millis_uptime / 1000.0 / 60.0 / 60.0 / 24.0;  // Convert to days
     DEBUG_PRINT("Updating day -- Days running: ");
     DEBUG_PRINTLN(day_exact);
-    total_day_progressed = old_total_day_progressed + day_exact;
+    total_day_progressed = eeprom_total_day_progressed + day_exact;
     
     if((day_exact - day_progressed) > epsilon)
     {
@@ -222,11 +222,11 @@ void Zone::manualIrrigation(int pump_id, float amount)
     }
 }
 
-int Zone::saveToEEPROM(int absolute_offset)
+void Zone::saveToEEPROM()
 {
     // EEPROM addresses
     // sizeof(float) == 4 bytes
-    int offset = absolute_offset;
+    int offset = eeprom_offset_start;
 
     updateDay();
     EEPROM.put(offset, total_day_progressed);
@@ -240,5 +240,22 @@ int Zone::saveToEEPROM(int absolute_offset)
         EEPROM.put(offset + (i * 4), total_value);
         offset += 4;
     }
-    return offset;
+}
+
+int Zone::resetEEPROM()
+{
+    int offset = eeprom_offset_start;
+    eeprom_total_day_progressed = 0.0;
+
+    EEPROM.put(offset, 0);
+    offset += 4;
+
+    for(int i = 0; i < nr_pumps; i++)
+    {
+        // 4 byte offset from total_day_progressed
+        // increment by float size
+        eeprom_values[i] = 0.0;
+        EEPROM.put(offset + (i * 4), 0.0);
+        offset += 4;
+    }
 }

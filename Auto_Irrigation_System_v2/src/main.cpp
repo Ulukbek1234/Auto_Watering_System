@@ -25,7 +25,7 @@ void setup() {
   pots->addSoilSensor(A2);
   // pots->addWaterLevelSensor(A0);
   
-  offset = pots->eeprom_offset;
+  offset = pots->eeprom_offset_end;
   auto_pot = new Zone(1, offset);
   auto_pot->setOperationMode(MODE_MANUAL);
   auto_pot->addPump(11, 0.4);
@@ -69,14 +69,21 @@ void commandHandler(String serial_input) {
 
     if (command == "SAV_EEP")
     {
-      int offset = 0;
       for(int i = 0; i < nr_zones; i++)
       {
-        offset = all_pots[i]->saveToEEPROM(offset);
-        // offset += 4; maybe required
+        all_pots[i]->saveToEEPROM();
       }
       Serial.println("SAVING_TO_EEPROM");
       return;
+    }
+
+    if (command == "RST_EEP")
+    {
+      for(int i = 0; i < nr_zones; i++)
+      {
+        all_pots[i]->resetEEPROM();
+      }
+      Serial.println("RESET_EEPROM");
     }
     
     String zone_string = "";
