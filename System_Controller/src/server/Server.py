@@ -31,6 +31,7 @@ logs: Deque[str] = deque(maxlen=300)
 moisture_perc_P54: Deque[Dict[str, Any]] = deque(maxlen=300)
 moisture_perc_P55: Deque[Dict[str, Any]] = deque(maxlen=300)
 moisture_perc_P56: Deque[Dict[str, Any]] = deque(maxlen=300)
+moisture_perc_P57: Deque[Dict[str, Any]] = deque(maxlen=300)
 
 start_time = time.time()
 
@@ -147,11 +148,15 @@ def metrics_loop() -> None:
             perc_54 = parsed_data.get("moisture_percent_54")
             perc_55 = parsed_data.get("moisture_percent_55")
             perc_56 = parsed_data.get("moisture_percent_56")
-            logging.info(f"Moisture percentages: P54={perc_54}, P55={perc_55}, P56={perc_56}")
+            perc_57 = parsed_data.get("moisture_percent_57")
+
+            logging.info(f"Moisture percentages: P54={perc_54}, P55={perc_55}, P56={perc_56}, P57={perc_57}")
             
             moisture_perc_P54.append({"t": time.time(), "value": perc_54})
             moisture_perc_P55.append({"t": time.time(), "value": perc_55})
             moisture_perc_P56.append({"t": time.time(), "value": perc_56})
+            moisture_perc_P57.append({"t": time.time(), "value": perc_57})
+
         time.sleep(chart_data_delay)
 
 
@@ -185,6 +190,7 @@ def api_metrics():
     pts1 = list(moisture_perc_P54)[-n:]
     pts2 = list(moisture_perc_P55)[-n:]
     pts3 = list(moisture_perc_P56)[-n:]
+    pts4 = list(moisture_perc_P57)[-n:]
 
     return jsonify({
         "datasets": [
@@ -199,6 +205,10 @@ def api_metrics():
             {
                 "label": "P56",
                 "data": [{"x": p["t"] * 1000, "y": p["value"]} for p in pts3]
+            },
+            {
+                "label": "P57",
+                "data": [{"x": p["t"] * 1000, "y": p["value"]} for p in pts4]
             }
         ]
     })
