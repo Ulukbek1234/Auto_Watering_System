@@ -5,8 +5,8 @@ Zone::Zone(int id, int absolute_offset) : zone_id(id)
     // Construct Pump
     eeprom_offset_start = absolute_offset;
 
-    EEPROM.get(absolute_offset, eeprom_total_day_progressed);
-    absolute_offset += 4;
+    // EEPROM.get(absolute_offset, eeprom_total_day_progressed);
+    // absolute_offset += 4;
 
     for(int i = 0; i < 4; i++)
     {
@@ -228,9 +228,9 @@ void Zone::saveToEEPROM()
     // sizeof(float) == 4 bytes
     int offset = eeprom_offset_start;
 
-    updateDay();
-    EEPROM.put(offset, total_day_progressed);
-    offset += 4;
+    // updateDay();
+    // EEPROM.put(offset, total_day_progressed);
+    // offset += 4;
 
     for(int i = 0; i < nr_pumps; i++)
     {
