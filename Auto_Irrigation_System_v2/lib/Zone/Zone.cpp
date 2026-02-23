@@ -242,7 +242,7 @@ void Zone::saveToEEPROM()
     }
 }
 
-int Zone::resetEEPROM()
+void Zone::resetEEPROM()
 {
     int offset = eeprom_offset_start;
     eeprom_total_day_progressed = 0.0;
