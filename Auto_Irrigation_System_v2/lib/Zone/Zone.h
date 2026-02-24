@@ -10,7 +10,7 @@
 #include "EEPROM.h"
 
 const int ARRAY_SIZE = 16;
-const float MOISTURE_THRESHOLD = 0.35;
+const float MOISTURE_THRESHOLD = 35.0;
 
 enum OperationModes {
     MODE_OFF = 0,
