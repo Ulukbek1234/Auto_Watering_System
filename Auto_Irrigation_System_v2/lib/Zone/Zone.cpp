@@ -66,7 +66,7 @@ void Zone::startAutoIrrigating()
         {
             DEBUG_PRINT("moisture_percent for sensor: ");
             DEBUG_PRINTLN(moisture_percent[i]);
-            if(moisture_percent[i] < MOISTURE_THRESHOLD)
+            if((moisture_percent[i] - MOISTURE_THRESHOLD) > epsilon )
             {
                 pumps[i]->turnOnPump(0.1);
             }
