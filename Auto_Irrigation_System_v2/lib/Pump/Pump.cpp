@@ -69,3 +69,9 @@ void Pump::deactivatePump()
     DEBUG_PRINTLN("Pump deactivated");
     is_active = false;
 }
+
+void Pump::updateMaxLiters(float new_max)
+{
+    limit_reached = false; 
+    max_liters = new_max;
+}
