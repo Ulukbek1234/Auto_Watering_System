@@ -16,8 +16,8 @@ void setup() {
   pots = new Zone(0, offset);
   pots->setOperationMode(MODE_SOIL);
 
-  pots->addPump(8, 0.5);
-  pots->addPump(9, 0.5);
+  pots->addPump(8, 1.0);
+  pots->addPump(9, 1.0);
   pots->addPump(10, 0.2);
   
   pots->addSoilSensor(A0);
