@@ -148,14 +148,14 @@ def metrics_loop() -> None:
             perc_54 = parsed_data.get("moisture_percent_54")
             perc_55 = parsed_data.get("moisture_percent_55")
             perc_56 = parsed_data.get("moisture_percent_56")
-            perc_57 = parsed_data.get("moisture_percent_57")
+            # perc_57 = parsed_data.get("moisture_percent_57")
 
-            logging.info(f"Moisture percentages: P54={perc_54}, P55={perc_55}, P56={perc_56}, P57={perc_57}")
+            logging.info(f"Moisture percentages: P54={perc_54}, P55={perc_55}, P56={perc_56}")
             
             moisture_perc_P54.append({"t": time.time(), "value": perc_54})
             moisture_perc_P55.append({"t": time.time(), "value": perc_55})
             moisture_perc_P56.append({"t": time.time(), "value": perc_56})
-            moisture_perc_P57.append({"t": time.time(), "value": perc_57})
+            # moisture_perc_P57.append({"t": time.time(), "value": perc_57})
 
         time.sleep(chart_data_delay)
 

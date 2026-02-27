@@ -58,6 +58,30 @@
 
         </div>
 
+
+        <!-- Dropdowns for zone and pump selection -->
+        <label for ="select_zone">Select Zone:</label>
+        <select id="select_zone">
+          <option value="0">Zone 0</option>
+          <option value="1">Zone 1</option>
+        </select>
+
+        <br><br>
+
+        <label for="select_pump">Select Pump:</label>
+        <select id="select_pump">
+          <option value="8">Pump 8</option>
+          <option value="9">Pump 9</option>
+          <option value="10">Pump 10</option>
+          <option value="11">Pump 11</option>
+        </select>
+
+        <label for="new_limit">Amount (liters):</label>
+        <input type="number" id="new_limit" step="0.1" min="0.1" value="0.1" placeholder="Enter Number">
+        <br><br>
+        <button onclick="sendAction('CMD:CHG_DLY_LTR,PUMP:'+document.getElementById('select_pump').value+',ZONE:'+document.getElementById('select_zone').value+',NEW_LIM:'+document.getElementById('new_limit').value)">Submit</button>
+        <!-- END -->
+
         <h3>Telemetry</h3>
         <div class="grid-container">
           <div class="inner_card">
