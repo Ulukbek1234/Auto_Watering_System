@@ -238,3 +238,14 @@ void Zone::saveToEEPROM()
     //     EEPROM.put(4 + (i * 4), total_value);
     // }
 }
+
+void Zone::changeDailyLimit(int pump_id, float new_limit)
+{
+    for(int i = 0; i < nr_pumps; i++)
+    {
+        if(pumps[i]->getPin() == pump_id){
+            pumps[i]->setDailyLiters(new_limit);
+            return;
+        }
+    }
+}

@@ -84,15 +84,33 @@ void commandHandler(String serial_input) {
       DEBUG_PRINTLN("Started manual irrigating.");
       String pump_id = "";
       String amount = "";
-      Utils::findDataFromMessage(serial_input, "PUMP:", pump_id);
-      Utils::findDataFromMessage(serial_input, "AMOUNT:", amount);
-      all_pots[zone]->manualIrrigation(pump_id.toInt(), amount.toFloat());
-      Serial.println("MANUAL_IRRIGATION_DONE");
+      bool found_pump = Utils::findDataFromMessage(serial_input, "PUMP:", pump_id);
+      bool found_amount = Utils::findDataFromMessage(serial_input, "AMOUNT:", amount);
+      if(found_pump && found_amount)
+      {
+        all_pots[zone]->manualIrrigation(pump_id.toInt(), amount.toFloat());
+        Serial.println("MANUAL_IRRIGATION_DONE");
+      } else {
+        DEBUG_PRINTLN("Failed to find pump or amount");
+      }
     } else if (command == "SAV_EEP") {
       all_pots[zone]->saveToEEPROM();
       Serial.println("SAVING_TO_EEPROM");
-    }
-    else {
+    } else if (command == "CHG_DLY_LTR") {
+      String pump_id = "";
+      String new_limit = "";
+      bool found_pump = Utils::findDataFromMessage(serial_input, "PUMP:", pump_id);
+      bool found_limit = Utils::findDataFromMessage(serial_input, "NEW_LIM:", new_limit);
+      if(found_pump && found_limit)
+      {
+        all_pots[zone]->changeDailyLimit(pump_id.toInt(), new_limit.toFloat());
+        Serial.print("NEW_DAILY_LIMIT: ");
+        Serial.println(new_limit);
+        DEBUG_PRINTLN("Changed daily limit to: " + new_limit);
+      } else {
+        DEBUG_PRINTLN("Failed to find pump or limit");
+      }
+    } else {
       DEBUG_PRINT("Unknown command");
       DEBUG_PRINTLN(command);
     }

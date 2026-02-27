@@ -55,6 +55,7 @@ public:
     void updateSensors();
     void manualIrrigation(int pump_id, float amount);
     void saveToEEPROM();
+    void changeDailyLimit(int pump_id, float new_limit);
 };
 
 #endif
