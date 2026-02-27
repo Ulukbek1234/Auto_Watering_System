@@ -81,8 +81,7 @@
         </select>
 
         <label for="new_limit">Amount (liters):</label>
-        <input type="number" id="new_limit" step="0.1" min="0.1" value="0.1" placeholder="Enter Number">
-        <br><br>
+        <input type="number" id="new_limit" step="0.1" min="0.1" value="0.1">
         <button onclick="sendAction('CMD:CHG_DLY_LTR,PUMP:'+document.getElementById('select_pump').value+',ZONE:'+document.getElementById('select_zone').value+',NEW_LIM:'+document.getElementById('new_limit').value)">Submit</button>
         <!-- END -->
 
