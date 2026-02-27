@@ -7,9 +7,10 @@
 #include "SoilSensor.h"
 #include "WaterLevelSensor.h"
 #include "Utils.h"
+#include "EEPROM.h"
 
 const int ARRAY_SIZE = 16;
-const float MOISTURE_THRESHOLD = 0.3;
+const float MOISTURE_THRESHOLD = 35.0;
 
 enum OperationModes {
     MODE_OFF = 0,
@@ -28,20 +29,23 @@ private:
     float day_progressed = 0.0;
     float day_exact = 0.0;
     float total_day_progressed = 0.0;
-    float old_total_day_progressed = 0.0;
+    float eeprom_total_day_progressed = 0.0;
     float moisture_percent[ARRAY_SIZE] = {0.0f};
     float water_level_percent[ARRAY_SIZE] = {0.0f};
-
+    
     Pump *pumps[ARRAY_SIZE]; 
     SoilSensor *soil_sensors[ARRAY_SIZE];
     WaterLevelSensor *water_level_sensors[ARRAY_SIZE];
-
-    float eeprom_values[4];
-
+    
+    float eeprom_values[3];
+    
     OperationModes current_mode = MODE_OFF;
-
+    
 public:
-    Zone(int id);
+    int eeprom_offset_start = 0;
+    int eeprom_offset_end = 0;
+
+    Zone(int id, int absolute_offset);
 
     void addPump(int pin, float max_liter);
     void addSoilSensor(uint8_t pin);
@@ -56,6 +60,7 @@ public:
     void manualIrrigation(int pump_id, float amount);
     void saveToEEPROM();
     void changeDailyLimit(int pump_id, float new_limit);
+    void resetEEPROM();
 };
 
 #endif

@@ -19,7 +19,15 @@
         padding: 12px;
         background: transparent;
       }
-      button { padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc; background: white; cursor: pointer; }
+      .grid-buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        padding: 12px;
+        max-width: 800px;
+        background: transparent;
+      }
+      button { flex: 1 0 30%; padding: 15px; border-radius: 10px; border: 1px solid #ccc; background: white; cursor: pointer; }
       button:active { transform: translateY(1px); }
       #logs { height: 260px; overflow: auto; background: #0b0b0b; color: #eaeaea; padding: 10px; border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
       img { width: 100%; border-radius: 12px; border: 1px solid #ddd; }
@@ -32,20 +40,21 @@
     <div class="grid">
       <div class="card">
         <h3>Controls</h3>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <div class="grid-buttons">
           <button onclick="sendAction('CMD:MAN_IRR,PUMP:8,AMOUNT:0.1,ZONE:0')">Splash Pump 8</button>
           <button onclick="sendAction('CMD:MAN_IRR,PUMP:9,AMOUNT:0.1,ZONE:0')">Splash Pump 9</button>
           <button onclick="sendAction('CMD:MAN_IRR,PUMP:10,AMOUNT:0.1,ZONE:0')">Splash Pump 10</button>
           <button onclick="sendAction('CMD:MAN_IRR,PUMP:11,AMOUNT:0.1,ZONE:1')">Splash Pump 11</button>
           
-          <button onclick="sendAction('CMD:SAV_EEP,ZONE:0')">Save to EEPROM, Zone 0</button>
-          <button onclick="sendAction('CMD:SAV_EEP,ZONE:1')">Save to EEPROM, Zone 1</button>
-
+          
           <button onclick="sendAction('CMD:SET_MODE,ZONE:0,NEW_MODE:0')">Set Mode, Zone 0, STOP</button>
           <button onclick="sendAction('CMD:SET_MODE,ZONE:1,NEW_MODE:0')">Set Mode, Zone 1, STOP</button>
-
+          
           <button onclick="sendAction('CMD:SET_MODE,ZONE:0,NEW_MODE:3')">Set Mode, Zone 0, SOIL</button>
           <button onclick="sendAction('CMD:SET_MODE,ZONE:1,NEW_MODE:3')">Set Mode, Zone 1, SOIL</button>
+
+          <button onclick="sendAction('CMD:SAV_EEP')">Save to EEPROM</button>
+          <button onclick="sendAction('CMD:RST_EEP')">Reset EEPROM</button>
 
         </div>
 
@@ -89,6 +98,26 @@
           <div class="inner_card">
             <div class="title">Daily_Liter_11:</div>
             <div class="value" id="daily_liter_11">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Total_Liters_8:</div>
+            <div class="value" id="total_liter_8">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Total_Liters_9:</div>
+            <div class="value" id="total_liter_9">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Total_Liters_10:</div>
+            <div class="value" id="total_liter_10">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Total_Liters_11:</div>
+            <div class="value" id="total_liter_11">--</div>
           </div>
 
           <div class="inner_card">
@@ -180,6 +209,13 @@
             pointRadius: 0,
             borderColor: "blue"
           }]
+          // }, {
+          //   label: "P57",
+          //   data: [],
+          //   tension: 0.2,
+          //   pointRadius: 0,
+          //   borderColor: "yellow"
+          // }
         },
         options: {
           responsive: true,
@@ -227,12 +263,14 @@
           document.getElementById("total_days").textContent = obj.total_days;
           document.getElementById("current_mode_0").textContent = obj.current_mode_0;
           document.getElementById("current_mode_1").textContent = obj.current_mode_1;
-          // document.getElementById("daily_liter_11").textContent = obj.daily_liter_11;
-
           document.getElementById("daily_liter_8").textContent = obj.daily_liter_8;
           document.getElementById("daily_liter_9").textContent = obj.daily_liter_9;
           document.getElementById("daily_liter_10").textContent = obj.daily_liter_10;
           document.getElementById("daily_liter_11").textContent = obj.daily_liter_11;
+          document.getElementById("total_liter_8").textContent = obj.total_liter_8;
+          document.getElementById("total_liter_9").textContent = obj.total_liter_9;
+          document.getElementById("total_liter_10").textContent = obj.total_liter_10;
+          document.getElementById("total_liter_11").textContent = obj.total_liter_11;
           document.getElementById("moisture_percent_P54").textContent = obj.moisture_percent_54;
           document.getElementById("moisture_percent_P55").textContent = obj.moisture_percent_55;
           document.getElementById("moisture_percent_P56").textContent = obj.moisture_percent_56;

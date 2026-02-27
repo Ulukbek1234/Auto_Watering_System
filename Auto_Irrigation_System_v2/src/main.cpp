@@ -12,7 +12,8 @@ const unsigned long wait_time = 60000; // 1 minute
 
 void setup() {
   Serial.begin(9600);
-  pots = new Zone(0);
+  int offset = 0;
+  pots = new Zone(0, offset);
   pots->setOperationMode(MODE_SOIL);
 
   pots->addPump(8, 0.5);
@@ -24,7 +25,8 @@ void setup() {
   pots->addSoilSensor(A2);
   // pots->addWaterLevelSensor(A0);
   
-  auto_pot = new Zone(1);
+  offset = pots->eeprom_offset_end;
+  auto_pot = new Zone(1, offset);
   auto_pot->setOperationMode(MODE_MANUAL);
   auto_pot->addPump(11, 0.4);
   auto_pot->addSoilSensor(A3);
@@ -54,17 +56,42 @@ void commandHandler(String serial_input) {
       return;
     } 
 
+    int nr_zones = 2; // TODO change dynamically
+
     if (command == "TELEM") {
-      for(int i = 0; i < 2; i++) {
+      for(int i = 0; i < nr_zones; i++) {
         Serial.print(all_pots[i]->getData());
       }
       Serial.println("");
       DEBUG_PRINTLN("Sent telemetry data.");
+      return;
     } 
+
+    if (command == "SAV_EEP")
+    {
+      for(int i = 0; i < nr_zones; i++)
+      {
+        all_pots[i]->saveToEEPROM();
+      }
+      Serial.println("SAVING_TO_EEPROM");
+      return;
+    }
+
+    if (command == "RST_EEP")
+    {
+      for(int i = 0; i < nr_zones; i++)
+      {
+        all_pots[i]->resetEEPROM();
+      }
+      Serial.println("RESET_EEPROM");
+      return;
+    }
     
-    int zone = Utils::findDataFromMessage(serial_input, "ZONE:", command) ? command.toInt() : -1;
+    String zone_string = "";
+    int zone = Utils::findDataFromMessage(serial_input, "ZONE:", zone_string) ? zone_string.toInt() : -1;
     if(zone < 0 || zone >= 2) {
-      Serial.println("Invalid zone specified");
+      Serial.print("Invalid zone specified: ");
+      Serial.println(zone);
       return;
     }
 
@@ -131,7 +158,10 @@ void loop() {
   {
     start_time = millis();
     DEBUG_PRINTLN("Waiting period over, checking sensors again.");
-    pots->startAutoIrrigating();
-    pots->updateDay();
+    for(int i = 0; i < 2; i++)
+    {
+      all_pots[i]->startAutoIrrigating();
+      all_pots[i]->updateDay();
+    }
   }
 }
