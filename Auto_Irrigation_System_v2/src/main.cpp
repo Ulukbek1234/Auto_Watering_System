@@ -16,9 +16,9 @@ void setup() {
   pots = new Zone(0, offset);
   pots->setOperationMode(MODE_SOIL);
 
-  pots->addPump(8, 1.0);
-  pots->addPump(9, 1.0);
-  pots->addPump(10, 0.2);
+  pots->addPump(8, 1.2);
+  pots->addPump(9, 1.2);
+  pots->addPump(10, 1.0);
   
   pots->addSoilSensor(A0);
   pots->addSoilSensor(A1);
@@ -29,7 +29,7 @@ void setup() {
   auto_pot = new Zone(1, offset);
   auto_pot->setOperationMode(MODE_MANUAL);
   auto_pot->addPump(11, 0.4);
-  auto_pot->addSoilSensor(A3);
+  auto_pot->addSoilSensor(A4);
 
   all_pots[0] = pots;
   all_pots[1] = auto_pot;
