@@ -14,25 +14,21 @@ void setup() {
   Serial.begin(9600);
   int offset = 0;
   pots = new Zone(0, offset);
-  pots->setOperationMode(MODE_SOIL);
+  pots->setOperationMode(MODE_MANUAL);
 
   pots->addPump(8, 1.2);
   pots->addPump(9, 1.2);
   pots->addPump(10, 1.0);
+  pots->addPump(11, 1.0);
+
   
   pots->addSoilSensor(A0);
   pots->addSoilSensor(A1);
   pots->addSoilSensor(A2);
-  // pots->addWaterLevelSensor(A0);
+  pots->addSoilSensor(A4);
   
   offset = pots->eeprom_offset_end;
-  auto_pot = new Zone(1, offset);
-  auto_pot->setOperationMode(MODE_MANUAL);
-  auto_pot->addPump(11, 0.4);
-  auto_pot->addSoilSensor(A4);
-
   all_pots[0] = pots;
-  all_pots[1] = auto_pot;
   start_time = millis();
 }
 
