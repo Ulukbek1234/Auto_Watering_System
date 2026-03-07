@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECT_DIR="/home/mola/Desktop/Auto_Watering_System/Auto_Irrigation_System_v2/"
+PROJECT_DIR="/home/ulukproto1/Desktop/Auto_Watering_System/Auto_Irrigation_System_v2/"
 
 cd "$PROJECT_DIR" || { echo "Directory not found!"; exit 1; }
 

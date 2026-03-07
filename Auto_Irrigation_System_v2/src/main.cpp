@@ -16,8 +16,8 @@ void setup() {
   pots = new Zone(0, offset);
   pots->setOperationMode(MODE_MANUAL);
 
-  pots->addPump(8, 1.2);
-  pots->addPump(9, 1.2);
+  pots->addPump(8, 1.0);
+  pots->addPump(9, 1.0);
   pots->addPump(10, 1.0);
   pots->addPump(11, 1.0);
 
