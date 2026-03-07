@@ -215,7 +215,7 @@ def api_metrics():
 
 
 def start_background_threads() -> None:
-    threading.Thread(target=capture_loop, daemon=True).start()
+    # threading.Thread(target=capture_loop, daemon=True).start()
     threading.Thread(target=metrics_loop, daemon=True).start()
 
 def main(log_queue=None):
