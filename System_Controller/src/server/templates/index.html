@@ -54,34 +54,62 @@
           <button onclick="sendAction('CMD:MAN_IRR,PUMP:11,AMOUNT:0.2,ZONE:0')">Splash Pump 11</button>
           
           <button onclick="sendAction('CMD:SET_MODE,ZONE:0,NEW_MODE:0')">Set Mode, Zone 0, STOP</button>
-          <button onclick="sendAction('CMD:SET_MODE,ZONE:1,NEW_MODE:0')">Set Mode, Zone 1, STOP</button>
-          
           <button onclick="sendAction('CMD:SET_MODE,ZONE:0,NEW_MODE:3')">Set Mode, Zone 0, SOIL</button>
-          <button onclick="sendAction('CMD:SET_MODE,ZONE:1,NEW_MODE:3')">Set Mode, Zone 1, SOIL</button>
-
-          <button onclick="sendAction('CMD:SAV_EEP')">Save to EEPROM</button>
-          <button onclick="sendAction('CMD:RST_EEP')">Reset EEPROM</button>
 
         </div>
 
 
         <!-- Dropdowns for zone and pump selection -->
-        <select id="select_zone" class = "dropdown_select">
+
+        <!-- Selection for splash -->
+        <h4 style="margin-top:16px;">Manual Splash</h4>
+        <select id="select_zone_to_splash" class = "dropdown_select">
           <option value="0">Zone 0</option>
-          <option value="1">Zone 1</option>
         </select>
 
-
-        <select id="select_pump" class = "dropdown_select">
+        <select id="select_pump_to_splash" class = "dropdown_select">
           <option value="8">Pump 8</option>
           <option value="9">Pump 9</option>
           <option value="10">Pump 10</option>
           <option value="11">Pump 11</option>
         </select>
 
-        <label for="new_limit">Amount (liters):</label>
-        <input class = "dropdown_select" type="number" id="new_limit" step="0.1" min="0.1" value="0.1">
-        <button onclick="sendAction('CMD:CHG_DLY_LTR,PUMP:'+document.getElementById('select_pump').value+',ZONE:'+document.getElementById('select_zone').value+',NEW_LIM:'+document.getElementById('new_limit').value)">Submit</button>
+        <label for="amount_to_splash">Amount (liters):</label>
+        <input class = "dropdown_select" type="number" id="amount_to_splash" step="0.1" min="0.1" value="0.1">
+        <button onclick="sendAction('CMD:MAN_IRR,PUMP:'+document.getElementById('select_pump_to_splash').value+',ZONE:'+document.getElementById('select_zone_to_splash').value+',AMOUNT:'+document.getElementById('amount_to_splash').value)">Submit</button>
+        
+        <!-- Selection for daily liter limit -->
+        <h4 style="margin-top:16px;">Set Daily Liter Limit</h4>
+        <select id="select_zone_daily_limit" class = "dropdown_select">
+          <option value="0">Zone 0</option>
+        </select>
+
+        <select id="select_pump_daily_limit" class = "dropdown_select">
+          <option value="8">Pump 8</option>
+          <option value="9">Pump 9</option>
+          <option value="10">Pump 10</option>
+          <option value="11">Pump 11</option>
+        </select>
+
+        <label for="amount_daily_limit">Amount (liters):</label>
+        <input class = "dropdown_select" type="number" id="amount_daily_limit" step="0.1" min="0.1" value="0.1">
+        <button onclick="sendAction('CMD:CHG_DLY_LTR,PUMP:'+document.getElementById('select_pump_daily_limit').value+',ZONE:'+document.getElementById('select_zone_daily_limit').value+',NEW_LIM:'+document.getElementById('amount_daily_limit').value)">Submit</button>
+        
+        <!-- Change Mode -->
+        <h4 style="margin-top:16px;">Change Mode</h4>
+        <select id="select_zone_change_mode" class = "dropdown_select">
+          <option value="0">Zone 0</option>
+        </select>
+
+        <select id="select_new_mode" class = "dropdown_select">
+          <option value="0">STOP</option>
+          <option value="1">MANUAL</option>
+          <option value="2">FLOOD</option>
+          <option value="3">SOIL</option>
+        </select>
+
+        <button onclick="sendAction('CMD:SET_MODE,ZONE:'+document.getElementById('select_zone_change_mode').value+',NEW_MODE:'+document.getElementById('select_new_mode').value)">Submit</button>
+        
         <!-- END -->
 
         <h3>Telemetry</h3>

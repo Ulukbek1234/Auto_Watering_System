@@ -115,9 +115,6 @@ void commandHandler(String serial_input) {
       } else {
         DEBUG_PRINTLN("Failed to find pump or amount");
       }
-    } else if (command == "SAV_EEP") {
-      all_pots[zone]->saveToEEPROM();
-      Serial.println("SAVING_TO_EEPROM");
     } else if (command == "CHG_DLY_LTR") {
       String pump_id = "";
       String new_limit = "";
