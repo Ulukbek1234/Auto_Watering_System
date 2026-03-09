@@ -6,7 +6,7 @@
 
 Zone *pots;
 Zone *auto_pot;
-Zone *all_pots[2]; // TODO dynamic array if more pots needed in future
+Zone *all_pots[1]; // TODO dynamic array if more pots needed in future
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
 
