@@ -6,6 +6,7 @@
 
 Zone *pots;
 Zone *auto_pot;
+int nr_zones = 1; // TODO change dynamically
 Zone *all_pots[1]; // TODO dynamic array if more pots needed in future
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
@@ -52,8 +53,6 @@ void commandHandler(String serial_input) {
       return;
     } 
 
-    int nr_zones = 2; // TODO change dynamically
-
     if (command == "TELEM") {
       for(int i = 0; i < nr_zones; i++) {
         Serial.print(all_pots[i]->getData());
@@ -85,7 +84,7 @@ void commandHandler(String serial_input) {
     
     String zone_string = "";
     int zone = Utils::findDataFromMessage(serial_input, "ZONE:", zone_string) ? zone_string.toInt() : -1;
-    if(zone < 0 || zone >= 2) {
+    if(zone < 0 || zone >= nr_zones) {
       Serial.print("Invalid zone specified: ");
       Serial.println(zone);
       return;
@@ -154,7 +153,7 @@ void loop() {
   {
     start_time = millis();
     DEBUG_PRINTLN("Waiting period over, checking sensors again.");
-    for(int i = 0; i < 2; i++)
+    for(int i = 0; i < nr_zones; i++)
     {
       all_pots[i]->startAutoIrrigating();
       all_pots[i]->updateDay();
