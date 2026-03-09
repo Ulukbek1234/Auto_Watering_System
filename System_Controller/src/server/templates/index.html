@@ -14,7 +14,7 @@
       .grid-container { 
         display: grid; 
         grid-template-columns: repeat(4, 1fr); 
-        grid-template-rows: repeat(4, auto);
+        grid-template-rows: repeat(5, auto);
         gap: 16px; 
         padding: 12px;
         background: transparent;
@@ -140,6 +140,26 @@
           <div class="inner_card">
             <div class="title">Daily_Liter_11:</div>
             <div class="value" id="daily_liter_11">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Max_Liter_8:</div>
+            <div class="value" id="max_liter_8">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Max_Liter_9:</div>
+            <div class="value" id="max_liter_9">--</div>
+          </div>
+          
+          <div class="inner_card">
+            <div class="title">Max_Liter_10:</div>
+            <div class="value" id="max_liter_10">--</div>
+          </div>
+
+          <div class="inner_card">
+            <div class="title">Max_Liter_11:</div>
+            <div class="value" id="max_liter_11">--</div>
           </div>
 
           <div class="inner_card">
@@ -308,6 +328,10 @@
           document.getElementById("daily_liter_9").textContent = obj.daily_liter_9;
           document.getElementById("daily_liter_10").textContent = obj.daily_liter_10;
           document.getElementById("daily_liter_11").textContent = obj.daily_liter_11;
+          document.getElementById("max_liter_8").textContent = obj.max_liter_8;
+          document.getElementById("max_liter_9").textContent = obj.max_liter_9;
+          document.getElementById("max_liter_10").textContent = obj.max_liter_10;
+          document.getElementById("max_liter_11").textContent = obj.max_liter_11;
           document.getElementById("total_liter_8").textContent = obj.total_liter_8;
           document.getElementById("total_liter_9").textContent = obj.total_liter_9;
           document.getElementById("total_liter_10").textContent = obj.total_liter_10;
