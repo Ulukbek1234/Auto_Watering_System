@@ -275,14 +275,14 @@
         }});
     
       async function refreshChart() {
-        const res = await fetch("/api/metrics?n=1440");
+        const res = await fetch("/api/metrics?n=8640"); // Last 24 hours of data at 10s intervals
         const j = await res.json();
 
         chart.data.datasets = j.datasets;
         chart.update();
       }
 
-      setInterval(refreshChart, 60000); // Refresh every 60 seconds
+      setInterval(refreshChart, 10000); // Refresh every 10 seconds
       refreshChart();
 
 
