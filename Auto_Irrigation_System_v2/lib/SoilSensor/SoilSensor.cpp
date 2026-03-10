@@ -10,6 +10,13 @@ SoilSensor::SoilSensor(uint8_t pin)
 void SoilSensor::checkRawValues()
 {
     moisture_raw = analogRead(pin);
+    if (moisture_raw < 0 || moisture_raw > 1023) {
+        DEBUG_PRINT("Invalid raw moisture value: ");
+        DEBUG_PRINTLN(moisture_raw);
+        moisture_percent = 0; // Set to 0% if invalid
+        return;
+    }
+
     moisture_percent = map(moisture_raw, DRY_VALUE_SOIL, WET_VALUE_SOIL, 0, 100);
 
     DEBUG_PRINT("SoilSensor moister_raw: ");
