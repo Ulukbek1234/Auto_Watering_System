@@ -10,8 +10,8 @@ class SoilSensor
 {
 private:
     uint8_t pin;
-    int moisture_raw;
-    long moisture_percent;
+    int moisture_raw = 0;
+    long moisture_percent = 0;
 
     public:
     SoilSensor(uint8_t pin);
