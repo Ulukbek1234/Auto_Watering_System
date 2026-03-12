@@ -25,7 +25,7 @@ void setup() {
   pots->addSoilSensor(A0);
   pots->addSoilSensor(A1);
   pots->addSoilSensor(A2);
-  pots->addSoilSensor(A3);
+  pots->addSoilSensor(A4);
   
   offset = pots->eeprom_offset_end;
   all_pots[0] = pots;
