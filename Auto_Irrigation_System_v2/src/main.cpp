@@ -20,8 +20,7 @@ void setup() {
   pots->addPump(8, 1.0);
   pots->addPump(9, 1.0);
   pots->addPump(10, 1.0);
-  pots->addPump(11, 0.5);
-
+  pots->addPump(11, 1.0);
   
   pots->addSoilSensor(A0);
   pots->addSoilSensor(A1);
