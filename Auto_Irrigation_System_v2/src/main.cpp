@@ -32,23 +32,22 @@ void setup() {
   start_time = millis();
 }
 
-// TODO
 /*
-  - Commands from master
-  - Different modes of irrigation
-    - Max daily limit
-    - Moisture threshold
-    - Time based
-    - Slave to master commands
+  Performs commands sent from Serial
+  Response: CMD: RESP, STATUS: (SUCC, FAIL)
 */
 
 void commandHandler(String serial_input) {
+    bool status = false;
+    String response = "CMD:RESP,STATUS:";
+
     String command = "";
     bool real_command = Utils::findDataFromMessage(serial_input, "CMD:", command);
     if(!real_command)
     {
       DEBUG_PRINT("No command found: ");
       DEBUG_PRINTLN(serial_input);
+      Serial.println(response + "FAIL");
       return;
     } 
 
@@ -63,43 +62,44 @@ void commandHandler(String serial_input) {
 
     if (command == "SAV_EEP")
     {
-      for(int i = 0; i < nr_zones; i++)
-      {
-        all_pots[i]->saveToEEPROM();
-      }
-      Serial.println("SAVING_TO_EEPROM");
+      // for(int i = 0; i < nr_zones; i++)
+      // {
+      //   all_pots[i]->saveToEEPROM();
+      // }
+      // Serial.println("SAVING_TO_EEPROM");
+      status = false;
       return;
     }
 
     if (command == "RST_EEP")
     {
-      for(int i = 0; i < nr_zones; i++)
-      {
-        all_pots[i]->resetEEPROM();
-      }
-      Serial.println("RESET_EEPROM");
+      // for(int i = 0; i < nr_zones; i++)
+      // {
+      //   all_pots[i]->resetEEPROM();
+      // }
+      // Serial.println("RESET_EEPROM");
+      status = false;
       return;
     }
     
     String zone_string = "";
     int zone = Utils::findDataFromMessage(serial_input, "ZONE:", zone_string) ? zone_string.toInt() : -1;
     if(zone < 0 || zone >= nr_zones) {
-      Serial.print("Invalid zone specified: ");
-      Serial.println(zone);
+      Serial.println(response + "FAIL");      
       return;
     }
-
+    
     if (command == "SET_MODE") {
       // TODO which zone selected?
       String mode = "";
       if(Utils::findDataFromMessage(serial_input, "NEW_MODE:", mode))
       {
         all_pots[zone]->setOperationMode(static_cast<OperationModes>(mode.toInt()));
-        Serial.print("NEW_MODE_SELECTED: ");
-        Serial.println(mode);
+        status = true;
         DEBUG_PRINTLN("Set operation mode to: " + mode);
       } else {
         DEBUG_PRINTLN("Wrong operation mode");
+        status = false;
       }
     } else if (command == "MAN_IRR") {
       DEBUG_PRINTLN("Started manual irrigating.");
@@ -110,9 +110,10 @@ void commandHandler(String serial_input) {
       if(found_pump && found_amount)
       {
         all_pots[zone]->manualIrrigation(pump_id.toInt(), amount.toFloat());
-        Serial.println("MANUAL_IRRIGATION_DONE");
+        status = true;
       } else {
         DEBUG_PRINTLN("Failed to find pump or amount");
+        status = false;
       }
     } else if (command == "CHG_DLY_LTR") {
       String pump_id = "";
@@ -122,25 +123,28 @@ void commandHandler(String serial_input) {
       if(found_pump && found_limit)
       {
         all_pots[zone]->changeDailyLimit(pump_id.toInt(), new_limit.toFloat());
-        Serial.print("NEW_DAILY_LIMIT: ");
-        Serial.println(new_limit);
         DEBUG_PRINTLN("Changed daily limit to: " + new_limit);
+        status = true;
       } else {
         DEBUG_PRINTLN("Failed to find pump or limit");
+        status = false;
       }
     } else if (command == "CALI_AIR") {
       String soil_pin = "";
       Utils::findDataFromMessage(serial_input, "SOIL_PIN", soil_pin);
       all_pots[zone]->caliSoilInAir(soil_pin.toInt());
+      status = true;
     } else if (command == "CALI_WATER") {
       String soil_pin = "";
       Utils::findDataFromMessage(serial_input, "SOIL_PIN", soil_pin);
       all_pots[zone]->caliSoilInWater(soil_pin.toInt());
+      status = true;
     } else {
       DEBUG_PRINT("Unknown command");
       DEBUG_PRINTLN(command);
+      status = false;
     }
-
+    Serial.println(response + (status ? "SUCC" : "FAIL"));
 }
 
 void loop() {
