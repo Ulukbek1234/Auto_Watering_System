@@ -85,6 +85,24 @@
         
         <!-- Change Pump threshold-->
          
+        <!-- Calibrate Soil Sensor -->
+        <h4 style="margin-top:16px;">Calibrate Soil Sensor</h4>
+        <select id="select_zone_cali_soil" class = "dropdown_select">
+          <option value="0">Zone 0</option>
+        </select>
+
+        <select id="select_calibration_pin" class ="dropdown_select">
+          <option value="54">Pin 54</option>
+          <option value="55">Pin 55</option>
+          <option value="56">Pin 56</option>
+          <option value="58">Pin 58</option>
+        </select>
+
+        <select id="select_calibration_status" class ="dropdown_select">
+          <option value="CALI_AIR">Air</option>
+          <option value="CALI_WATER">Water</option>
+        </select>
+        <button onclick="sendAction('CMD:'+document.getElementById('select_calibration_status').value+',SOIL_PIN:'+document.getElementById('select_calibration_pin').value+',ZONE:'+document.getElementById('select_zone_cali_soil').value)">Submit</button>
 
         <!-- Change Mode -->
         <h4 style="margin-top:16px;">Change Mode</h4>

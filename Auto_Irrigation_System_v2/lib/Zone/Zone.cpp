@@ -270,3 +270,25 @@ void Zone::changeDailyLimit(int pump_id, float new_limit)
         }
     }
 }
+
+void Zone::caliSoilInAir(int soil_pin)
+{
+    for(int i = 0; i < nr_soil_sensors; i++)
+    {
+        if(soil_sensors[i]->getPin() == soil_pin)
+        {
+            soil_sensors[i]->calibrateInAir();
+        }
+    }
+}
+
+void Zone::caliSoilInWater(int soil_pin)
+{
+    for(int i = 0; i < nr_soil_sensors; i++)
+    {
+        if(soil_sensors[i]->getPin() == soil_pin)
+        {
+            soil_sensors[i]->calibrateInWater();
+        }
+    }
+}

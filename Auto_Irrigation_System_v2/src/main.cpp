@@ -128,6 +128,14 @@ void commandHandler(String serial_input) {
       } else {
         DEBUG_PRINTLN("Failed to find pump or limit");
       }
+    } else if (command == "CALI_AIR") {
+      String soil_pin = "";
+      Utils::findDataFromMessage(serial_input, "SOIL_PIN", soil_pin);
+      all_pots[zone]->caliSoilInAir(soil_pin.toInt());
+    } else if (command == "CALI_WATER") {
+      String soil_pin = "";
+      Utils::findDataFromMessage(serial_input, "SOIL_PIN", soil_pin);
+      all_pots[zone]->caliSoilInWater(soil_pin.toInt());
     } else {
       DEBUG_PRINT("Unknown command");
       DEBUG_PRINTLN(command);

@@ -17,7 +17,14 @@ void SoilSensor::checkRawValues()
     //     return;
     // }
 
-    moisture_percent = map(moisture_raw, DRY_VALUE_SOIL, WET_VALUE_SOIL, 0, 100);
+    if(cali_air_raw == -1 || cali_water_raw == -1)
+    {
+        moisture_percent = map(moisture_raw, DRY_VALUE_SOIL, WET_VALUE_SOIL, 0, 100);
+    }
+    else
+    {
+        moisture_percent = map(moisture_raw, cali_air_raw, cali_water_raw, 0, 100);
+    }
 
     DEBUG_PRINT("SoilSensor moister_raw: ");
     DEBUG_PRINTLN(moisture_raw);
@@ -26,3 +33,18 @@ void SoilSensor::checkRawValues()
 
 }
 
+// TODO: 
+/*
+    1. Put sensor in water
+    2. Put sensor in air
+    3. Save values to EEPROM
+*/
+void SoilSensor::calibrateInWater()
+{
+    cali_water_raw = analogRead(pin);
+}
+
+void SoilSensor::calibrateInAir()
+{
+    cali_air_raw = analogRead(pin);
+}
