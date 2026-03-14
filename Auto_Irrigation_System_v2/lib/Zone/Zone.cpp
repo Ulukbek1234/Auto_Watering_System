@@ -276,8 +276,10 @@ void Zone::changeDailyLimit(int pump_id, float new_limit)
 
 bool Zone::caliSoilInAir(int soil_pin)
 {
+    Serial.println(soil_pin);
     for(int i = 0; i < nr_soil_sensors; i++)
     {
+        Serial.println(soil_sensors[i]->getPin());
         if(soil_sensors[i]->getPin() == soil_pin)
         {
             soil_sensors[i]->calibrateInAir();
