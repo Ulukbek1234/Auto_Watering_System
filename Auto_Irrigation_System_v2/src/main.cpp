@@ -29,9 +29,9 @@ void setup() {
   pots->addPump(10, 1.0);
   pots->addPump(11, 1.0);
   
-  pots->addSoilSensor(A0);
-  pots->addSoilSensor(A1);
-  pots->addSoilSensor(A2);
+  pots->addSoilSensor(A0, eeprom_data.cali_air[0], eeprom_data.cali_water[0]);
+  pots->addSoilSensor(A1, eeprom_data.cali_air[1], eeprom_data.cali_water[1]);
+  pots->addSoilSensor(A2, eeprom_data.cali_air[2], eeprom_data.cali_water[2]);
   pots->addSoilSensor(A4, eeprom_data.cali_air[3], eeprom_data.cali_water[3]);
   
   all_pots[0] = pots;
