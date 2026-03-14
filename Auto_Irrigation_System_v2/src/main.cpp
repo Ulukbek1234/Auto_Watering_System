@@ -16,7 +16,7 @@ void setup() {
   Serial.begin(9600);
   int offset = 0;
   pots = new Zone(0, offset);
-  pots->setOperationMode(MODE_SOIL);
+  pots->setOperationMode(MODE_MANUAL);
 
   pots->addPump(8, 1.0);
   pots->addPump(9, 1.0);
