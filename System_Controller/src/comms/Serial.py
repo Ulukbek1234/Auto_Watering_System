@@ -11,6 +11,14 @@ import threading
 
 telem_dict_data = {}
 
+# For data bus
+ROOT = Path(__file__).parent.parent
+DATA_BUS_PATH = ROOT / "data_bus"
+logging.debug(f"DATA_BUS_PATH: {DATA_BUS_PATH}")
+
+# For telemetry data
+TELEM_PATH = DATA_BUS_PATH / "slave_telem.txt"
+
 class SerialComms:
     # For synchronization TODO better solution
     MOLA_DELAY = 0.5  # seconds
@@ -23,18 +31,11 @@ class SerialComms:
         time.sleep(2)  # wait for the serial connection to initialize
         self.ser.write(b"SYNCH\n")
 
-        # For data bus
-        ROOT = Path(__file__).parent.parent
-        DATA_BUS_PATH = ROOT / "data_bus"
-        logging.debug(f"DATA_BUS_PATH: {DATA_BUS_PATH}")
-
-        # For telemetry data
-        self.TELEM_INTER = 10 # telemetry data gets requested every 10 seconds
-        self.TELEM_PATH = DATA_BUS_PATH / "slave_telem.txt"
-
         # For boat commands
         self.SLAVE_COMMAND_INTER = 1
         self.SLAVE_COMMAND_PATH = DATA_BUS_PATH / "slave_command.txt"
+
+        self.TELEM_INTER = 10 # telemetry data gets requested every 10 seconds
 
 
     def check_response(self, line, command):
@@ -87,6 +88,8 @@ def reader(ser: serial.Serial):
             if line:
                 # Print exactly what Arduino sent
                 logging.debug(f"Response from boat: {line}")
+                write_to_file_lock_safe(TELEM_PATH, str(telem_dict_data))
+
 
     except Exception as e:
         print(f"\n[reader stopped] {e}")
@@ -114,9 +117,7 @@ def main(log_queue=None):
         if elapsed_telem_time > serial_comms.TELEM_INTER:
             last_telem_time = time.time()
             try:
-                telem_dict_data = serial_comms.request_telemetry()
-                if telem_dict_data != None:
-                    write_to_file_lock_safe(serial_comms.TELEM_PATH, str(telem_dict_data))
+                serial_comms.request_telemetry()
             except Exception as e:
                 logging.info(f"ERROR: request telemetry: {e}")
 
