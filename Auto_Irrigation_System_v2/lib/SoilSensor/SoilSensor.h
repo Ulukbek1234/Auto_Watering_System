@@ -14,8 +14,8 @@ private:
     long moisture_percent = 0;
     int cali_water_raw = -1;
     int cali_air_raw = -1;
-
 public:
+
     SoilSensor(uint8_t pin);
     void checkRawValues();
     void calibrateInWater();
@@ -24,6 +24,8 @@ public:
     uint8_t getPin() {return pin;};
     long getMoisturePercent() {return moisture_percent;};
     int getMoistureRaw() {return moisture_raw;};
+    int getCaliWater() {return cali_water_raw;};
+    int getCaliAir() {return cali_air_raw;};
 };
 
 #endif

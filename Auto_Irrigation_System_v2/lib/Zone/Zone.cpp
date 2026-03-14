@@ -137,10 +137,6 @@ String Zone::getData()
         data_values[index++] = String(pumps[i]->getTotalLiter(), NR_DEC_POINTS);
         data_names[index] = "max_liter_" + pump_pin;
         data_values[index++] = String(pumps[i]->getMaxLiter(), NR_DEC_POINTS);
-        // data_names[index] = "is_active_" + pump_pin;
-        // data_values[index++] = String(pumps[i]->getIsActive());
-        // data_names[index] = "eeprom_val_" + pump_pin;
-        // data_values[index++] = eeprom_values[i];
     }
 
     for (int i = 0; i < nr_water_level_sensors; i++)
@@ -224,25 +220,13 @@ void Zone::manualIrrigation(int pump_id, float amount)
     }
 }
 
-void Zone::saveToEEPROM()
+void Zone::saveToEEPROM(EE_Data *eeprom_data)
 {
-    // // EEPROM addresses
-    // // sizeof(float) == 4 bytes
-    // int offset = eeprom_offset_start;
-
-    // // updateDay();
-    // // EEPROM.put(offset, total_day_progressed);
-    // // offset += 4;
-
-    // for(int i = 0; i < nr_pumps; i++)
-    // {
-    //     // 4 byte offset from total_day_progressed
-    //     // increment by float size
-    //     float total_value = eeprom_values[i] + pumps[i]->getTotalLiter();
-    //     EEPROM.put(offset + (i * 4), total_value);
-    //     offset += 4;
-    // }
-    
+    for(int i = 0; i < nr_soil_sensors; i++)
+    {
+        eeprom_data->cali_air[i] = soil_sensors[i]->getCaliAir();
+        eeprom_data->cali_water[i] = soil_sensors[i]->getCaliWater();
+    }
 }
 
 void Zone::resetEEPROM()

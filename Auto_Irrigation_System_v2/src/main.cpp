@@ -12,12 +12,6 @@ Zone *all_pots[1]; // TODO dynamic array if more pots needed in future
 unsigned long start_time = 0;
 const unsigned long wait_time = 10000; // 1 minute
 // EEPROM 
-struct EE_Data
-{
-  int cali_air[4] = {-1, -1, -1, -1};
-  int cali_water[4] = {-1, -1, -1, -1};
-};
-
 EE_Data eeprom_data;
 
 
@@ -42,8 +36,7 @@ void setup() {
   all_pots[0] = pots;
   
   EEPROM.setMaxAllowedWrites(100);
-  EEPROM.writeBlock(0, eeprom_data);
-  // EEPROM.readBlock(0, eeprom_data);
+  EEPROM.readBlock(0, eeprom_data);
 
   start_time = millis();
 }
@@ -78,11 +71,17 @@ void commandHandler(String serial_input) {
 
     if (command == "SAV_EEP")
     {
+      
+      
       for(int i = 0; i < nr_zones; i++)
       {
-        all_pots[i]->saveToEEPROM();
+        all_pots[i]->saveToEEPROM(&eeprom_data);
+        Serial.print("eeprom valus: ");
+        Serial.println(eeprom_data.cali_air[i]);
+        Serial.println(eeprom_data.cali_water[i]);
       }
-      Serial.println("SAVING_TO_EEPROM");
+      
+      EEPROM.writeBlock(0, eeprom_data);
       status = false;
       return;
     }

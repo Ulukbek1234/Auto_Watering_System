@@ -56,7 +56,7 @@ public:
     void setOperationMode(OperationModes mode);
     void updateSensors();
     void manualIrrigation(int pump_id, float amount);
-    void saveToEEPROM();
+    void saveToEEPROM(EE_Data *eeprom_data);
     void changeDailyLimit(int pump_id, float new_limit);
     void resetEEPROM();
     bool caliSoilInAir(int soil_pin);

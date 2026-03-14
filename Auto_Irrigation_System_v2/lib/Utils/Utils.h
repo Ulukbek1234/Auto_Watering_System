@@ -11,6 +11,11 @@ typedef struct Dictionary
     String value_;
 } Dictionary;
 
+struct EE_Data
+{
+  int cali_air[4] = {-1, -1, -1, -1};
+  int cali_water[4] = {-1, -1, -1, -1};
+};
 
 class Utils 
 {
