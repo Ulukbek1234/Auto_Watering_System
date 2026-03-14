@@ -80,7 +80,7 @@ void commandHandler(String serial_input) {
         Serial.println(eeprom_data.cali_air[i]);
         Serial.println(eeprom_data.cali_water[i]);
       }
-      
+
       EEPROM.writeBlock(0, eeprom_data);
       status = false;
       return;

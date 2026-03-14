@@ -227,6 +227,11 @@ void Zone::saveToEEPROM(EE_Data *eeprom_data)
         eeprom_data->cali_air[i] = soil_sensors[i]->getCaliAir();
         eeprom_data->cali_water[i] = soil_sensors[i]->getCaliWater();
     }
+    for(int i = 0; i < nr_pumps; i++)
+    {
+        // TODO gotta fix the += makes wrong value if not reset
+        eeprom_data->total_liters[i] += pumps[i]->getTotalLiter();
+    }
 }
 
 void Zone::resetEEPROM()
