@@ -40,13 +40,10 @@ private:
     OperationModes current_mode = MODE_OFF;
 
 public:
-    int eeprom_offset_start = 0;
-    int eeprom_offset_end = 0;
-
-    Zone(int id, int absolute_offset);
+    Zone(int id);
 
     void addPump(int pin, float max_liter);
-    void addSoilSensor(uint8_t pin);
+    void addSoilSensor(uint8_t pin, int cali_air = -1, int cali_water = -1);
     void addWaterLevelSensor(uint8_t pin);
     void startAutoIrrigating();
     void updateDay();

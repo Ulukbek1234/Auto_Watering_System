@@ -17,8 +17,11 @@ EE_Data eeprom_data;
 
 void setup() {
   Serial.begin(9600);
-  int offset = 0;
-  pots = new Zone(0, offset);
+
+  EEPROM.setMaxAllowedWrites(100);
+  EEPROM.readBlock(0, eeprom_data);
+
+  pots = new Zone(0);
   pots->setOperationMode(MODE_MANUAL);
 
   pots->addPump(8, 1.0);
@@ -29,15 +32,9 @@ void setup() {
   pots->addSoilSensor(A0);
   pots->addSoilSensor(A1);
   pots->addSoilSensor(A2);
-  pots->addSoilSensor(A4);
+  pots->addSoilSensor(A4, eeprom_data.cali_air[3], eeprom_data.cali_water[3]);
   
-  offset = pots->eeprom_offset_end;
-
   all_pots[0] = pots;
-  
-  EEPROM.setMaxAllowedWrites(100);
-  EEPROM.readBlock(0, eeprom_data);
-
   start_time = millis();
 }
 

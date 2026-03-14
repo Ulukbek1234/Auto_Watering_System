@@ -16,7 +16,7 @@ private:
     int cali_air_raw = -1;
 public:
 
-    SoilSensor(uint8_t pin);
+    SoilSensor(uint8_t pin, int cali_air = -1, int cali_water = -1);
     void checkRawValues();
     void calibrateInWater();
     void calibrateInAir();

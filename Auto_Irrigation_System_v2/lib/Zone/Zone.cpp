@@ -1,9 +1,8 @@
 #include "Zone.h"
 
-Zone::Zone(int id, int absolute_offset) : zone_id(id)
+Zone::Zone(int id) : zone_id(id)
 {
     // Construct Pump
-    eeprom_offset_start = absolute_offset;
 
     // EEPROM.get(absolute_offset, eeprom_total_day_progressed);
     // absolute_offset += 4;
@@ -22,9 +21,9 @@ void Zone::addPump(int pin, float max_liters)
     // EEPROM.getAddress();
 }
 
-void Zone::addSoilSensor(uint8_t pin)
+void Zone::addSoilSensor(uint8_t pin, int cali_air = -1, int cali_water = -1)
 {
-    soil_sensors[nr_soil_sensors++] = new SoilSensor(pin);
+    soil_sensors[nr_soil_sensors++] = new SoilSensor(pin, cali_air, cali_water);
 }
 
 void Zone::addWaterLevelSensor(uint8_t pin)
