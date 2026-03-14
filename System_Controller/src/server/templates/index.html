@@ -340,8 +340,13 @@
           
           // Convert to proper JSON
           // const obj = JSON.parse(cleanLine.replace(/'/g, '"'));
-          alert(cleanLine)
-          const obj = JSON.parse(cleanLine)
+          const obj = Object.fromEntries(
+            cleanLine.split(",").map(p => {
+              const [k, v] = p.split(":");
+              return [k, Number(v)];
+            })
+          );
+          alert(obj)
 
           document.getElementById("current_day").textContent = obj.current_day;
           document.getElementById("total_days").textContent = obj.total_days;
