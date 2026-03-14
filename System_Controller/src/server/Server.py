@@ -142,6 +142,7 @@ def metrics_loop() -> None:
     while True:
         t = time.time() - start_time
         telem_data = read_from_file_lock_safe(DATA_BUS_PATH / "slave_telem.txt")
+        telem_data = telem_data.rstrip()
         logging.info(f"slave_telem data: {telem_data}")
         if telem_data:
             write_to_web_log(telem_data)
