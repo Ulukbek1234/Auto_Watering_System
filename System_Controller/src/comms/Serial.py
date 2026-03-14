@@ -38,29 +38,12 @@ class SerialComms:
         self.TELEM_INTER = 10 # telemetry data gets requested every 10 seconds
 
 
-    def check_response(self, line, command):
-        if command in line:
-            return True
-        else:
-            return False
-
     def request_telemetry(self):
         logging.info("Getting telem data from Mega")
         
         # Send request for telemetry data
         # ser.write(json.dumps({"Command": 250}).encode())  # 250 == GET_TELEM_DATA
         self.ser.write(b"CMD: TELEM,\n")
-        time.sleep(self.MOLA_DELAY)  # Wait for the device to respond
-        
-        # Check if data is available in the serial buffer
-        if self.ser.in_waiting > 0:
-        # while ser.in_waiting > 0: # TODO: only for debugging, remove later
-            line = self.ser.readline().decode('utf-8', errors='replace').rstrip()
-            logging.debug(f"Telem data from Mega: {line}") 
-            return split_and_parse_data(line)
-        else:
-            logging.info("No telemetry data received.")
-
 
     def readAndSendCommandToBoat(self):
         logging.info("Getting boat commands and sending")
