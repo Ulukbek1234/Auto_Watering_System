@@ -40,7 +40,7 @@ ROOT = Path(__file__).parent.parent
 DATA_BUS_PATH = ROOT / "data_bus"
 
 # ---- Chart points ----
-chart_points_count = 1440  # 1440 for 24h of 1-min data
+chart_points_count = 8640  # 8640 for 24h of 1-min data
 chart_data_delay = 60.0  # seconds between data points (matches metrics_loop sleep)
 
 

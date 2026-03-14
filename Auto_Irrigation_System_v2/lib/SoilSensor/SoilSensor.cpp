@@ -30,7 +30,6 @@ void SoilSensor::checkRawValues()
     DEBUG_PRINTLN(moisture_raw);
     DEBUG_PRINT("SoilSensor moister_percent: ");
     DEBUG_PRINTLN(moisture_percent);
-
 }
 
 // TODO: 

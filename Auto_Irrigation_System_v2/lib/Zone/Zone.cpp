@@ -118,6 +118,7 @@ String Zone::getData()
 
     for (int i = 0; i < nr_soil_sensors; i++)
     {
+        soil_sensors[i]->checkRawValues();
         String soil_pin = String(soil_sensors[i]->getPin());
         data_names[index] = "moisture_percent_" + soil_pin;
         data_values[index++] = soil_sensors[i]->getMoisturePercent();
