@@ -70,7 +70,7 @@ def reader(ser: serial.Serial):
             if line:
                 # Print exactly what Arduino sent
                 logging.debug(f"Response from boat: {line}")
-                write_to_file_lock_safe(TELEM_PATH, str(telem_dict_data))
+                write_to_file_lock_safe(TELEM_PATH, str(line))
             time.sleep(1)
 
     except Exception as e:
