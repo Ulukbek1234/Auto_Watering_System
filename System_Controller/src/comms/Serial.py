@@ -66,7 +66,7 @@ def reader(ser: serial.Serial):
     try:
         while ser.is_open:
             line = ser.readline().decode('utf-8').rstrip()
-
+            line = line.replace(" ", "")
             if line:
                 # Print exactly what Arduino sent
                 logging.debug(f"Response from boat: {line}")
