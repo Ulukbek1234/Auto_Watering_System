@@ -47,11 +47,10 @@ def split_and_parse_data(line):
     line = line.replace("}", "")
     line = line.replace("'", "")
 
-
     output = {}
-    split_data = line.split(", ")
+    split_data = line.split(",")
     for item in split_data:
-        key, value = item.split(": ")
+        key, value = item.split(":")
         key = key.strip()
         value = value.strip()
         value = value.replace(",", "")
