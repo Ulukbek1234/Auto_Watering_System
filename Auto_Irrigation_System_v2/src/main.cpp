@@ -79,6 +79,7 @@ void commandHandler(String serial_input) {
         Serial.print("eeprom valus: ");
         Serial.println(eeprom_data.cali_air[i]);
         Serial.println(eeprom_data.cali_water[i]);
+        Serial.println(eeprom_data.total_liters[i]);
       }
 
       EEPROM.writeBlock(0, eeprom_data);
