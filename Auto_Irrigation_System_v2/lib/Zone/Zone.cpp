@@ -19,7 +19,7 @@ Zone::Zone(int id, int absolute_offset) : zone_id(id)
 void Zone::addPump(int pin, float max_liters)
 {
     pumps[nr_pumps++] = new Pump(pin, max_liters);
-    EEPROM.getAddress()
+    // EEPROM.getAddress();
 }
 
 void Zone::addSoilSensor(uint8_t pin)
@@ -138,8 +138,8 @@ String Zone::getData()
         data_values[index++] = String(pumps[i]->getMaxLiter(), NR_DEC_POINTS);
         // data_names[index] = "is_active_" + pump_pin;
         // data_values[index++] = String(pumps[i]->getIsActive());
-        data_names[index] = "eeprom_val_" + pump_pin;
-        data_values[index++] = eeprom_values[i];
+        // data_names[index] = "eeprom_val_" + pump_pin;
+        // data_values[index++] = eeprom_values[i];
     }
 
     for (int i = 0; i < nr_water_level_sensors; i++)
