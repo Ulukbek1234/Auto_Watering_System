@@ -15,7 +15,7 @@ struct EE_Data
 {
   int cali_air[4] = {-1, -1, -1, -1};
   int cali_water[4] = {-1, -1, -1, -1};
-  float total_liters[4] = {0.0, 0.0, 0.0, 0.0};
+//   float total_liters[4] = {0.0, 0.0, 0.0, 0.0};
 };
 
 class Utils 
