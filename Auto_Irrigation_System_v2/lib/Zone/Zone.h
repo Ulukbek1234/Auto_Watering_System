@@ -59,8 +59,8 @@ public:
     void saveToEEPROM();
     void changeDailyLimit(int pump_id, float new_limit);
     void resetEEPROM();
-    void caliSoilInAir(int soil_pin);
-    void caliSoilInWater(int soil_pin);
+    bool caliSoilInAir(int soil_pin);
+    bool caliSoilInWater(int soil_pin);
 
 };
 
