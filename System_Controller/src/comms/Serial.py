@@ -60,16 +60,6 @@ class SerialComms:
         # Send a command to the boat
         self.ser.write(boat_command.encode() + b'\n')
 
-def is_not_empty_json(input):
-    try:
-        json_data = json.loads(input)
-        if(len(json_data) == 0):
-            return False
-        
-        return True
-    except(json.JSONDecodeError, ValueError):
-        logging.info(f"Input not json format: {input}")
-        return False
 
 def reader(ser: serial.Serial):
     """Continuously read lines from Arduino and print them."""
@@ -77,7 +67,7 @@ def reader(ser: serial.Serial):
         while ser.is_open:
             line = ser.readline().decode('utf-8').rstrip()
 
-            if line and is_not_empty_json(line):
+            if line:
                 # Print exactly what Arduino sent
                 logging.debug(f"Response from boat: {line}")
                 write_to_file_lock_safe(TELEM_PATH, str(telem_dict_data))
