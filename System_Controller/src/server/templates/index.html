@@ -339,7 +339,9 @@
           const cleanLine = line.substring(line.indexOf("{"));
           
           // Convert to proper JSON
-          const obj = JSON.parse(cleanLine.replace(/'/g, '"'));
+          // const obj = JSON.parse(cleanLine.replace(/'/g, '"'));
+          alert(cleanLine)
+          const obj = JSON.parse(cleanLine)
 
           document.getElementById("current_day").textContent = obj.current_day;
           document.getElementById("total_days").textContent = obj.total_days;
