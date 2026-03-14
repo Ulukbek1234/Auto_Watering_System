@@ -3,6 +3,7 @@
 #include "Zone.h"
 #include "Config.h"
 #include "Utils.h"
+#include "EEPROMex.h"
 
 Zone *pots;
 Zone *auto_pot;
@@ -28,6 +29,7 @@ void setup() {
   pots->addSoilSensor(A4);
   
   offset = pots->eeprom_offset_end;
+
   all_pots[0] = pots;
   start_time = millis();
 }
@@ -62,11 +64,11 @@ void commandHandler(String serial_input) {
 
     if (command == "SAV_EEP")
     {
-      // for(int i = 0; i < nr_zones; i++)
-      // {
-      //   all_pots[i]->saveToEEPROM();
-      // }
-      // Serial.println("SAVING_TO_EEPROM");
+      for(int i = 0; i < nr_zones; i++)
+      {
+        all_pots[i]->saveToEEPROM();
+      }
+      Serial.println("SAVING_TO_EEPROM");
       status = false;
       return;
     }

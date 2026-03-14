@@ -7,7 +7,7 @@
 #include "SoilSensor.h"
 #include "WaterLevelSensor.h"
 #include "Utils.h"
-#include "EEPROM.h"
+#include "EEPROMEx.h"
 
 const int ARRAY_SIZE = 16;
 const float MOISTURE_THRESHOLD = 35.0;
@@ -37,10 +37,8 @@ private:
     SoilSensor *soil_sensors[ARRAY_SIZE];
     WaterLevelSensor *water_level_sensors[ARRAY_SIZE];
     
-    float eeprom_values[3];
-    
     OperationModes current_mode = MODE_OFF;
-    
+        
 public:
     int eeprom_offset_start = 0;
     int eeprom_offset_end = 0;
