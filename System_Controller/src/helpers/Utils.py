@@ -43,20 +43,24 @@ def write_to_file_lock_safe(file_path, data):
 
 @staticmethod
 def split_and_parse_data(line):
-    line = line.replace("{", "")
-    line = line.replace("}", "")
-    line = line.replace("'", "")
+    line = line.replace("{", "").replace("}", "").replace("'", "")
 
     output = {}
     split_data = line.split(",")
+
     for item in split_data:
-        key, value = item.split(":")
+        key, value = item.split(":", 1)
         key = key.strip()
         value = value.strip()
-        value = value.replace(",", "")
-        if value.isnumeric():
-            value = int(value)
-        elif "." in value:
-            value = float(value)
+
+        try:
+            if "." in value:
+                value = float(value)
+            else:
+                value = int(value)
+        except ValueError:
+            pass
+
         output[key] = value
+
     return output
