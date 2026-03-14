@@ -6,7 +6,7 @@ import multiprocessing
 from ..helpers.Utils import read_from_file_lock_safe, write_to_file_lock_safe, split_and_parse_data
 from ..helpers.Logger import setup_listener, setup_worker_logging
 from pathlib import Path
-
+import threading
 
 
 telem_dict_data = {}
@@ -76,15 +76,20 @@ class SerialComms:
 
         # Send a command to the boat
         self.ser.write(boat_command.encode() + b'\n')
-        time.sleep(self.MOLA_DELAY)
 
-        # Check if a response is available from the boat
-        if self.ser.in_waiting > 0:
-            line = self.ser.readline().decode('utf-8').rstrip()
-            logging.debug(f"Response from boat: {line}")
-            # Need to check if its correct response
-        else:
-            logging.debug("No response from the boat.")
+
+def reader(ser: serial.Serial):
+    """Continuously read lines from Arduino and print them."""
+    try:
+        while ser.is_open:
+            line = ser.readline().decode('utf-8').rstrip()
+
+            if line:
+                # Print exactly what Arduino sent
+                logging.debug(f"Response from boat: {line}")
+
+    except Exception as e:
+        print(f"\n[reader stopped] {e}")
 
 # TODO need to check if response is correct (synchronization issue)
 def main(log_queue=None):
@@ -99,6 +104,10 @@ def main(log_queue=None):
 
     last_telem_time = time.time()
     last_boat_command_time = time.time()
+
+    listening_thread = threading.Thread(target=reader, args=(serial_comms.ser,), daemon=True)
+    listening_thread.start()
+
     while True:
         # Request telemetry data from the boat
         elapsed_telem_time = time.time() - last_telem_time
