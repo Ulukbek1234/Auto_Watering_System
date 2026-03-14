@@ -336,17 +336,20 @@
           const line = j.lines[0];
 
           // Remove timestamp
-          const cleanLine = line.substring(line.indexOf("{"));
+          temp_data = line.substring(line.indexOf("{"));
           
           // Convert to proper JSON
-          // const obj = JSON.parse(cleanLine.replace(/'/g, '"'));
-          const obj = Object.fromEntries(
-            cleanLine.split(",").map(p => {
-              const [k, v] = p.split(":");
-              return [k, Number(v)];
-            })
+          temp_data = Object.fromEntries(
+            temp_data
+              .replace(/,+$/, "")          // remove trailing comma
+              .split(",")                  
+              .map(p => {
+                const [key, val] = p.split(":");
+                return [key, Number(val)];
+              })
           );
-          alert(obj)
+
+          const obj = JSON.parse(temp_data);
 
           document.getElementById("current_day").textContent = obj.current_day;
           document.getElementById("total_days").textContent = obj.total_days;
