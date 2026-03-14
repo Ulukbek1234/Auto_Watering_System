@@ -131,6 +131,13 @@ def capture_loop() -> None:
 
         time.sleep(CAPTURE_INTERVAL_SEC)
 
+def is_json(input):
+    try:
+        json.loads(input)
+        return True
+    except(json.JSONDecodeError, ValueError):
+        logging.info("Input not json format")
+        return False
 
 def metrics_loop() -> None:
     """
@@ -142,7 +149,8 @@ def metrics_loop() -> None:
     while True:
         t = time.time() - start_time
         telem_data = read_from_file_lock_safe(DATA_BUS_PATH / "slave_telem.txt")
-        if telem_data:
+        
+        if telem_data and is_json(telem_data):
             write_to_web_log(telem_data)
             parsed_data = split_and_parse_data(telem_data)
             perc_54 = parsed_data.get("moisture_percent_54")
