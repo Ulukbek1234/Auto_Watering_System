@@ -42,7 +42,6 @@ class SerialComms:
         logging.info("Getting telem data from Mega")
         
         # Send request for telemetry data
-        # ser.write(json.dumps({"Command": 250}).encode())  # 250 == GET_TELEM_DATA
         self.ser.write(b"CMD: TELEM,\n")
 
     def readAndSendCommandToBoat(self):
@@ -72,7 +71,7 @@ def reader(ser: serial.Serial):
                 # Print exactly what Arduino sent
                 logging.debug(f"Response from boat: {line}")
                 write_to_file_lock_safe(TELEM_PATH, str(telem_dict_data))
-
+            time.sleep(1)
 
     except Exception as e:
         print(f"\n[reader stopped] {e}")
