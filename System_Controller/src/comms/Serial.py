@@ -68,7 +68,7 @@ def is_not_empty_json(input):
         
         return True
     except(json.JSONDecodeError, ValueError):
-        logging.info("Input not json format")
+        logging.info(f"Input not json format: {input}")
         return False
 
 def reader(ser: serial.Serial):
