@@ -68,19 +68,13 @@ void commandHandler(String serial_input) {
 
     if (command == "SAV_EEP")
     {
-      
-      
       for(int i = 0; i < nr_zones; i++)
       {
         all_pots[i]->saveToEEPROM(&eeprom_data);
-        Serial.print("eeprom valus: ");
-        Serial.println(eeprom_data.cali_air[i]);
-        Serial.println(eeprom_data.cali_water[i]);
-        // Serial.println(eeprom_data.total_liters[i]);
       }
 
       EEPROM.writeBlock(0, eeprom_data);
-      status = false;
+      status = true;
       return;
     }
 
@@ -90,7 +84,6 @@ void commandHandler(String serial_input) {
       // {
       //   all_pots[i]->resetEEPROM();
       // }
-      // Serial.println("RESET_EEPROM");
       status = false;
       return;
     }
