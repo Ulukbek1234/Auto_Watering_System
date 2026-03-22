@@ -128,7 +128,7 @@
         <label for="new_moisture_threshold">Threshold (Full percent):</label>
         <input class = "dropdown_select" type="number" id="new_moisture_threshold" step="1" min="0" value="0">
         
-        <button onclick="sendAction('CMD:SET_MODE,ZONE:'+document.getElementById('select_zone_change_mode').value+',NEW_LIM:'+document.getElementById('new_moisture_threshold').value)">Submit</button>
+        <button onclick="sendAction('CMD:CHG_MOI_THR,ZONE:'+document.getElementById('select_moisture_threshold_change').value+',NEW_LIM:'+document.getElementById('new_moisture_threshold').value)">Submit</button>
         
 
         <!-- EEPROM -->
