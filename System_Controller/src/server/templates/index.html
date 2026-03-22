@@ -119,6 +119,18 @@
 
         <button onclick="sendAction('CMD:SET_MODE,ZONE:'+document.getElementById('select_zone_change_mode').value+',NEW_MODE:'+document.getElementById('select_new_mode').value)">Submit</button>
         
+        <!-- Change Moisture Threshold -->
+        <h4 style="margin-top:16px;">Change Moisture Threshold</h4>
+        <select id="select_moisture_threshold_change" class = "dropdown_select">
+          <option value="0">Zone 0</option>
+        </select>
+
+        <label for="new_moisture_threshold">Threshold (Full percent):</label>
+        <input class = "dropdown_select" type="number" id="new_moisture_threshold" step="1" min="0" value="0">
+        
+        <button onclick="sendAction('CMD:SET_MODE,ZONE:'+document.getElementById('select_zone_change_mode').value+',NEW_LIM:'+document.getElementById('new_moisture_threshold').value)">Submit</button>
+        
+
         <!-- EEPROM -->
         <button onclick="sendAction('CMD:SAV_EEP')">SAVE EEPROM</button>
 

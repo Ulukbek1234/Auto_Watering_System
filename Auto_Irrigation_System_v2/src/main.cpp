@@ -10,7 +10,7 @@ Zone *auto_pot;
 int nr_zones = 1; // TODO change dynamically
 Zone *all_pots[1]; // TODO dynamic array if more pots needed in future
 unsigned long start_time = 0;
-const unsigned long wait_time = 10000; // 1 minute
+const unsigned long wait_time = 60000; // 1 minute
 // EEPROM 
 EE_Data eeprom_data;
 
@@ -104,7 +104,7 @@ void commandHandler(String serial_input) {
         status = true;
         DEBUG_PRINTLN("Set operation mode to: " + mode);
       } else {
-        DEBUG_PRINTLN("Wrong operation mode");
+        DEBUG_PRINTLN("Failed to NEW_MODE: Wrong operation mode");
         status = false;
       }
     } else if (command == "MAN_IRR") {
@@ -118,7 +118,7 @@ void commandHandler(String serial_input) {
         all_pots[zone]->manualIrrigation(pump_id.toInt(), amount.toFloat());
         status = true;
       } else {
-        DEBUG_PRINTLN("Failed to find pump or amount");
+        DEBUG_PRINTLN("Failed to MAN_IRR: find pump or amount");
         status = false;
       }
     } else if (command == "CHG_DLY_LTR") {
@@ -132,7 +132,18 @@ void commandHandler(String serial_input) {
         DEBUG_PRINTLN("Changed daily limit to: " + new_limit);
         status = true;
       } else {
-        DEBUG_PRINTLN("Failed to find pump or limit");
+        DEBUG_PRINTLN("Failed to CHG_DLY_LTR: find pump or limit");
+        status = false;
+      }
+    } else if (command == "CHG_MOI_THR") {
+      String new_limit = "";
+      bool found_limit = Utils::findDataFromMessage(serial_input, "NEW_LIM:", new_limit);
+      if(found_limit)
+      {
+        all_pots[zone]->changeMoistureThreshold(new_limit.toInt());
+        status = true;
+      } else {
+        DEBUG_PRINTLN("Failed to CHG_MOI_THR: find limit");
         status = false;
       }
     } else if (command == "CALI_AIR") {
