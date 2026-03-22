@@ -115,6 +115,9 @@ String Zone::getData()
     data_names[index] = "current_mode_" + String(zone_id);
     data_values[index++] = current_mode;
 
+    data_names[index] = "moisture_threshold";
+    data_values[index++] = MOISTURE_THRESHOLD;
+
     for (int i = 0; i < nr_soil_sensors; i++)
     {
         soil_sensors[i]->checkRawValues();
