@@ -42,7 +42,7 @@ private:
 public:
     Zone(int id);
 
-    void addPump(int pin, float max_liter);
+    void addPump(int pin, float max_liter, float ee_total_liters = 0.0);
     void addSoilSensor(uint8_t pin, int cali_air = -1, int cali_water = -1);
     void addWaterLevelSensor(uint8_t pin);
     void startAutoIrrigating();
