@@ -31,7 +31,7 @@ private:
     float eeprom_total_day_progressed = 0.0;
     float moisture_percent[ARRAY_SIZE] = {0.0f};
     float water_level_percent[ARRAY_SIZE] = {0.0f};
-    float MOISTURE_THRESHOLD = 40.0;
+    float MOISTURE_THRESHOLD = 50.0;
     
     Pump *pumps[ARRAY_SIZE]; 
     SoilSensor *soil_sensors[ARRAY_SIZE];
