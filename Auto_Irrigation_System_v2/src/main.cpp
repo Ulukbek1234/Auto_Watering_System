@@ -19,8 +19,8 @@ Preferences prefs;
 
 Zone *pots;
 Zone *auto_pot;
-int nr_zones = 1; // TODO change dynamically
-Zone *all_pots[1]; // TODO dynamic array if more pots needed in future
+int nr_zones = 2; // TODO change dynamically
+Zone *all_pots[2]; // TODO dynamic array if more pots needed in future
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
 // EEPROM 
@@ -78,6 +78,7 @@ void setup() {
   pots->addSoilSensor(35, eeprom_data.cali_air[3], eeprom_data.cali_water[3]);
   
   all_pots[0] = pots;
+  all_pots[1] = auto_pot;
   start_time = millis();
 }
 
