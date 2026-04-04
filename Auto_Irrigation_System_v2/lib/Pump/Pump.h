@@ -22,7 +22,7 @@ private:
 
 public:
     Pump(int pin, float max_liters);
-    void turnOnPump(float liters, bool override = false);
+    void turnOnPump(float liters, bool override);
     void deactivatePump();
     void activatePump();
 

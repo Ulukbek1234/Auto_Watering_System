@@ -43,7 +43,7 @@ public:
     Zone(int id);
 
     void addPump(int pin, float max_liter);
-    void addSoilSensor(uint8_t pin, int cali_air = -1, int cali_water = -1);
+    void addSoilSensor(uint8_t pin, int cali_air, int cali_water);
     void addWaterLevelSensor(uint8_t pin);
     void startAutoIrrigating();
     void updateDay();
@@ -53,7 +53,7 @@ public:
     void setOperationMode(OperationModes mode);
     void updateSensors();
     void manualIrrigation(int pump_id, float amount);
-    void saveToEEPROM(EE_Data *eeprom_data);
+    void saveToEEPROM(EE_Data_t *eeprom_data);
     void changeDailyLimit(int pump_id, float new_limit);
     void resetEEPROM();
     bool caliSoilInAir(int soil_pin);

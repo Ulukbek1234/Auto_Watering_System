@@ -1,6 +1,6 @@
 #include "SoilSensor.h"
 
-SoilSensor::SoilSensor(uint8_t pin, int cali_air = -1, int cali_water = -1) : cali_air_raw(cali_air), cali_water_raw(cali_water)
+SoilSensor::SoilSensor(uint8_t pin, int cali_air, int cali_water) : cali_air_raw(cali_air), cali_water_raw(cali_water)
 {
     // Construct SoilSensor
     pinMode(pin, INPUT);

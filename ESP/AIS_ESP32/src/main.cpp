@@ -11,35 +11,36 @@
 // GPIO 32-35: Moisture Sensors Input
 #define MSI_0 32
 // GPIO 16-19: Pump Control Output
-#define PCO_0 16
+#define PUMP_0 16
+#define PUMP_1 17
+#define PUMP_2 18
+#define PUMP_3 19
+
 
 void setup() {
   // Initialize serial communication
   Serial.begin(115200);
   // Set LED pin as output
-  pinMode(LED, OUTPUT);
-  pinMode(MSI_0, INPUT);
-  pinMode(PCO_0, OUTPUT);
+  pinMode(PUMP_0, OUTPUT);
+  pinMode(PUMP_1, OUTPUT);
+  pinMode(PUMP_2, OUTPUT);
+  pinMode(PUMP_3, OUTPUT);
+  digitalWrite(PUMP_0, LOW);
+  digitalWrite(PUMP_1, LOW);
+  digitalWrite(PUMP_2, LOW);
+  digitalWrite(PUMP_3, LOW);
+
 }
 
 void loop() {
-  // Turn LED on
-  digitalWrite(LED, HIGH);
-  Serial.println("LED is on");
-  delay(1000);
-  // Turn LED off
-  digitalWrite(LED, LOW);
-  Serial.println("LED is off");
-  delay(1000);
-
-  uint16_t anal_input = analogRead(MSI_0);
-  Serial.print("Anal_Input: ");
-  Serial.println(anal_input);
-  delay(1000);
-
-  digitalWrite(PCO_0, HIGH);
-  delay(1000);
-  digitalWrite(PCO_0, LOW);
-  delay(1000);
-
+  for(int i = 0; i < 4; i++)
+  {
+    Serial.print("Active Pump ");
+    Serial.println(i);
+    delay(1000);
+    digitalWrite(i + 16, LOW);
+    delay(1000);
+    digitalWrite(i + 16, HIGH);
+  }
+  delay(5000);
 }   

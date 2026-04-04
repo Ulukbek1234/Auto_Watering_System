@@ -21,7 +21,7 @@ void Zone::addPump(int pin, float max_liters)
     // EEPROM.getAddress();
 }
 
-void Zone::addSoilSensor(uint8_t pin, int cali_air = -1, int cali_water = -1)
+void Zone::addSoilSensor(uint8_t pin, int cali_air, int cali_water)
 {
     soil_sensors[nr_soil_sensors++] = new SoilSensor(pin, cali_air, cali_water);
 }
@@ -57,7 +57,7 @@ void Zone::startAutoIrrigating()
         DEBUG_PRINTLN("Zone is in FLOOD mode, irrigating all pumps to max daily limit.");
         for(int i = 0; i < nr_pumps; i++)
         {
-            pumps[i]->turnOnPump(0.2);
+            pumps[i]->turnOnPump(0.2, false);
         }
         break;
     case MODE_SOIL:
@@ -68,7 +68,7 @@ void Zone::startAutoIrrigating()
             DEBUG_PRINTLN(moisture_percent[i]);
             if((MOISTURE_THRESHOLD - moisture_percent[i]) > epsilon )
             {
-                pumps[i]->turnOnPump(0.2);
+                pumps[i]->turnOnPump(0.2, false);
             }
         }
         break;
@@ -213,13 +213,13 @@ void Zone::manualIrrigation(int pump_id, float amount)
     for(int i = 0; i < nr_pumps; i++)
     {
         if(pumps[i]->getPin() == pump_id){
-            pumps[i]->turnOnPump(amount);
+            pumps[i]->turnOnPump(amount, true);
             return;
         }
     }
 }
 
-void Zone::saveToEEPROM(EE_Data *eeprom_data)
+void Zone::saveToEEPROM(EE_Data_t *eeprom_data)
 {
     for(int i = 0; i < nr_soil_sensors; i++)
     {
