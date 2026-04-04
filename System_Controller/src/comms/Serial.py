@@ -27,7 +27,9 @@ class SerialComms:
         # Establish serial connection with Slave
         # USB = ttyACM0
         # GPIO = serial0 
-        self.ser = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=1) 
+        
+        self.ser = serial.Serial(port='/dev/ttyUSB0', baudrate=9600, timeout=1) 
+
         time.sleep(2)  # wait for the serial connection to initialize
         self.ser.write(b"SYNCH\n")
 
