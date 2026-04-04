@@ -3,7 +3,19 @@
 #include "Zone.h"
 #include "Config.h"
 #include "Utils.h"
+#if defined(ESP32)
+// ESP32-specific includes
+#include <WiFi.h>
+#include <Preferences.h>
+Preferences prefs;
+
+#elif defined(ARDUINO_ARCH_AVR)
+// Arduino Uno/Nano includes
+#include <Arduino.h>
 #include "EEPROMex.h"
+
+#endif
+
 
 Zone *pots;
 Zone *auto_pot;
@@ -12,27 +24,58 @@ Zone *all_pots[1]; // TODO dynamic array if more pots needed in future
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
 // EEPROM 
-EE_Data eeprom_data;
+EE_Data_t eeprom_data;
 
 
 void setup() {
   Serial.begin(9600);
 
-  EEPROM.setMaxAllowedWrites(100);
-  EEPROM.readBlock(0, eeprom_data);
+  #if defined(ESP32)
+    Serial.println("Running on ESP32");
+
+    // // ESP32-specific setup
+    // WiFi.begin("ssid", "password");
+
+    prefs.begin("EE_Data");
+
+
+    
+    // Read the data back
+    size_t schLen = prefs.getBytesLength("EE_Data");
+    char buffer[schLen];
+    prefs.getBytes("EE_Data", buffer, schLen);
+    
+    // Cast the buffer back to the struct type
+    EE_Data_t *retrieved = (EE_Data_t *)buffer;
+    eeprom_data = *retrieved;
+    
+    prefs.end();
+
+
+  #elif defined(ARDUINO_ARCH_AVR)
+    Serial.println("Running on Arduino AVR");
+    EEPROM.setMaxAllowedWrites(100);
+    EEPROM.readBlock(0, eeprom_data);
+
+    // Arduino-specific setup
+  #endif
+
+
+
+
 
   pots = new Zone(0);
   pots->setOperationMode(MODE_MANUAL);
 
-  pots->addPump(8, 1.0);
-  pots->addPump(9, 1.0);
-  pots->addPump(10, 1.0);
-  pots->addPump(11, 1.0);
+  pots->addPump(16, 1.0);
+  pots->addPump(17, 1.0);
+  pots->addPump(18, 1.0);
+  pots->addPump(19, 1.0);
   
-  pots->addSoilSensor(A0, eeprom_data.cali_air[0], eeprom_data.cali_water[0]);
-  pots->addSoilSensor(A1, eeprom_data.cali_air[1], eeprom_data.cali_water[1]);
-  pots->addSoilSensor(A2, eeprom_data.cali_air[2], eeprom_data.cali_water[2]);
-  pots->addSoilSensor(A4, eeprom_data.cali_air[3], eeprom_data.cali_water[3]);
+  pots->addSoilSensor(32, eeprom_data.cali_air[0], eeprom_data.cali_water[0]);
+  pots->addSoilSensor(33, eeprom_data.cali_air[1], eeprom_data.cali_water[1]);
+  pots->addSoilSensor(34, eeprom_data.cali_air[2], eeprom_data.cali_water[2]);
+  pots->addSoilSensor(35, eeprom_data.cali_air[3], eeprom_data.cali_water[3]);
   
   all_pots[0] = pots;
   start_time = millis();
@@ -73,7 +116,14 @@ void commandHandler(String serial_input) {
         all_pots[i]->saveToEEPROM(&eeprom_data);
       }
 
-      EEPROM.writeBlock(0, eeprom_data);
+      #if defined(ESP32)
+        // Store the struct as bytes
+        prefs.putBytes("EE_Data", &eeprom_data, sizeof(eeprom_data));
+      #elif defined(ARDUINO_ARCH_AVR)
+        EEPROM.writeBlock(0, eeprom_data);
+
+      #endif
+
       status = true;
       return;
     }

@@ -21,8 +21,8 @@ private:
     bool limit_reached = false;
 
 public:
-    Pump(int pin, float max_liters, float ee_total_liters);
-    void turnOnPump(float liters, bool override = false);
+    Pump(int pin, float max_liters);
+    void turnOnPump(float liters, bool override);
     void deactivatePump();
     void activatePump();
 

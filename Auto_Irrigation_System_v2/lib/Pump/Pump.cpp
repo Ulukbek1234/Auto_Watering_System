@@ -14,7 +14,7 @@ Pump::Pump(int pin, float max_liters, float ee_total_liters)
 }
 
 
-void Pump::turnOnPump(float liters, bool override = false)
+void Pump::turnOnPump(float liters, bool override)
 {
     DEBUG_PRINTLN("Started pumping liters");
     if (!override &&
