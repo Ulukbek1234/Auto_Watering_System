@@ -67,15 +67,15 @@ void setup() {
   pots = new Zone(0);
   pots->setOperationMode(MODE_MANUAL);
 
-  pots->addPump(16, 1.0);
-  pots->addPump(17, 1.0);
-  pots->addPump(18, 1.0);
-  pots->addPump(19, 1.0);
+  pots->addPump(8, 1.0);
+  pots->addPump(9, 1.0);
+  pots->addPump(10, 0.5);
+  pots->addPump(11, 0.0);
   
-  pots->addSoilSensor(32, eeprom_data.cali_air[0], eeprom_data.cali_water[0]);
-  pots->addSoilSensor(33, eeprom_data.cali_air[1], eeprom_data.cali_water[1]);
-  pots->addSoilSensor(34, eeprom_data.cali_air[2], eeprom_data.cali_water[2]);
-  pots->addSoilSensor(35, eeprom_data.cali_air[3], eeprom_data.cali_water[3]);
+  pots->addSoilSensor(A0, eeprom_data.cali_air[0], eeprom_data.cali_water[0]);
+  pots->addSoilSensor(A1, eeprom_data.cali_air[1], eeprom_data.cali_water[1]);
+  pots->addSoilSensor(A2, eeprom_data.cali_air[2], eeprom_data.cali_water[2]);
+  pots->addSoilSensor(A3, eeprom_data.cali_air[3], eeprom_data.cali_water[3]);
   
   all_pots[0] = pots;
   all_pots[1] = auto_pot;

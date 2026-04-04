@@ -15,9 +15,9 @@ Zone::Zone(int id) : zone_id(id)
     // eeprom_offset_end = absolute_offset;
 }
 
-void Zone::addPump(int pin, float max_liters, float ee_total_liters = 0.0)
+void Zone::addPump(int pin, float max_liters)
 {
-    pumps[nr_pumps++] = new Pump(pin, max_liters, ee_total_liters);
+    pumps[nr_pumps++] = new Pump(pin, max_liters);
     // EEPROM.getAddress();
 }
 
@@ -231,7 +231,7 @@ void Zone::saveToEEPROM(EE_Data_t *eeprom_data)
     }
     for(int i = 0; i < nr_pumps; i++)
     {
-        eeprom_data->total_liters[i] = pumps[i]->getTotalLiter();
+        // eeprom_data->total_liters[i] = pumps[i]->getTotalLiter();
     }
 }
 
