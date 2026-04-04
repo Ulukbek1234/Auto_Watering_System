@@ -7,7 +7,8 @@
 // ESP32-specific includes
 #include <WiFi.h>
 #include <Preferences.h>
-Preferences prefs;
+#include "Web.h"
+
 #define PUMP_0 16
 #define PUMP_1 17 
 #define PUMP_2 18 
@@ -16,6 +17,8 @@ Preferences prefs;
 #define HUM_SNS_1 33
 #define HUM_SNS_2 34
 #define HUM_SNS_3 35
+Preferences prefs;
+Web *server;
 
 #elif defined(ARDUINO_ARCH_AVR)
 // Arduino Uno/Nano includes
@@ -43,9 +46,10 @@ EE_Data_t eeprom_data;
 
 
 void setup() {
-  Serial.begin(9600);
 
   #if defined(ESP32)
+    Serial.begin(115200);
+
     Serial.println("Running on ESP32");
 
     // // ESP32-specific setup
@@ -66,8 +70,12 @@ void setup() {
     
     prefs.end();
 
+    server = new Web();
+
 
   #elif defined(ARDUINO_ARCH_AVR)
+    Serial.begin(9600);
+
     Serial.println("Running on Arduino AVR");
     EEPROM.setMaxAllowedWrites(100);
     EEPROM.readBlock(0, eeprom_data);
@@ -94,6 +102,8 @@ void setup() {
   
   all_pots[0] = pots;
   start_time = millis();
+
+
 }
 
 /*
@@ -246,5 +256,7 @@ void loop() {
       all_pots[i]->startAutoIrrigating();
       all_pots[i]->updateDay();
     }
+
+
   }
 }
