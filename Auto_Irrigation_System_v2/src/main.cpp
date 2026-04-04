@@ -8,19 +8,34 @@
 #include <WiFi.h>
 #include <Preferences.h>
 Preferences prefs;
+#define PUMP_0 16
+#define PUMP_1 17 
+#define PUMP_2 18 
+#define PUMP_3 19
+#define HUM_SNS_0 32
+#define HUM_SNS_1 33
+#define HUM_SNS_2 34
+#define HUM_SNS_3 35
 
 #elif defined(ARDUINO_ARCH_AVR)
 // Arduino Uno/Nano includes
 #include <Arduino.h>
 #include "EEPROMex.h"
+#define PUMP_0 8
+#define PUMP_1 9 
+#define PUMP_2 10 
+#define PUMP_3 11
+#define HUM_SNS_0 A0
+#define HUM_SNS_1 A1
+#define HUM_SNS_2 A2
+#define HUM_SNS_3 A3
 
 #endif
 
 
 Zone *pots;
-Zone *auto_pot;
-int nr_zones = 2; // TODO change dynamically
-Zone *all_pots[2]; // TODO dynamic array if more pots needed in future
+int nr_zones = 1; // TODO change dynamically
+Zone *all_pots[1]; // TODO dynamic array if more pots needed in future
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
 // EEPROM 
@@ -67,18 +82,17 @@ void setup() {
   pots = new Zone(0);
   pots->setOperationMode(MODE_MANUAL);
 
-  pots->addPump(8, 1.0);
-  pots->addPump(9, 1.0);
-  pots->addPump(10, 0.5);
-  pots->addPump(11, 0.0);
+  pots->addPump(PUMP_0, 1.0);
+  pots->addPump(PUMP_1, 1.0);
+  pots->addPump(PUMP_2, 0.5);
+  pots->addPump(PUMP_3, 0.0);
   
-  pots->addSoilSensor(A0, eeprom_data.cali_air[0], eeprom_data.cali_water[0]);
-  pots->addSoilSensor(A1, eeprom_data.cali_air[1], eeprom_data.cali_water[1]);
-  pots->addSoilSensor(A2, eeprom_data.cali_air[2], eeprom_data.cali_water[2]);
-  pots->addSoilSensor(A3, eeprom_data.cali_air[3], eeprom_data.cali_water[3]);
+  pots->addSoilSensor(HUM_SNS_0, eeprom_data.cali_air[0], eeprom_data.cali_water[0]);
+  pots->addSoilSensor(HUM_SNS_1, eeprom_data.cali_air[1], eeprom_data.cali_water[1]);
+  pots->addSoilSensor(HUM_SNS_2, eeprom_data.cali_air[2], eeprom_data.cali_water[2]);
+  pots->addSoilSensor(HUM_SNS_3, eeprom_data.cali_air[3], eeprom_data.cali_water[3]);
   
   all_pots[0] = pots;
-  all_pots[1] = auto_pot;
   start_time = millis();
 }
 
