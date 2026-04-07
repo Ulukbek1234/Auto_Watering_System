@@ -5,14 +5,27 @@
 #include <WiFi.h>
 #include <WebServer.h>
 
-class Web 
-{
+class Web {
 private:
-    // Replace with your network credentials
-    const char* ssid = "InternetUluk";
+    const char* ssid = "InternetHandy";
     const char* password = "thisisuluk";
+    
 public:
-    Web();
+    Web(uint16_t port = 80);
+
+    void begin();
+    void loop();
+
+private:
+    WebServer server;
+
+    // Route handlers
+    void handleRoot();
+    void handleOn();
+    void handleOff();
+
+    // HTML generator
+    String getHTML();
 };
 
 #endif

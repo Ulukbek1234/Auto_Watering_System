@@ -18,7 +18,7 @@
 #define HUM_SNS_2 34
 #define HUM_SNS_3 35
 Preferences prefs;
-Web *server;
+Web server;
 
 #elif defined(ARDUINO_ARCH_AVR)
 // Arduino Uno/Nano includes
@@ -70,8 +70,7 @@ void setup() {
     
     prefs.end();
 
-    server = new Web();
-
+    server.begin();
 
   #elif defined(ARDUINO_ARCH_AVR)
     Serial.begin(9600);
@@ -238,6 +237,7 @@ void commandHandler(String serial_input) {
 }
 
 void loop() {
+  server.loop();
   // Check serial for commands from master here
   if(Serial.available() > 0) {
     String serial_input = Serial.readStringUntil('\n');

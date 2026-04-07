@@ -1,23 +1,121 @@
 #include "Web.h"
 
+// Constructor
+Web::Web(uint16_t port)
+  : server(port) {}
 
-Web::Web() 
-{
-  // Connect to Wi-Fi network
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.println("WiFi connected.");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-  WebServer server(80);
+// Start server and define routes
+void Web::begin() {
 
+  // Root page
+  server.on("/", [this]() {
+    this->handleRoot();
+  });
+
+  // Commands
+  server.on("/on", [this]() {
+    this->handleOn();
+  });
+
+  server.on("/off", [this]() {
+    this->handleOff();
+  });
+
+  server.begin();
 }
+
+// Handle client requests
+void Web::loop() {
+  server.handleClient();
+}
+
+// ===== Route Handlers =====
+
+void Web::handleRoot() {
+  server.send(200, "text/html", getHTML());
+}
+
+void Web::handleOn() {
+  digitalWrite(2, HIGH); // LED ON (GPIO 2)
+  server.send(200, "text/plain", "LED ON");
+}
+
+void Web::handleOff() {
+  digitalWrite(2, LOW); // LED OFF
+  server.send(200, "text/plain", "LED OFF");
+}
+
+// ===== HTML Page =====
+
+String Web::getHTML() {
+  return R"rawliteral(
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ESP32 Control</title>
+  <style>
+    body { text-align: center; font-family: Arial; }
+    button {
+      padding: 20px;
+      font-size: 20px;
+      margin: 10px;
+      width: 200px;
+    }
+  </style>
+</head>
+<body>
+  <h1>ESP32 Control Panel</h1>
+
+  <button onclick="sendCmd('on')">LED ON</button>
+  <button onclick="sendCmd('off')">LED OFF</button>
+
+  <script>
+    function sendCmd(cmd) {
+      fetch('/' + cmd)
+        .then(res => console.log(cmd))
+        .catch(err => console.error(err));
+    }
+  </script>
+</body>
+</html>
+)rawliteral";
+}
+
+// void Web::handleRoot() {
+//   String html = "<!DOCTYPE html><html>";
+//   html += "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+//   html += "<link rel=\"icon\" href=\"data:,\">";
+//   html += "<style>body { text-align: center; font-family: \"Trebuchet MS\", Arial;}";
+//   html += "table { border-collapse: collapse; width:60%; margin-left:auto; margin-right:auto; }";
+//   html += "th { padding: 10px; background-color: #0043af; color: white; }";
+//   html += "tr { border: 1px solid #ddd; padding: 10px; }";
+//   html += "tr:hover { background-color: #bcbcbc; }";
+//   html += "td { border: none; padding: 8px; }";
+//   html += ".sensor { color:white; font-weight: bold; background-color: #bcbcbc; padding: 1px; }</style></head>";
+//   html += "<body><h1>Auto Irrigation Grow Dashboard</h1>";
+//   html += "<table><tr><th>MEASUREMENT</th><th>VALUE</th></tr>";
+//   html += "<tr><td>Pump 1 Total</td><td><span class=\"sensor\">";
+//   html += String(1);
+//   html += " *C</span></td></tr>";
+//   html += "<tr><td>Pump 2 Total</td><td><span class=\"sensor\">";
+//   html += String(2);
+//   html += " *F</span></td></tr>";
+//   html += "<tr><td>Pump 3 Total</td><td><span class=\"sensor\">";
+//   html += String(3);
+//   html += " hPa</span></td></tr>";
+//   html += "<tr><td>Pump 4 Total</td><td><span class=\"sensor\">";
+//   html += String(4);
+//   html += " m</span></td></tr>";
+//   html += " %</span></td></tr></table></body></html>";
+
+//   // Send the response to the client
+//   server.send(200, "text/html", html);
+// }
+
+// void Web::loop() {
+//   // server.handleClient();
+//   Serial.println("Web loop");
+// }
 
 /*  
   Rui Santos & Sara Santos - Random Nerd Tutorials
