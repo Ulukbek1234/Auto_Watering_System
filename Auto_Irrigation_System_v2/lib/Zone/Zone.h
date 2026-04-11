@@ -9,7 +9,7 @@
 #include "Utils.h"
 // #include "EEPROMEx.h"
 
-const int ARRAY_SIZE = 16;
+const int ARRAY_SIZE = 4;
 
 enum OperationModes {
     MODE_OFF = 0,
@@ -29,15 +29,15 @@ private:
     float day_exact = 0.0;
     float total_day_progressed = 0.0;
     float eeprom_total_day_progressed = 0.0;
-    float moisture_percent[ARRAY_SIZE] = {0.0f};
-    float water_level_percent[ARRAY_SIZE] = {0.0f};
-    float moisture_threshold[ARRAY_SIZE] = {50.0f}; 
+    float moisture_percent[ARRAY_SIZE] = {0.0f, 0.0f, 0.0f, 0.0f,};
+    float water_level_percent[ARRAY_SIZE] = {0.0f, 0.0f, 0.0f, 0.0f,};
+    float moisture_threshold[ARRAY_SIZE] = {50.0f, 50.0f, 50.0f, 50.0f}; 
     
     Pump *pumps[ARRAY_SIZE]; 
     SoilSensor *soil_sensors[ARRAY_SIZE];
     WaterLevelSensor *water_level_sensors[ARRAY_SIZE];
     
-    OperationModes current_mode = MODE_OFF;
+    OperationModes current_mode = MODE_OFF; 
 
 public:
     Zone(int id);
