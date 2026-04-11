@@ -66,7 +66,7 @@ void Zone::startAutoIrrigating()
         {
             DEBUG_PRINT("moisture_percent for sensor: ");
             DEBUG_PRINTLN(moisture_percent[i]);
-            if((MOISTURE_THRESHOLD - moisture_percent[i]) > epsilon )
+            if((moisture_threshold[i] - moisture_percent[i]) > epsilon )
             {
                 pumps[i]->turnOnPump(0.2, false);
             }
@@ -115,9 +115,7 @@ String Zone::getData()
     data_names[index] = "current_mode_" + String(zone_id);
     data_values[index++] = current_mode;
 
-    data_names[index] = "moisture_threshold";
-    data_values[index++] = MOISTURE_THRESHOLD;
-
+    
     for (int i = 0; i < nr_soil_sensors; i++)
     {
         soil_sensors[i]->checkRawValues();
@@ -126,6 +124,8 @@ String Zone::getData()
         data_values[index++] = soil_sensors[i]->getMoisturePercent();
         data_names[index] = "moisture_raw_" + soil_pin;
         data_values[index++] = soil_sensors[i]->getMoistureRaw(); 
+        data_names[index] = "moisture_threshold_" + soil_pin;
+        data_values[index++] = moisture_threshold[i];
     }
 
     for (int i = 0; i < nr_pumps; i++)
