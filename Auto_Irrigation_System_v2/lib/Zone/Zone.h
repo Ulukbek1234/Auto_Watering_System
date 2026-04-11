@@ -10,7 +10,6 @@
 // #include "EEPROMEx.h"
 
 const int ARRAY_SIZE = 16;
-const float MOISTURE_THRESHOLD = 35.0;
 
 enum OperationModes {
     MODE_OFF = 0,
@@ -32,6 +31,7 @@ private:
     float eeprom_total_day_progressed = 0.0;
     float moisture_percent[ARRAY_SIZE] = {0.0f};
     float water_level_percent[ARRAY_SIZE] = {0.0f};
+    float MOISTURE_THRESHOLD = 50.0;
     
     Pump *pumps[ARRAY_SIZE]; 
     SoilSensor *soil_sensors[ARRAY_SIZE];
@@ -42,7 +42,7 @@ private:
 public:
     Zone(int id);
 
-    void addPump(int pin, float max_liter);
+    void addPump(int pin, float max_liter, float ee_total_liters = 0.0);
     void addSoilSensor(uint8_t pin, int cali_air = -1, int cali_water = -1);
     void addWaterLevelSensor(uint8_t pin);
     void startAutoIrrigating();
@@ -55,6 +55,7 @@ public:
     void manualIrrigation(int pump_id, float amount);
     void saveToEEPROM(EE_Data *eeprom_data);
     void changeDailyLimit(int pump_id, float new_limit);
+    void changeMoistureThreshold(float new_limit);
     void resetEEPROM();
     bool caliSoilInAir(int soil_pin);
     bool caliSoilInWater(int soil_pin);

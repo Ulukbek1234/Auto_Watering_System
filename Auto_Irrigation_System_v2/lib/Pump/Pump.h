@@ -17,11 +17,11 @@ private:
     int is_active = 0; // 0 off, 1 on
     float max_liters = 1.0; // Default, changed by init  
     float daily_liter = 0.0;
-    float total_liter = 0.0; // TODO safe to EEPROM
+    float total_liter = 0.0; 
     bool limit_reached = false;
 
 public:
-    Pump(int pin, float max_liters);
+    Pump(int pin, float max_liters, float ee_total_liters);
     void turnOnPump(float liters, bool override = false);
     void deactivatePump();
     void activatePump();

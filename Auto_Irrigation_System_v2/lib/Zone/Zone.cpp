@@ -15,9 +15,9 @@ Zone::Zone(int id) : zone_id(id)
     // eeprom_offset_end = absolute_offset;
 }
 
-void Zone::addPump(int pin, float max_liters)
+void Zone::addPump(int pin, float max_liters, float ee_total_liters = 0.0)
 {
-    pumps[nr_pumps++] = new Pump(pin, max_liters);
+    pumps[nr_pumps++] = new Pump(pin, max_liters, ee_total_liters);
     // EEPROM.getAddress();
 }
 
@@ -114,6 +114,9 @@ String Zone::getData()
 
     data_names[index] = "current_mode_" + String(zone_id);
     data_values[index++] = current_mode;
+
+    data_names[index] = "moisture_threshold";
+    data_values[index++] = MOISTURE_THRESHOLD;
 
     for (int i = 0; i < nr_soil_sensors; i++)
     {
@@ -228,8 +231,7 @@ void Zone::saveToEEPROM(EE_Data *eeprom_data)
     }
     for(int i = 0; i < nr_pumps; i++)
     {
-        // TODO gotta fix the += makes wrong value if not reset
-        // eeprom_data->total_liters[i] += pumps[i]->getTotalLiter();
+        eeprom_data->total_liters[i] = pumps[i]->getTotalLiter();
     }
 }
 
@@ -260,6 +262,11 @@ void Zone::changeDailyLimit(int pump_id, float new_limit)
             return;
         }
     }
+}
+
+void Zone::changeMoistureThreshold(float new_limit)
+{
+    MOISTURE_THRESHOLD = new_limit;
 }
 
 bool Zone::caliSoilInAir(int soil_pin)

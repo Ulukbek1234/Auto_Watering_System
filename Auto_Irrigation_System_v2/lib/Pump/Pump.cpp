@@ -1,16 +1,16 @@
 #include "Pump.h"
 
 
-Pump::Pump(int pin, float max_liters) 
+Pump::Pump(int pin, float max_liters, float ee_total_liters) 
 {
     // Construct Pump
     this->pin = pin;
     this->max_liters = max_liters;
     this->limit_reached = false;
+    this->total_liter = ee_total_liters;
     pinMode(pin, OUTPUT);
     digitalWrite(pin, PUMP_OFF);
     activatePump();
-    // total_liter = EEPROM.read(pin);
 }
 
 
