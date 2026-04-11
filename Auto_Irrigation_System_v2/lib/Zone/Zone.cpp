@@ -264,9 +264,15 @@ void Zone::changeDailyLimit(int pump_id, float new_limit)
     }
 }
 
-void Zone::changeMoistureThreshold(float new_limit)
+void Zone::changeMoistureThreshold(int pump_id, float new_threshold)
 {
-    MOISTURE_THRESHOLD = new_limit;
+    for(int i = 0; i < nr_pumps; i++)
+    {
+        if(pumps[i]->getPin() == pump_id){
+            moisture_threshold[i] = new_threshold;
+            return;
+        }
+    }
 }
 
 bool Zone::caliSoilInAir(int soil_pin)

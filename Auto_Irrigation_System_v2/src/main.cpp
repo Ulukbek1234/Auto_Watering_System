@@ -144,6 +144,8 @@ void commandHandler(String serial_input) {
       return;
     }
     
+    // TODO MAJOR REFACTOR
+    // HORRIBLE CODE
     if (command == "SET_MODE") {
       // TODO which zone selected?
       String mode = "";
@@ -186,10 +188,13 @@ void commandHandler(String serial_input) {
       }
     } else if (command == "CHG_MOI_THR") {
       String new_limit = "";
+      String pump_id = "";
+      bool found_pump = Utils::findDataFromMessage(serial_input, "PUMP:", pump_id);
       bool found_limit = Utils::findDataFromMessage(serial_input, "NEW_LIM:", new_limit);
-      if(found_limit)
+      if(found_pump && found_limit)
       {
-        all_pots[zone]->changeMoistureThreshold(new_limit.toInt());
+        all_pots[zone]->changeMoistureThreshold(pump_id.toInt(), new_limit.toInt());
+        DEBUG_PRINTLN("Changed moisture threhsold: " + new_limit);
         status = true;
       } else {
         DEBUG_PRINTLN("Failed to CHG_MOI_THR: find limit");
