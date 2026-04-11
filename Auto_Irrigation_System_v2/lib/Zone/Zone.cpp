@@ -57,7 +57,7 @@ void Zone::startAutoIrrigating()
         DEBUG_PRINTLN("Zone is in FLOOD mode, irrigating all pumps to max daily limit.");
         for(int i = 0; i < nr_pumps; i++)
         {
-            pumps[i]->turnOnPump(0.2, false);
+            pumps[i]->turnOnPump(0.1, false);
         }
         break;
     case MODE_SOIL:
@@ -68,7 +68,7 @@ void Zone::startAutoIrrigating()
             DEBUG_PRINTLN(moisture_percent[i]);
             if((moisture_threshold[i] - moisture_percent[i]) > epsilon )
             {
-                pumps[i]->turnOnPump(0.2, false);
+                pumps[i]->turnOnPump(0.15, false);
             }
         }
         break;

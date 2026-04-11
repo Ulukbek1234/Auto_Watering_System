@@ -29,9 +29,9 @@ private:
     float day_exact = 0.0;
     float total_day_progressed = 0.0;
     float eeprom_total_day_progressed = 0.0;
-    float moisture_percent[ARRAY_SIZE] = {0.0f, 0.0f, 0.0f, 0.0f,};
-    float water_level_percent[ARRAY_SIZE] = {0.0f, 0.0f, 0.0f, 0.0f,};
-    float moisture_threshold[ARRAY_SIZE] = {50.0f, 50.0f, 50.0f, 50.0f}; 
+    float moisture_percent[ARRAY_SIZE] = {0.0, 0.0, 0.0, 0.0};
+    float water_level_percent[ARRAY_SIZE] = {0.0, 0.0, 0.0, 0.0};
+    float moisture_threshold[ARRAY_SIZE] = {50.0, 50.0, 50.0, 50.0}; 
     
     Pump *pumps[ARRAY_SIZE]; 
     SoilSensor *soil_sensors[ARRAY_SIZE];
