@@ -7,7 +7,7 @@
 
 class Web {
 private:
-    const char* ssid = "InternetHandy";
+    const char* ssid = "InternetUluk";
     const char* password = "thisisuluk";
     
 public:

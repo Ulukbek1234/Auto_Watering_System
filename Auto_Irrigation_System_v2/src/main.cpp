@@ -48,16 +48,23 @@ EE_Data_t eeprom_data;
 void setup() {
 
   #if defined(ESP32)
+    // ESP32-specific setup
     Serial.begin(115200);
-
     Serial.println("Running on ESP32");
 
-    // // ESP32-specific setup
-    // WiFi.begin("ssid", "password");
+    // Wifi & server start 
+    WiFi.begin("InternetUluk", "thisisuluk");
+    while(WiFi.status() != WL_CONNECTED) {
+      delay(200);
+      Serial.println(".");
+    }
+    Serial.println("WiFi Connected");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+    server.begin();
 
+    // Memory load
     prefs.begin("EE_Data");
-
-
     
     // Read the data back
     size_t schLen = prefs.getBytesLength("EE_Data");
@@ -70,7 +77,6 @@ void setup() {
     
     prefs.end();
 
-    server.begin();
 
   #elif defined(ARDUINO_ARCH_AVR)
     Serial.begin(9600);
