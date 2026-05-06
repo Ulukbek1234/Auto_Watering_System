@@ -38,7 +38,7 @@ class SerialComms:
         self.SLAVE_COMMAND_INTER = 1
         self.SLAVE_COMMAND_PATH = DATA_BUS_PATH / "slave_command.txt"
 
-        self.TELEM_INTER = 10 # telemetry data gets requested every 10 seconds
+        self.TELEM_INTER = 60 # telemetry data gets requested every 60 seconds
 
 
     def request_telemetry(self):

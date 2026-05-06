@@ -66,10 +66,10 @@ void setup() {
   pots = new Zone(0);
   pots->setOperationMode(MODE_MANUAL);
 
-  pots->addPump(8, 1.0);
-  pots->addPump(9, 1.0);
+  pots->addPump(8, 0.5);
+  pots->addPump(9, 1.5);
   pots->addPump(10, 0.5);
-  pots->addPump(11, 0.0);
+  pots->addPump(11, 0.5);
   
   pots->addSoilSensor(A0, eeprom_data.cali_air[0], eeprom_data.cali_water[0]);
   pots->addSoilSensor(A1, eeprom_data.cali_air[1], eeprom_data.cali_water[1]);
