@@ -2,7 +2,17 @@
 
 // Constructor
 Web::Web(uint16_t port)
-  : server(port) {}
+  : server(port) {
+    // Wifi & server start 
+    WiFi.begin("InternetUluk", "thisisuluk");
+    while(WiFi.status() != WL_CONNECTED) {
+      delay(200);
+      Serial.println(".");
+    }
+    Serial.println("WiFi Connected");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+}
 
 // Start server and define routes
 void Web::begin() {

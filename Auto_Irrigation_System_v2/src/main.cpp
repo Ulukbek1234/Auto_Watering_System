@@ -52,15 +52,7 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Running on ESP32");
 
-    // Wifi & server start 
-    WiFi.begin("InternetUluk", "thisisuluk");
-    while(WiFi.status() != WL_CONNECTED) {
-      delay(200);
-      Serial.println(".");
-    }
-    Serial.println("WiFi Connected");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+
     server.begin();
 
     // Memory load
