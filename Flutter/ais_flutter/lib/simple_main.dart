@@ -27,8 +27,8 @@ class _BottomNavigationBarExampleState
   int _selectedIndex = 0;
 
   static final List<Widget> _pages = <Widget>[
-    Page1(),
-    Page2(),
+    PageHome(),
+    PageCharts(),
     PageCamera(),
     PageSettings(),
   ];
@@ -80,24 +80,42 @@ class _BottomNavigationBarExampleState
   }
 }
 
-class Page1 extends StatelessWidget {
+class PageHome extends StatelessWidget {
+  /*
+    ToDo
+    - General information
+      - Environmental
+      - See active pumps
+    - Add pumps
+    - Pumps, when pressed 
+      - see current telemetry
+      - pump configurations
+  */
   @override
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
-        'Page 1',
+        'Page Home',
         style: TextStyle(fontSize: 30),
       ),
     );
   }
 }
 
-class Page2 extends StatelessWidget {
+class PageCharts extends StatelessWidget {
+  /*
+    ToDo
+    - See humidity 
+    - See water flow
+    - Different time interval
+    - y from 0 - 100
+   */
+  
   @override
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
-        'Page 2',
+        'Page Charts',
         style: TextStyle(fontSize: 30),
       ),
     );
@@ -105,6 +123,11 @@ class Page2 extends StatelessWidget {
 }
 
 class PageCamera extends StatelessWidget {
+  /*
+    ToDo
+    - live feed
+    - timelapse?
+  */
   @override
   Widget build(BuildContext context) {
     return const Center(
@@ -117,6 +140,15 @@ class PageCamera extends StatelessWidget {
 }
 
 class PageSettings extends StatelessWidget {
+  /*
+    ToDo
+    - BLE connection
+    - WiFi credential input
+    - WiFi connection
+    - User profile
+    - Delete Data
+    - Other settings stuff
+  */
   @override
   Widget build(BuildContext context) {
     return const Center(
