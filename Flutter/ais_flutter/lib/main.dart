@@ -15,10 +15,9 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with TickerProviderStateMixin<Home> {
   static const List<Destination> allDestinations = <Destination>[
-    Destination(0, 'Teal', Icons.home, Colors.teal),
-    Destination(1, 'Cyan', Icons.business, Colors.cyan),
-    Destination(2, 'Orange', Icons.school, Colors.orange),
-    Destination(3, 'Blue', Icons.flight, Colors.blue),
+    Destination(0, 'Home', Icons.home, Colors.teal),
+    Destination(1, 'Graphs', Icons.chat_rounded, Colors.cyan),
+    Destination(2, 'Settings', Icons.settings, Colors.orange),
   ];
 
   late final List<GlobalKey<NavigatorState>> navigatorKeys;
@@ -387,3 +386,4 @@ class _DestinationViewState extends State<DestinationView> {
     );
   }
 }
+
