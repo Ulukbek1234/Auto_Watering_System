@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() => runApp(const BottomNavigationBarExampleApp());
 
@@ -43,7 +46,7 @@ class _BottomNavigationBarExampleState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('BottomNavigationBar Sample'),
+        //title: const Text('BottomNavigationBar Sample'),
       ),
 
       body: _pages[_selectedIndex],
@@ -139,22 +142,195 @@ class PageCamera extends StatelessWidget {
   }
 }
 
-class PageSettings extends StatelessWidget {
-  /*
-    ToDo
-    - BLE connection
-    - WiFi credential input
-    - WiFi connection
-    - User profile
-    - Delete Data
-    - Other settings stuff
-  */
+
+
+class PageSettings extends StatefulWidget {
+  const PageSettings({super.key});
+
+  @override
+  State<PageSettings> createState() => _PageSettingsState();
+}
+
+class _PageSettingsState extends State<PageSettings> {
+  final List<ScanResult> _devices = [];
+  BluetoothDevice? _connectedDevice;
+  bool _isScanning = false;
+
+  StreamSubscription<List<ScanResult>>? _scanSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestPermissions();
+    _listenToScanResults();
+  }
+
+  Future<void> _requestPermissions() async {
+    await [
+      Permission.bluetoothScan,
+      Permission.bluetoothConnect,
+      Permission.location,
+    ].request();
+  }
+
+  void _listenToScanResults() {
+    _scanSubscription = FlutterBluePlus.scanResults.listen((results) {
+      if (!mounted) return;
+
+      setState(() {
+        _devices
+          ..clear()
+          ..addAll(results);
+      });
+    });
+  }
+
+  Future<void> _startScan() async {
+    setState(() {
+      _devices.clear();
+      _isScanning = true;
+    });
+
+    try {
+      await FlutterBluePlus.startScan(timeout: const Duration(seconds: 8));
+    } catch (e) {
+      _showMessage('Scan failed: $e');
+    }
+
+    if (mounted) {
+      setState(() => _isScanning = false);
+    }
+  }
+
+  Future<void> _stopScan() async {
+    await FlutterBluePlus.stopScan();
+
+    if (mounted) {
+      setState(() => _isScanning = false);
+    }
+  }
+
+  Future<void> _connectToDevice(BluetoothDevice device) async {
+    try {
+      await FlutterBluePlus.stopScan();
+
+      await device.connect(
+        timeout: const Duration(seconds: 10),
+        autoConnect: false,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _connectedDevice = device;
+        _isScanning = false;
+      });
+
+      _showMessage('Connected to ${_deviceName(device)}');
+    } catch (e) {
+      _showMessage('Connection failed: $e');
+    }
+  }
+
+  Future<void> _disconnectDevice() async {
+    final device = _connectedDevice;
+    if (device == null) return;
+
+    await device.disconnect();
+
+    if (mounted) {
+      setState(() => _connectedDevice = null);
+    }
+
+    _showMessage('Disconnected');
+  }
+
+  String _deviceName(BluetoothDevice device) {
+    return device.platformName.isNotEmpty
+        ? device.platformName
+        : 'Unknown Device';
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scanSubscription?.cancel();
+    FlutterBluePlus.stopScan();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Settings Page',
-        style: TextStyle(fontSize: 30),
+    final connectedDevice = _connectedDevice;
+
+    return Scaffold(
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const Text(
+            'Bluetooth Connection',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+
+          const SizedBox(height: 16),
+
+          if (connectedDevice != null)
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.bluetooth_connected),
+                title: Text('Connected: ${_deviceName(connectedDevice)}'),
+                subtitle: Text(connectedDevice.remoteId.str),
+                trailing: TextButton(
+                  onPressed: _disconnectDevice,
+                  child: const Text('Disconnect'),
+                ),
+              ),
+            ),
+
+          const SizedBox(height: 12),
+
+          ElevatedButton.icon(
+            icon: Icon(_isScanning ? Icons.stop : Icons.search),
+            label: Text(_isScanning ? 'Stop Scan' : 'Scan Devices'),
+            onPressed: _isScanning ? _stopScan : _startScan,
+          ),
+
+          const SizedBox(height: 16),
+
+          if (_devices.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Text('No Bluetooth devices found'),
+              ),
+            )
+          else
+            ..._devices.map((result) {
+              final device = result.device;
+
+              return Card(
+                child: ListTile(
+                  leading: const Icon(Icons.bluetooth),
+                  title: Text(_deviceName(device)),
+                  subtitle: Text(
+                    '${device.remoteId.str}\nRSSI: ${result.rssi}',
+                  ),
+                  isThreeLine: true,
+                  trailing: ElevatedButton(
+                    onPressed: () => _connectToDevice(device),
+                    child: const Text('Connect'),
+                  ),
+                ),
+              );
+            }),
+        ],
       ),
     );
   }
