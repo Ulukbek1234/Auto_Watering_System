@@ -145,6 +145,14 @@ class PageCamera extends StatelessWidget {
 
 
 class PageSettings extends StatefulWidget {
+  /* ToDo 
+    - BLE connection 
+    - WiFi credential input 
+    - WiFi connection 
+    - User profile 
+    - Delete Data 
+    - Other settings stuff 
+  */
   const PageSettings({super.key});
 
   @override
