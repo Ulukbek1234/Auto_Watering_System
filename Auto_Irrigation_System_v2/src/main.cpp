@@ -7,8 +7,7 @@
 // ESP32-specific includes
 #include <WiFi.h>
 #include <Preferences.h>
-#include "Web.h"
-#include "Bluetooth.h"
+#include "Comms.h"
 
 #define PUMP_0 16
 #define PUMP_1 17 
@@ -20,7 +19,7 @@
 #define HUM_SNS_3 35
 Preferences prefs;
 // Web server;
-Bluetooth *bluetooth;
+//Bluetooth *bluetooth;
 #elif defined(ARDUINO_ARCH_AVR)
 // Arduino Uno/Nano includes
 #include <Arduino.h>
@@ -52,7 +51,7 @@ void setup() {
     // ESP32-specific setup
     Serial.begin(115200);
     Serial.println("Running on ESP32");
-    bluetooth = new Bluetooth();
+    // bluetooth = new Bluetooth();
 
     // server.begin();
 
@@ -237,6 +236,17 @@ void commandHandler(String serial_input) {
 
 void loop() {
   // server.loop();
+  
+  #if defined(ESP32)
+  // String bt_input = bluetooth->read();
+  // if(bt_input.length() > 0)
+  // {
+  //   DEBUG_PRINTLN("Received Bluetooth command: " + bt_input);
+  //   bt_input.toUpperCase();
+  //   bt_input.trim();
+   // commandHandler(bt_input);
+  }
+  #endif
   // Check serial for commands from master here
   if(Serial.available() > 0) {
     String serial_input = Serial.readStringUntil('\n');
