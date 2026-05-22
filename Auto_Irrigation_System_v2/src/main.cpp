@@ -19,8 +19,8 @@
 #define HUM_SNS_2 34
 #define HUM_SNS_3 35
 Preferences prefs;
-Web server;
-Bluetooth bluetooth;
+// Web server;
+Bluetooth *bluetooth;
 #elif defined(ARDUINO_ARCH_AVR)
 // Arduino Uno/Nano includes
 #include <Arduino.h>
@@ -52,8 +52,9 @@ void setup() {
     // ESP32-specific setup
     Serial.begin(115200);
     Serial.println("Running on ESP32");
+    bluetooth = new Bluetooth();
 
-    server.begin();
+    // server.begin();
 
     // Memory load
     prefs.begin("EE_Data");
@@ -235,7 +236,7 @@ void commandHandler(String serial_input) {
 }
 
 void loop() {
-  server.loop();
+  // server.loop();
   // Check serial for commands from master here
   if(Serial.available() > 0) {
     String serial_input = Serial.readStringUntil('\n');

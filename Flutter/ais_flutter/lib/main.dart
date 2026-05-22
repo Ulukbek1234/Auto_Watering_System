@@ -46,7 +46,7 @@ class _BottomNavigationBarExampleState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //title: const Text('BottomNavigationBar Sample'),
+        title: const Text('Automatic Irrigation System'),
       ),
 
       body: _pages[_selectedIndex],
