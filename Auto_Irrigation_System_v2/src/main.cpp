@@ -8,6 +8,7 @@
 #include <WiFi.h>
 #include <Preferences.h>
 #include "Web.h"
+#include "Bluetooth.h"
 
 #define PUMP_0 16
 #define PUMP_1 17 
@@ -19,7 +20,7 @@
 #define HUM_SNS_3 35
 Preferences prefs;
 Web server;
-
+Bluetooth bluetooth;
 #elif defined(ARDUINO_ARCH_AVR)
 // Arduino Uno/Nano includes
 #include <Arduino.h>
@@ -51,7 +52,6 @@ void setup() {
     // ESP32-specific setup
     Serial.begin(115200);
     Serial.println("Running on ESP32");
-
 
     server.begin();
 
