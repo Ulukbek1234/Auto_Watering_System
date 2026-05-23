@@ -26,11 +26,11 @@
 #define DRY_VALUE_WATER 0
 #define WET_VALUE_WATER 680
 
-typedef enum {
+enum CommsType {
     USB_SERIAL_COMMS,
     ESP32_SERIAL_COMMS,
     BLUETOOTH_COMMS,
-} CommsType;
+};
 
 
 #endif

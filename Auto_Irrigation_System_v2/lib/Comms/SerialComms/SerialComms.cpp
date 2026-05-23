@@ -1,6 +1,11 @@
 #include "SerialComms.h"
 
-SerialComms::SerialComms(CommsType init_serial_type)
+SerialComms::SerialComms()
+{
+
+}
+
+void SerialComms::initComms(CommsType init_serial_type)
 {
     // Construct SerialComms
     switch (init_serial_type)

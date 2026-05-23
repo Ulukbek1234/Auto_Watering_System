@@ -12,7 +12,8 @@ private:
     char input_buffer[256];
     CommsType serial_type;
 public:
-    SerialComms(CommsType init_serial_type);
+    SerialComms();
+    void initComms(CommsType init_serial_type);
     String read();
     void write(String output);
     HardwareSerial* getSource();

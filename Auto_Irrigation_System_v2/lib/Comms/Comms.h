@@ -2,10 +2,10 @@
 #define COMMS_H
 #pragma once
 #include <Arduino.h>
+#include "Config.h"
 #include "Web/Web.h"
 #include "Bluetooth/Bluetooth.h"
 #include "SerialComms/SerialComms.h"
-#include "Config.h"
 
 
 class Comms
@@ -17,7 +17,7 @@ private:
 
     Web *web;
     Bluetooth *bluetooth;
-    SerialComms *serial_comms;
+    SerialComms serial_comms;
 public:
     Comms();
     String read();
