@@ -245,7 +245,7 @@ void loop() {
   //   bt_input.toUpperCase();
   //   bt_input.trim();
    // commandHandler(bt_input);
-  }
+  //}
   #endif
   // Check serial for commands from master here
   if(Serial.available() > 0) {
