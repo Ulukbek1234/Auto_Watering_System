@@ -2,24 +2,24 @@
 #define COMMS_H
 #pragma once
 #include <Arduino.h>
-#include "Web.h"
-#include "Bluetooth.h"
+#include "Web/Web.h"
+#include "Bluetooth/Bluetooth.h"
+#include "SerialComms/SerialComms.h"
 #include "Config.h"
 
-typedef enum {
-    USB_SERIAL_COMMS,
-    ESP32_SERIAL_COMMS,
-    BLUETOOTH_COMMS,
-} CommsType;
 
-class SerialComms
+class Comms
 {
 private:
     HardwareSerial* serial;
     char input_buffer[256];
     CommsType serial_type;
+
+    Web *web;
+    Bluetooth *bluetooth;
+    SerialComms *serial_comms;
 public:
-    SerialComms(CommsType init_serial_type);
+    Comms();
     String read();
     void write(String output);
     HardwareSerial* getSource();

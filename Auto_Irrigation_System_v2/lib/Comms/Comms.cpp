@@ -2,12 +2,11 @@
 
 Comms::Comms() {
     #ifdef ESP32
-    web = new Web(80);
-    bluetooth = new Bluetooth();
-    serialComms = new SerialComms(ESP32_SERIAL_COMMS);
+    serial_comms = new SerialComms(ESP32_SERIAL_COMMS);
+    // web = new Web(80);
+    // bluetooth = new Bluetooth();
     
-    #endif
-    elif defined(ARDUINO_ARCH_AVR)
-    serialComms = new SerialComms(USB_SERIAL_COMMS);    
+    #elif defined(ARDUINO_ARCH_AVR)
+    serial_comms = new SerialComms(USB_SERIAL_COMMS);    
     #endif
 }

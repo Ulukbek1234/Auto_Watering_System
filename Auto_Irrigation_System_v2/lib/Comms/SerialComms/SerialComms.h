@@ -4,10 +4,6 @@
 #include <Arduino.h>
 #include "Config.h"
 
-typedef enum {
-    USB_SERIAL_COMMS,
-    ESP32_SERIAL_COMMS,
-} CommsType;
 
 class SerialComms
 {

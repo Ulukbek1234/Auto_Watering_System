@@ -43,13 +43,13 @@ unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
 // EEPROM 
 EE_Data_t eeprom_data;
-
+Comms *comms;
 
 void setup() {
+  comms = new Comms();
 
   #if defined(ESP32)
     // ESP32-specific setup
-    Serial.begin(115200);
     Serial.println("Running on ESP32");
     // bluetooth = new Bluetooth();
 
@@ -71,8 +71,6 @@ void setup() {
 
 
   #elif defined(ARDUINO_ARCH_AVR)
-    Serial.begin(9600);
-
     Serial.println("Running on Arduino AVR");
     EEPROM.setMaxAllowedWrites(100);
     EEPROM.readBlock(0, eeprom_data);
@@ -237,16 +235,6 @@ void commandHandler(String serial_input) {
 void loop() {
   // server.loop();
   
-  #if defined(ESP32)
-  // String bt_input = bluetooth->read();
-  // if(bt_input.length() > 0)
-  // {
-  //   DEBUG_PRINTLN("Received Bluetooth command: " + bt_input);
-  //   bt_input.toUpperCase();
-  //   bt_input.trim();
-   // commandHandler(bt_input);
-  }
-  #endif
   // Check serial for commands from master here
   if(Serial.available() > 0) {
     String serial_input = Serial.readStringUntil('\n');
