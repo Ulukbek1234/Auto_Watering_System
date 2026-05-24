@@ -12,7 +12,7 @@ Web::Web(uint16_t port)
     Serial.println("WiFi Connected");
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
-    web_socket = new WebSocketsServer(81);
+    web_socket = new WebSocketsServer(5000);
     web_socket->begin();
 }
 

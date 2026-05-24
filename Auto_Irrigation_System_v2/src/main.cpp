@@ -2,22 +2,14 @@
 #include <Utils.h>
 #include <Config.h>
 #include <Interface.h>
-
-// ESP32-specific includes
-// #include <WiFi.h>
 #include <Preferences.h>
-
-
-// Web server;
 
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
 
-
 Interface *interface;
 
 void setup() {
-  // // comms->initComms();
   Serial.begin(115200);
   while (!Serial)
   {
@@ -25,10 +17,6 @@ void setup() {
   }
 
   Serial.println("Work");
-  // ESP32-specific setup
-  // bluetooth = new Bluetooth();
-
-  // server.begin();
 
   // Memory load
   Preferences prefs;

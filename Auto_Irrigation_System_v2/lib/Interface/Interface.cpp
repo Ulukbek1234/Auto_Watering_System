@@ -142,7 +142,7 @@ void Interface::readCommand() {
     for(int i = 0; i < comms.nr_active_types; i++) {
         COMMS_TYPE type = comms.active_types[i];
         String command = comms.read(type);
-        if(command)
+        if(command != "")
         {
             DEBUG_PRINTLN("Received command: " + command);
             command.toUpperCase();
