@@ -26,6 +26,18 @@ constexpr int NR_DEC_POINTS = 8;
 #define DRY_VALUE_WATER 0
 #define WET_VALUE_WATER 680
 
+
+// Pins
+#define PUMP_0 16
+#define PUMP_1 17 
+#define PUMP_2 18 
+#define PUMP_3 19
+#define HUM_SNS_0 32
+#define HUM_SNS_1 33
+#define HUM_SNS_2 34
+#define HUM_SNS_3 35
+
+
 enum COMMS_TYPE {
     USB_SERIAL_COMMS,
     ESP32_SERIAL_COMMS,

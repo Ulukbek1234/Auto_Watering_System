@@ -31,15 +31,11 @@ void Zone::addWaterLevelSensor(uint8_t pin)
     water_level_sensors[nr_water_level_sensors++] = new WaterLevelSensor(pin);
 }
 
-void Zone::startAutoIrrigating()
+void Zone::startAutoIrrigation()
 {
     // Check moisture from sensors
     // if below a threshold, must start pumping
     // must not exceed maximum water limit
-
-    // TODO change nr_pumps for better solution
-    // ISSUE must connect sensors to pumps or vice versa
-    // multiple pumps can be attached to one sensor
 
     if (current_mode == MODE_OFF) {
         DEBUG_PRINTLN("Zone is OFF, not auto irrigating.");

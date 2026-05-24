@@ -46,7 +46,7 @@ public:
     void addPump(int pin, float max_liter);
     void addSoilSensor(uint8_t pin, int cali_air, int cali_water);
     void addWaterLevelSensor(uint8_t pin);
-    void startAutoIrrigating();
+    void startAutoIrrigation();
     void updateDay();
     
     String getData();
