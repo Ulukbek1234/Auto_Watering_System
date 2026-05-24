@@ -227,7 +227,7 @@ void Zone::saveToEEPROM(EE_Data_t *eeprom_data)
     }
     for(int i = 0; i < nr_pumps; i++)
     {
-        // eeprom_data->total_liters[i] = pumps[i]->getTotalLiter();
+        eeprom_data->total_liters[i] = pumps[i]->getTotalLiter();
     }
 }
 
