@@ -2,7 +2,7 @@
 
 Interface::Interface(EE_Data_t eeprom_data_param) : comms(), zone(0)
 {
-    eeprom_data = &eeprom_data_param;
+    eeprom_data = new EE_Data_t(eeprom_data_param);
     zone.setOperationMode(MODE_MANUAL);
 
     zone.addPump(PUMP_0, 1.0);

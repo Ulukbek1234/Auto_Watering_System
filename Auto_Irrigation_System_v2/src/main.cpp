@@ -8,13 +8,11 @@
 #include <Preferences.h>
 
 
-Preferences prefs;
 Web server;
 
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
-// EEPROM 
-EE_Data_t eeprom_data;
+
 
 Interface *interface;
 
@@ -28,8 +26,11 @@ void setup() {
   // server.begin();
 
   // Memory load
+  Preferences prefs;
   prefs.begin("EE_Data");
-  
+  // EEPROM 
+  EE_Data_t eeprom_data;
+    
   // Read the data back
   size_t schLen = prefs.getBytesLength("EE_Data");
   char buffer[schLen];
