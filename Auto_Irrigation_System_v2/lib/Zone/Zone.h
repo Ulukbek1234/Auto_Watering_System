@@ -3,10 +3,11 @@
 #pragma once
 
 #include "Arduino.h"
-#include "Pump.h"
-#include "SoilSensor.h"
-#include "WaterLevelSensor.h"
-#include "Utils.h"
+#include <Pump.h>
+#include <SoilSensor.h>
+#include <WaterLevelSensor.h>
+#include <Utils.h>
+#include <Config.h>
 // #include "EEPROMEx.h"
 
 const int ARRAY_SIZE = 16;

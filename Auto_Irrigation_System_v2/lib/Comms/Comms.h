@@ -2,8 +2,8 @@
 #define COMMS_H
 #pragma once
 #include <Config.h>
-#include "Web/Web.h"
-#include "Bluetooth/Bluetooth.h"
+#include <Web.h>
+#include <Bluetooth.h>
 #include <SerialComms.h>
 
 

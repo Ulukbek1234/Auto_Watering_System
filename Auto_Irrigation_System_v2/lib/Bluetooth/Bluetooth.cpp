@@ -9,6 +9,7 @@ String Bluetooth::read()
 {
     if(Serial.available())
     {
-        return Serial.readStringUntil("\n");
+        // return Serial.readStringUntil("\n");
+        return ("");
     }
 }

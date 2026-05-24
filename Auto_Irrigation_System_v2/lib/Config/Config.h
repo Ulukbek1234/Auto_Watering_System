@@ -17,8 +17,8 @@
 #endif
 
 // ---------- Numeric ----------
-// #define NR_DEC_POINTS   8
-// #define epsilon         0.000001f   
+constexpr float epsilon = 0.000001f;
+constexpr int NR_DEC_POINTS = 8;
 
 // ---------- Sensor calibration ----------
 #define DRY_VALUE_SOIL  550

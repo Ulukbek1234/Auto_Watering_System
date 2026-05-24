@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Arduino.h"
-#include "Config.h"
+#include <Config.h>
 
 #define PUMP_ON 0
 #define PUMP_OFF 1
