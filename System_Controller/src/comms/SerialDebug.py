@@ -3,7 +3,7 @@ import threading
 import serial
 import serial.tools.list_ports
 
-BAUD = 9600
+BAUD = 115200
 
 def pick_port():
     ports = list(serial.tools.list_ports.comports())

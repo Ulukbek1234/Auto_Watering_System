@@ -1,14 +1,14 @@
 #include <Zone.h>
 #include <Utils.h>
 #include <Config.h>
-#include "Interface.h"
+#include <Interface.h>
 
 // ESP32-specific includes
-#include <WiFi.h>
+// #include <WiFi.h>
 #include <Preferences.h>
 
 
-Web server;
+// Web server;
 
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute
@@ -18,9 +18,14 @@ Interface *interface;
 
 void setup() {
   // // comms->initComms();
+  Serial.begin(115200);
+  while (!Serial)
+  {
+    delay(100);
+  }
 
+  Serial.println("Work");
   // ESP32-specific setup
-  Serial.println("Running on ESP32");
   // bluetooth = new Bluetooth();
 
   // server.begin();
@@ -40,17 +45,19 @@ void setup() {
   EE_Data_t *retrieved = (EE_Data_t *)buffer;
   eeprom_data = *retrieved;
   
-  prefs.end();
-
+  
   interface = new Interface(eeprom_data);
-
+  Serial.println("Running on ESP32");
+  
+  prefs.end();
   start_time = millis();
 }
 
 
 void loop() {
-  // server.loop();
-  
+  // // server.loop();
+  Serial.println("Loop");
+  delay(1000);  
   // Check serial for commands from master here
   if(Serial.available() > 0) {
     String serial_input = Serial.readStringUntil('\n');
