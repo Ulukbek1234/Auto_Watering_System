@@ -136,3 +136,17 @@ void Interface::startAutoIrrigation() {
 void Interface::updateDay() {
     zone.updateDay();
 }
+
+String Interface::readCommand() {
+    
+    for(int i = 0; i < comms.nr_active_types; i++) {
+        String command = comms.read(static_cast<COMMS_TYPE> (i));
+        if(command)
+        {
+            DEBUG_PRINTLN("Received command: " + command);
+            command.toUpperCase();
+            command.trim();
+            commandHandler(command);
+        }
+    }
+}

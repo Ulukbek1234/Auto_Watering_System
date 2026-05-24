@@ -3,29 +3,25 @@
 #pragma once
 
 #include <WiFi.h>
-#include <WebServer.h>
+#include <WebSocketsServer.h>
 
 class Web {
 private:
     const char* ssid = "InternetUluk";
     const char* password = "thisisuluk";
-    
+    WebSocketsServer *web_socket;
+    String last_message = "";
 public:
     Web(uint16_t port = 5000);
 
     void begin();
-    void loop();
+    String read();
+    void onWebSocketEvent(  uint8_t client,
+                            WStype_t type,
+                            uint8_t * payload,
+                            size_t length);
+    
 
-private:
-    WebServer server;
-
-    // Route handlers
-    void handleRoot();
-    void handleOn();
-    void handleOff();
-
-    // HTML generator
-    String getHTML();
 };
 
 #endif

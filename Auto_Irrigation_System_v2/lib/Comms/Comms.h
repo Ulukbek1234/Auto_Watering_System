@@ -12,15 +12,15 @@ class Comms
 private:
     HardwareSerial* serial;
     char input_buffer[256];
-    COMMS_TYPE serial_type;
-
-    Web *web;
+    
+    Web web;
     Bluetooth *bluetooth;
     SerialComms serial_comms;
 public:
+    static const int nr_active_types = 2; // TODO dynamically adjust 
+    COMMS_TYPE active_types[nr_active_types];
     Comms();
-    void initComms();
-    String read();
+    String read(COMMS_TYPE comms_type);
     void write(String output);
     HardwareSerial* getSource();
 };

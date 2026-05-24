@@ -10,9 +10,9 @@
 class Interface 
 {
 private:
-    Comms comms;
-    Zone zone;
-    EE_Data_t *eeprom_data;
+Comms comms;
+Zone zone;
+EE_Data_t *eeprom_data;
 
 public:
     Interface(EE_Data_t eeprom_data_param);
@@ -20,6 +20,7 @@ public:
     void commandHandler(String serial_input);
     void startAutoIrrigation();
     void updateDay();
+    String readCommand();
 };
 
 #endif

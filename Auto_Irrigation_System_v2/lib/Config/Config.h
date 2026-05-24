@@ -40,8 +40,8 @@ constexpr int NR_DEC_POINTS = 8;
 
 enum COMMS_TYPE {
     USB_SERIAL_COMMS,
-    ESP32_SERIAL_COMMS,
     BLUETOOTH_COMMS,
+    WEB_SOCKET_COMMS,
 };
 
 

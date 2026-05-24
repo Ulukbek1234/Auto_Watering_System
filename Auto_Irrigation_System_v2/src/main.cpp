@@ -57,15 +57,10 @@ void setup() {
 void loop() {
   // // server.loop();
   Serial.println("Loop");
-  delay(1000);  
-  // Check serial for commands from master here
-  if(Serial.available() > 0) {
-    String serial_input = Serial.readStringUntil('\n');
-    DEBUG_PRINTLN("Received command: " + serial_input);
-    serial_input.toUpperCase();
-    serial_input.trim();
-    interface->commandHandler(serial_input);
-  }
+  String command = interface->readCommand();
+
+
+
   // Non-Blocking delay logic
   if(millis() - start_time >= wait_time)
   {
