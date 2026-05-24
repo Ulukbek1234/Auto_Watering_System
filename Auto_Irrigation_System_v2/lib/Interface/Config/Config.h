@@ -17,8 +17,8 @@
 #endif
 
 // ---------- Numeric ----------
-#define NR_DEC_POINTS   8
-#define epsilon         0.000001f   
+// #define NR_DEC_POINTS   8
+// #define epsilon         0.000001f   
 
 // ---------- Sensor calibration ----------
 #define DRY_VALUE_SOIL  550
@@ -26,7 +26,7 @@
 #define DRY_VALUE_WATER 0
 #define WET_VALUE_WATER 680
 
-enum CommsType {
+enum COMMS_TYPE {
     USB_SERIAL_COMMS,
     ESP32_SERIAL_COMMS,
     BLUETOOTH_COMMS,
