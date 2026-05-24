@@ -1,6 +1,6 @@
 #include "Interface.h"
 
-Interface::Interface() //: comms()
+Interface::Interface() : comms()
 {
     
 }

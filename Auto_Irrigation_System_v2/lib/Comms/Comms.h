@@ -1,13 +1,13 @@
-#ifndef COMMS_INTERFACE_H
-#define COMMS_INTERFACE_H
+#ifndef COMMS_H
+#define COMMS_H
 #pragma once
-#include "../Config/Config.h"
+#include <Config.h>
 #include "Web/Web.h"
 #include "Bluetooth/Bluetooth.h"
-#include "SerialComms/SerialComms.h"
+#include <SerialComms.h>
 
 
-class CommsInterface
+class Comms
 {
 private:
     HardwareSerial* serial;
@@ -16,9 +16,9 @@ private:
 
     Web *web;
     Bluetooth *bluetooth;
-    // SerialComms serial_comms;
+    SerialComms serial_comms;
 public:
-    CommsInterface();
+    Comms();
     void initComms();
     String read();
     void write(String output);

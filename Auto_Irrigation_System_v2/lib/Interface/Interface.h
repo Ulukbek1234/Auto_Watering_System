@@ -2,12 +2,12 @@
 #define INTERFACE_H
 #pragma once
 
-#include "Comms/CommsInterface.h"
+#include <Comms.h>
 
 class Interface 
 {
 private:
-    CommsInterface comms;
+    Comms comms;
 public:
     Interface();
 };

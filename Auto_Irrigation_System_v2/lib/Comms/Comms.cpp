@@ -1,10 +1,11 @@
-#include "CommsInterface.h"
+#include "Comms.h"
 
-CommsInterface::CommsInterface() //: serial_comms()
+Comms::Comms() : serial_comms()
 {
+    
 }
 
-void CommsInterface::initComms() {
+void Comms::initComms() {
     // serial_comms.initComms(ESP32_SERIAL_COMMS);
     // web = new Web(80);
     // bluetooth = new Bluetooth();
