@@ -18,7 +18,7 @@ Web::Web(uint16_t port)
 
 String Web::read()
 {
-  // web_socket->loop();
+  web_socket->loop();
   return last_message;
 }
 

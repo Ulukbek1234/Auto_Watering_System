@@ -57,9 +57,8 @@ void setup() {
 void loop() {
   // // server.loop();
   Serial.println("Loop");
-  String command = interface->readCommand();
-
-
+  interface->readCommand();
+  delay(100);
 
   // Non-Blocking delay logic
   if(millis() - start_time >= wait_time)

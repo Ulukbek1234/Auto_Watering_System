@@ -137,10 +137,11 @@ void Interface::updateDay() {
     zone.updateDay();
 }
 
-String Interface::readCommand() {
+void Interface::readCommand() {
     
     for(int i = 0; i < comms.nr_active_types; i++) {
-        String command = comms.read(static_cast<COMMS_TYPE> (i));
+        COMMS_TYPE type = comms.active_types[i];
+        String command = comms.read(type);
         if(command)
         {
             DEBUG_PRINTLN("Received command: " + command);

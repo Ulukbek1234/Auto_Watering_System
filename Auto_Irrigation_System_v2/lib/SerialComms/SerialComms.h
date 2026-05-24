@@ -8,7 +8,6 @@
 class SerialComms
 {
 private:
-    HardwareSerial* serial;
     char input_buffer[256];
     COMMS_TYPE serial_type;
 public:

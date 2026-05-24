@@ -8,18 +8,21 @@ SerialComms::SerialComms()
 
 String SerialComms::read()
 {
-    String input;
-    input = serial->readStringUntil('\n');
+    String input = "";
+    if(Serial.available())
+    {
+        input = Serial.readStringUntil('\n');
+    }
     return input;
 }
 
 void SerialComms::write(String output)
 {
-    serial->println(output.c_str());
-    serial->flush();
+    Serial.println(output.c_str());
+    Serial.flush();
 }
 
 HardwareSerial* SerialComms::getSource()
 {
-    return serial;
+    return &Serial;
 }

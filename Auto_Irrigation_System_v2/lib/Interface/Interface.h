@@ -20,7 +20,7 @@ public:
     void commandHandler(String serial_input);
     void startAutoIrrigation();
     void updateDay();
-    String readCommand();
+    void readCommand();
 };
 
 #endif
