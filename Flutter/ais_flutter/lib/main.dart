@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:convert';
+import 'package:fl_chart/fl_chart.dart';
+
 
 class IrrigationUnit {
   final String name;
@@ -434,17 +436,197 @@ class PageHome extends StatelessWidget {
   }
 }
 
-class PageCharts extends StatelessWidget {
+
+
+enum ChartRange { hour, day, week, month }
+
+class ChartReading {
+  final DateTime time;
+  final double humidity;
+  final double dailyLiters;
+
+  ChartReading({
+    required this.time,
+    required this.humidity,
+    required this.dailyLiters,
+  });
+}
+
+class PageCharts extends StatefulWidget {
   const PageCharts({super.key});
 
   @override
+  State<PageCharts> createState() => _PageChartsState();
+}
+
+class _PageChartsState extends State<PageCharts> {
+  ChartRange selectedRange = ChartRange.day;
+  final Esp32Service esp32 = Esp32Service.instance;
+
+  // TODO make this work with real data
+  final List<ChartReading> readings = [
+    ChartReading(
+      time: DateTime.now().subtract(const Duration(hours: 5)),
+      humidity: 45,
+      dailyLiters: 20,
+    ),
+    ChartReading(
+      time: DateTime.now().subtract(const Duration(hours: 4)),
+      humidity: 50,
+      dailyLiters: 30,
+    ),
+    ChartReading(
+      time: DateTime.now().subtract(const Duration(hours: 3)),
+      humidity: 48,
+      dailyLiters: 40,
+    ),
+    ChartReading(
+      time: DateTime.now().subtract(const Duration(hours: 2)),
+      humidity: 55,
+      dailyLiters: 60,
+    ),
+    ChartReading(
+      time: DateTime.now().subtract(const Duration(hours: 1)),
+      humidity: 52,
+      dailyLiters: 75,
+    ),
+  ];
+
+  Duration get selectedDuration {
+    switch (selectedRange) {
+      case ChartRange.hour:
+        return const Duration(hours: 1);
+      case ChartRange.day:
+        return const Duration(days: 1);
+      case ChartRange.week:
+        return const Duration(days: 7);
+      case ChartRange.month:
+        return const Duration(days: 30);
+    }
+  }
+
+  List<ChartReading> get filteredReadings {
+    final from = DateTime.now().subtract(selectedDuration);
+
+    return readings.where((reading) {
+      return reading.time.isAfter(from);
+    }).toList();
+  }
+
+  List<FlSpot> getHumiditySpots() {
+    final from = DateTime.now().subtract(selectedDuration);
+
+    return filteredReadings.map((reading) {
+      final x = reading.time.difference(from).inMinutes.toDouble();
+      return FlSpot(x, reading.humidity);
+    }).toList();
+  }
+
+
+  double get maxX => selectedDuration.inMinutes.toDouble();
+
+  @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Page Charts',
-        style: TextStyle(fontSize: 30),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          SegmentedButton<ChartRange>(
+            segments: const [
+              ButtonSegment(
+                value: ChartRange.hour,
+                label: Text("1h"),
+              ),
+              ButtonSegment(
+                value: ChartRange.day,
+                label: Text("1d"),
+              ),
+              ButtonSegment(
+                value: ChartRange.week,
+                label: Text("1w"),
+              ),
+              ButtonSegment(
+                value: ChartRange.month,
+                label: Text("1m"),
+              ),
+            ],
+            selected: {selectedRange},
+            onSelectionChanged: (value) {
+              setState(() {
+                selectedRange = value.first;
+              });
+            },
+          ),
+
+          const SizedBox(height: 20),
+
+          Expanded(
+            child: LineChart(
+              LineChartData(
+                minY: 0,
+                maxY: 100,
+                minX: 0,
+                maxX: maxX,
+
+                gridData: const FlGridData(show: true),
+
+                titlesData: FlTitlesData(
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  leftTitles: const AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      interval: 20,
+                    ),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: maxX / 4,
+                      getTitlesWidget: (value, meta) {
+                        return Text(_bottomLabel(value));
+                      },
+                    ),
+                  ),
+                ),
+
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: getHumiditySpots(),
+                    isCurved: true,
+                    barWidth: 3,
+                    dotData: const FlDotData(show: false),
+                  ),
+
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          const Text("Humidity and daily liters over time"),
+        ],
       ),
     );
+  }
+
+  String _bottomLabel(double value) {
+    switch (selectedRange) {
+      case ChartRange.hour:
+        return "${value.toInt()}m";
+      case ChartRange.day:
+        return "${(value / 60).toInt()}h";
+      case ChartRange.week:
+        return "${(value / 1440).toInt()}d";
+      case ChartRange.month:
+        return "${(value / 1440).toInt()}d";
+    }
   }
 }
 

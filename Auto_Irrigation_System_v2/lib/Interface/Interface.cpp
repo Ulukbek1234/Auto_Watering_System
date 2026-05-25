@@ -119,7 +119,6 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
         DEBUG_PRINTLN("Failed to MAN_IRR: find pump or amount");
         status = false;
       }
-    } else if (command == "CHG_MOI_THR") {
     } else if (command == "CALI_AIR") {
       String soil_pin = "";
       Utils::findDataFromMessage(input, "SOIL_PIN:", soil_pin);
