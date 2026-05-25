@@ -1,5 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:convert';
+
+class IrrigationUnit {
+  final String name;
+  final String pumpName;
+  final String sensorName;
+  final String pumpStatus;
+  final int soilHumidity;
+  final double waterFlow;
+  final double temperature;
+
+  IrrigationUnit({
+    required this.name,
+    required this.pumpName,
+    required this.sensorName,
+    required this.pumpStatus,
+    required this.soilHumidity,
+    required this.waterFlow,
+    required this.temperature,
+  });
+
+  factory IrrigationUnit.fromJson(Map<String, dynamic> json) {
+    return IrrigationUnit(
+      name: json["name"] ?? "Unknown Unit",
+      pumpName: json["pumpName"] ?? "Unknown Pump",
+      sensorName: json["sensorName"] ?? "Unknown Sensor",
+      pumpStatus: json["pumpStatus"] ?? "Unknown",
+      soilHumidity: (json["soilHumidity"] as num?)?.toInt() ?? 0,
+      waterFlow: (json["waterFlow"] as num?)?.toDouble() ?? 0.0,
+      temperature: (json["temperature"] as num?)?.toDouble() ?? 0.0,
+    );
+  }
+}
+
+Map<String, String> parseTelemetryText(String text) {
+  final Map<String, String> data = {};
+
+  final parts = text.split(',');
+
+  for (final part in parts) {
+    final keyValue = part.trim().split(':');
+
+    if (keyValue.length == 2) {
+      data[keyValue[0].trim()] = keyValue[1].trim();
+    }
+  }
+
+  return data;
+}
 
 void main() => runApp(const BottomNavigationBarExampleApp());
 
@@ -8,6 +57,7 @@ class Esp32Service {
   static final Esp32Service instance = Esp32Service._();
 
   WebSocketChannel? _channel;
+  final ValueNotifier<List<IrrigationUnit>> units = ValueNotifier([]);
 
   final ValueNotifier<String> status = ValueNotifier("Disconnected");
   final ValueNotifier<String> message = ValueNotifier("");
@@ -31,7 +81,51 @@ class Esp32Service {
 
       ws.stream.listen(
         (data) {
-          message.value = data.toString();
+          final text = data.toString();
+          message.value = text;
+
+          final parsed = parseTelemetryText(text);
+
+          if (parsed.isNotEmpty) {
+            units.value = [
+              IrrigationUnit(
+                name: "Unit 1",
+                pumpName: "Pump 16",
+                sensorName: "Sensor 32",
+                pumpStatus: "Pin ${parsed["pump_pin_16"] ?? "16"}",
+                soilHumidity: int.tryParse(parsed["moisture_percent_32"] ?? "0") ?? 0,
+                waterFlow: double.tryParse(parsed["daily_liter_16"] ?? "0") ?? 0.0,
+                temperature: 0.0,
+              ),
+              IrrigationUnit(
+                name: "Unit 2",
+                pumpName: "Pump 17",
+                sensorName: "Sensor 33",
+                pumpStatus: "Pin ${parsed["pump_pin_17"] ?? "17"}",
+                soilHumidity: int.tryParse(parsed["moisture_percent_33"] ?? "0") ?? 0,
+                waterFlow: double.tryParse(parsed["daily_liter_17"] ?? "0") ?? 0.0,
+                temperature: 0.0,
+              ),
+              IrrigationUnit(
+                name: "Unit 3",
+                pumpName: "Pump 18",
+                sensorName: "Sensor 34",
+                pumpStatus: "Pin ${parsed["pump_pin_18"] ?? "18"}",
+                soilHumidity: int.tryParse(parsed["moisture_percent_34"] ?? "0") ?? 0,
+                waterFlow: double.tryParse(parsed["daily_liter_18"] ?? "0") ?? 0.0,
+                temperature: 0.0,
+              ),
+              IrrigationUnit(
+                name: "Unit 4",
+                pumpName: "Pump 19",
+                sensorName: "Sensor 35",
+                pumpStatus: "Pin ${parsed["pump_pin_19"] ?? "19"}",
+                soilHumidity: int.tryParse(parsed["moisture_percent_35"] ?? "0") ?? 0,
+                waterFlow: double.tryParse(parsed["daily_liter_19"] ?? "0") ?? 0.0,
+                temperature: 0.0,
+              ),
+            ];
+          }
         },
         onError: (error) {
           _channel = null;
@@ -42,6 +136,7 @@ class Esp32Service {
           status.value = "Disconnected";
         },
       );
+
     } catch (e) {
       _channel = null;
       status.value = "Failed: $e";
@@ -139,78 +234,23 @@ class _BottomNavigationBarExampleState
   }
 }
 
-
 class PageHome extends StatelessWidget {
   PageHome({super.key});
 
   final Esp32Service esp32 = Esp32Service.instance;
 
-  final List<Map<String, dynamic>> units = const [
-    {
-      "name": "Plant A",
-      "pumpName": "pump_pin_16",
-      "sensorName": "moisture_percent_32",
-      "pumpStatus": "Active",
-      "soilHumidity": "42%",
-      "waterFlow": "2.4 L/min",
-      "waterLevel": "78%",
-      "temperature": "23°C",
-      "mode": "Automatic",
-    },
-    {
-      "name": "Plant B",
-      "pumpName": "pump_pin_17",
-      "sensorName": "moisture_percent_33",
-      "pumpStatus": "Off",
-      "soilHumidity": "61%",
-      "waterFlow": "0.0 L/min",
-      "waterLevel": "78%",
-      "temperature": "22°C",
-      "mode": "Manual",
-    },
-    {
-      "name": "Plant C",
-      "pumpName": "pump_pin_18",
-      "sensorName": "moisture_percent_34",
-      "pumpStatus": "Active",
-      "soilHumidity": "35%",
-      "waterFlow": "2.1 L/min",
-      "waterLevel": "78%",
-      "temperature": "24°C",
-      "mode": "Automatic",
-    },
-    {
-      "name": "Plant D",
-      "pumpName": "pump_pin_19",
-      "sensorName": "moisture_percent_35",
-      "pumpStatus": "Active",
-      "soilHumidity": "35%",
-      "waterFlow": "2.1 L/min",
-      "waterLevel": "78%",
-      "temperature": "24°C",
-      "mode": "Automatic",
-    },
-  ];
-
-  void openDetails(BuildContext context, Map<String, dynamic> unit) {
+  void openDetails(BuildContext context, IrrigationUnit unit) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(unit["name"]),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Pump: ${unit["pumpName"]}"),
-            Text("Sensor: ${unit["sensorName"]}"),
-            const SizedBox(height: 12),
-            Text("Pump status: ${unit["pumpStatus"]}"),
-            Text("Soil humidity: ${unit["soilHumidity"]}"),
-            Text("Water flow: ${unit["waterFlow"]}"),
-            Text("Water level: ${unit["waterLevel"]}"),
-            Text("Temperature: ${unit["temperature"]}"),
-            Text("Mode: ${unit["mode"]}"),
-          ],
+        title: Text(unit.name),
+        content: Text(
+          "Pump: ${unit.pumpName}\n"
+          "Sensor: ${unit.sensorName}\n\n"
+          "Pump status: ${unit.pumpStatus}\n"
+          "Soil humidity: ${unit.soilHumidity}%\n"
+          "Water flow: ${unit.waterFlow} L/min\n"
+          "Temperature: ${unit.temperature}°C",
         ),
         actions: [
           TextButton(
@@ -240,67 +280,48 @@ class PageHome extends StatelessWidget {
 
         const SizedBox(height: 16),
 
-        ...units.map((unit) {
-          return Card(
-            margin: const EdgeInsets.only(bottom: 14),
-            child: InkWell(
-              onTap: () => openDetails(context, unit),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      unit["name"],
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    Row(
-                      children: [
-                        const Icon(Icons.water_drop, size: 20),
-                        const SizedBox(width: 8),
-                        Text("${unit["pumpName"]}: ${unit["pumpStatus"]}"),
-                      ],
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    Row(
-                      children: [
-                        const Icon(Icons.sensors, size: 20),
-                        const SizedBox(width: 8),
-                        Text("${unit["sensorName"]}: ${unit["soilHumidity"]}"),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    Text("Flow: ${unit["waterFlow"]}"),
-                    Text("Temperature: ${unit["temperature"]}"),
-
-                    const Align(
-                      alignment: Alignment.centerRight,
-                      child: Icon(Icons.chevron_right),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
-
-        const SizedBox(height: 20),
-
         ElevatedButton(
           onPressed: () {
             esp32.send("cmd: telem");
           },
-          child: const Text("Refresh All Telemetry"),
+          child: const Text("Refresh Telemetry"),
+        ),
+
+        const SizedBox(height: 16),
+
+        ValueListenableBuilder<List<IrrigationUnit>>(
+          valueListenable: esp32.units,
+          builder: (_, units, __) {
+            if (units.isEmpty) {
+              return const Text(
+                "No telemetry yet. Connect in Settings, then press Refresh Telemetry.",
+                style: TextStyle(fontSize: 16),
+              );
+            }
+
+            return Column(
+              children: units.map((unit) {
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 14),
+                  child: ListTile(
+                    leading: const Icon(Icons.water_drop),
+                    title: Text(
+                      unit.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      "${unit.pumpName}: ${unit.pumpStatus}\n"
+                      "${unit.sensorName}: ${unit.soilHumidity}%\n"
+                      "Flow: ${unit.waterFlow} L/min",
+                    ),
+                    isThreeLine: true,
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => openDetails(context, unit),
+                  ),
+                );
+              }).toList(),
+            );
+          },
         ),
 
         const SizedBox(height: 16),
@@ -308,15 +329,12 @@ class PageHome extends StatelessWidget {
         ValueListenableBuilder(
           valueListenable: esp32.message,
           builder: (_, value, __) {
-            
             return Text(
-              "ESP32 says: $value",
+              "Last ESP32 message: $value",
               style: const TextStyle(fontSize: 16),
             );
           },
         ),
-
-        
       ],
     );
   }
