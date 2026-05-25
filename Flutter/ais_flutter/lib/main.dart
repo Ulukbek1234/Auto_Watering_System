@@ -147,9 +147,9 @@ class PageHome extends StatelessWidget {
 
   final List<Map<String, dynamic>> units = const [
     {
-      "name": "Plant Bed A",
-      "pumpName": "Pump 1",
-      "sensorName": "Soil Sensor 1",
+      "name": "Plant A",
+      "pumpName": "pump_pin_16",
+      "sensorName": "moisture_percent_32",
       "pumpStatus": "Active",
       "soilHumidity": "42%",
       "waterFlow": "2.4 L/min",
@@ -158,9 +158,9 @@ class PageHome extends StatelessWidget {
       "mode": "Automatic",
     },
     {
-      "name": "Plant Bed B",
-      "pumpName": "Pump 2",
-      "sensorName": "Soil Sensor 2",
+      "name": "Plant B",
+      "pumpName": "pump_pin_17",
+      "sensorName": "moisture_percent_33",
       "pumpStatus": "Off",
       "soilHumidity": "61%",
       "waterFlow": "0.0 L/min",
@@ -169,9 +169,20 @@ class PageHome extends StatelessWidget {
       "mode": "Manual",
     },
     {
-      "name": "Plant Bed C",
-      "pumpName": "Pump 3",
-      "sensorName": "Soil Sensor 3",
+      "name": "Plant C",
+      "pumpName": "pump_pin_18",
+      "sensorName": "moisture_percent_34",
+      "pumpStatus": "Active",
+      "soilHumidity": "35%",
+      "waterFlow": "2.1 L/min",
+      "waterLevel": "78%",
+      "temperature": "24°C",
+      "mode": "Automatic",
+    },
+    {
+      "name": "Plant D",
+      "pumpName": "pump_pin_19",
+      "sensorName": "moisture_percent_35",
       "pumpStatus": "Active",
       "soilHumidity": "35%",
       "waterFlow": "2.1 L/min",
@@ -297,12 +308,15 @@ class PageHome extends StatelessWidget {
         ValueListenableBuilder(
           valueListenable: esp32.message,
           builder: (_, value, __) {
+            
             return Text(
               "ESP32 says: $value",
               style: const TextStyle(fontSize: 16),
             );
           },
         ),
+
+        
       ],
     );
   }
