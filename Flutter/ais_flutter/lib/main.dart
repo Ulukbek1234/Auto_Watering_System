@@ -89,7 +89,7 @@ class Esp32Service {
           if (parsed.isNotEmpty) {
             units.value = [
               IrrigationUnit(
-                name: "Unit 1",
+                name: "Plant 1",
                 pumpName: "Pump 16",
                 sensorName: "Sensor 32",
                 pumpStatus: "Pin ${parsed["pump_pin_16"] ?? "16"}",
@@ -98,7 +98,7 @@ class Esp32Service {
                 temperature: 0.0,
               ),
               IrrigationUnit(
-                name: "Unit 2",
+                name: "Plant 2",
                 pumpName: "Pump 17",
                 sensorName: "Sensor 33",
                 pumpStatus: "Pin ${parsed["pump_pin_17"] ?? "17"}",
@@ -107,7 +107,7 @@ class Esp32Service {
                 temperature: 0.0,
               ),
               IrrigationUnit(
-                name: "Unit 3",
+                name: "Plant 3",
                 pumpName: "Pump 18",
                 sensorName: "Sensor 34",
                 pumpStatus: "Pin ${parsed["pump_pin_18"] ?? "18"}",
@@ -116,7 +116,7 @@ class Esp32Service {
                 temperature: 0.0,
               ),
               IrrigationUnit(
-                name: "Unit 4",
+                name: "Plant 4",
                 pumpName: "Pump 19",
                 sensorName: "Sensor 35",
                 pumpStatus: "Pin ${parsed["pump_pin_19"] ?? "19"}",
