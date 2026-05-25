@@ -8,6 +8,7 @@ class IrrigationUnit {
   final String sensorName;
   final int pumpStatus;
   final int soilHumidity;
+  final double moistureThreshold;
   final double waterFlowDaily;
   final double waterFlowTotal;
   final double waterFlowDailyMax;
@@ -18,6 +19,7 @@ class IrrigationUnit {
     required this.sensorName,
     required this.pumpStatus,
     required this.soilHumidity,
+    required this.moistureThreshold,
     required this.waterFlowDaily,
     required this.waterFlowTotal,
     required this.waterFlowDailyMax,
@@ -30,6 +32,7 @@ class IrrigationUnit {
       sensorName: json["sensorName"] ?? "Unknown Sensor",
       pumpStatus: json["pumpStatus"] ?? "Unknown",
       soilHumidity: (json["soilHumidity"] as num?)?.toInt() ?? 0,
+      moistureThreshold: (json["moistureThreshold" as num?]?.toDouble() ?? 0.0),
       waterFlowDaily: (json["waterFlowDaily"] as num?)?.toDouble() ?? 0.0,
       waterFlowTotal: (json["waterFlowTotal"] as num?)?.toDouble() ?? 0.0,
       waterFlowDailyMax: (json["waterFlowDailyMax"] as num?)?.toDouble() ?? 0.0,
@@ -97,6 +100,7 @@ class Esp32Service {
                 sensorName: "Sensor 32",
                 pumpStatus: int.tryParse(parsed["current_mode_16"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_32"] ?? "0") ?? 0,
+                moistureThreshold: double.tryParse(parsed["moisture_threshold_32"] ?? "0") ?? 0,
                 waterFlowDaily: double.tryParse(parsed["daily_liter_16"] ?? "0") ?? 0.0,
                 waterFlowTotal: double.tryParse(parsed["total_liter_16"] ?? "0") ?? 0.0,
                 waterFlowDailyMax: double.tryParse(parsed["max_liter_16"] ?? "0") ?? 0.0,
@@ -107,6 +111,7 @@ class Esp32Service {
                 sensorName: "Sensor 33",
                 pumpStatus: int.tryParse(parsed["current_mode_17"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_33"] ?? "0") ?? 0,
+                moistureThreshold: double.tryParse(parsed["moisture_threshold_33"] ?? "0") ?? 0,
                 waterFlowDaily: double.tryParse(parsed["daily_liter_17"] ?? "0") ?? 0.0,
                 waterFlowTotal: double.tryParse(parsed["total_liter_17"] ?? "0") ?? 0.0,
                 waterFlowDailyMax: double.tryParse(parsed["max_liter_17"] ?? "0") ?? 0.0,
@@ -117,6 +122,7 @@ class Esp32Service {
                 sensorName: "Sensor 34",
                 pumpStatus: int.tryParse(parsed["current_mode_18"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_34"] ?? "0") ?? 0,
+                moistureThreshold: double.tryParse(parsed["moisture_threshold_34"] ?? "0") ?? 0,
                 waterFlowDaily: double.tryParse(parsed["daily_liter_18"] ?? "0") ?? 0.0,
                 waterFlowTotal: double.tryParse(parsed["total_liter_18"] ?? "0") ?? 0.0,
                 waterFlowDailyMax: double.tryParse(parsed["max_liter_18"] ?? "0") ?? 0.0,
@@ -128,6 +134,7 @@ class Esp32Service {
                 sensorName: "Sensor 35",
                 pumpStatus: int.tryParse(parsed["current_mode_19"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_35"] ?? "0") ?? 0,
+                moistureThreshold: double.tryParse(parsed["moisture_threshold_35"] ?? "0") ?? 0,
                 waterFlowDaily: double.tryParse(parsed["daily_liter_19"] ?? "0") ?? 0.0,
                 waterFlowTotal: double.tryParse(parsed["total_liter_19"] ?? "0") ?? 0.0,
                 waterFlowDailyMax: double.tryParse(parsed["max_liter_19"] ?? "0") ?? 0.0,
@@ -246,25 +253,86 @@ class PageHome extends StatelessWidget {
   PageHome({super.key});
 
   final Esp32Service esp32 = Esp32Service.instance;
-
   void openDetails(BuildContext context, IrrigationUnit unit) {
+    final maxDailyLitersController = TextEditingController(text: unit.waterFlowDailyMax.toString());
+    final thresholdController = TextEditingController(text: unit.moistureThreshold.toString());
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(unit.name),
-        content: Text(
-          "Pump: ${unit.pumpName}\n"
-          "Sensor: ${unit.sensorName}\n\n"
-          "Pump status: ${unit.pumpStatus}\n"
-          "Soil humidity: ${unit.soilHumidity}%\n"
-          "Water flow: ${unit.waterFlowDaily} L/Day\n"
-          "Water flow: ${unit.waterFlowTotal} L/Total",
+
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Pump: ${unit.pumpName}\n"
+                "Sensor: ${unit.sensorName}\n\n"
+                "Pump status: ${unit.pumpStatus}\n"
+                "Soil humidity: ${unit.soilHumidity}%\n"
+                "Water flow today: ${unit.waterFlowDaily} L\n"
+                "Total water flow: ${unit.waterFlowTotal} L",
+              ),
+
+              const SizedBox(height: 20),
+
+              // Change pump setting
+              /*
+                - Set Mode
+                - Daily liters
+                - Moisture threshold
+                - Sensor calibration
+                - Manual irrigation
+              */
+
+
+              TextField(
+                controller: maxDailyLitersController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Max Daily (L)" ,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              TextField(
+                controller: thresholdController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Humidity threshold (%)",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              
+            ],
+          ),
         ),
+
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text("Close"),
           ),
+
+          ElevatedButton(
+            onPressed: () {
+              final maxDailyLitersNew = maxDailyLitersController.text;
+              final thresholdNew = thresholdController.text;
+
+              // TODO change command, all in one
+              esp32.send(
+                "cmd: irrigate,duration:$maxDailyLitersNew,threshold:$thresholdNew",
+              );
+
+              Navigator.pop(context);
+            },
+            child: const Text("Send"),
+          ),
+
           ElevatedButton(
             onPressed: () {
               esp32.send("cmd: telem");

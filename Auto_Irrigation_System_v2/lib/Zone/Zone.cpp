@@ -56,7 +56,7 @@ void Zone::startAutoIrrigation()
                 DEBUG_PRINTLN("Pump is in SOIL mode, irrigating based on soil moisture.");
                 DEBUG_PRINT("moisture_percent for sensor: ");
                 DEBUG_PRINTLN(moisture_percent[i]);
-                if((MOISTURE_THRESHOLD - moisture_percent[i]) > epsilon )
+                if((MOISTURE_THRESHOLD[i] - moisture_percent[i]) > epsilon )
                 {
                     pumps[i]->turnOnPump(0.2, false);
                 }
@@ -104,18 +104,7 @@ String Zone::getData()
 
 
 
-    data_names[index] = "moisture_threshold";
-    data_values[index++] = MOISTURE_THRESHOLD;
 
-    for (int i = 0; i < nr_soil_sensors; i++)
-    {
-        soil_sensors[i]->checkRawValues();
-        String soil_pin = String(soil_sensors[i]->getPin());
-        data_names[index] = "moisture_percent_" + soil_pin;
-        data_values[index++] = soil_sensors[i]->getMoisturePercent();
-        data_names[index] = "moisture_raw_" + soil_pin;
-        data_values[index++] = soil_sensors[i]->getMoistureRaw(); 
-    }
 
     for (int i = 0; i < nr_pumps; i++)
     {
@@ -130,17 +119,15 @@ String Zone::getData()
         data_values[index++] = String(pumps[i]->getTotalLiter(), NR_DEC_POINTS);
         data_names[index] = "max_liter_" + pump_pin;
         data_values[index++] = String(pumps[i]->getMaxLiter(), NR_DEC_POINTS);
-    }
-
-    for (int i = 0; i < nr_water_level_sensors; i++)
-    {
-        String water_pin = String(water_level_sensors[i]->getPin());
-        data_names[index] = "water_level_sensor_pin_" + water_pin;
-        data_values[index++] = water_level_sensors[i]->getPin();
-        data_names[index] = "moisture_percent_" + water_pin;
-        data_values[index++] = water_level_sensors[i]->getMoisturePercent();
-        data_names[index] = "moisture_raw_" + water_pin;
-        data_values[index++] = water_level_sensors[i]->getMoistureRaw();
+        
+        soil_sensors[i]->checkRawValues();
+        String soil_pin = String(soil_sensors[i]->getPin());
+        data_names[index] = "moisture_percent_" + soil_pin;
+        data_values[index++] = soil_sensors[i]->getMoisturePercent();
+        data_names[index] = "moisture_raw_" + soil_pin;
+        data_values[index++] = soil_sensors[i]->getMoistureRaw(); 
+        data_names[index] = "moisture_threshold_" + soil_pin;
+        data_values[index++] = MOISTURE_THRESHOLD[i];
     }
 
     return Utils::parseDataForWriting(data_names, data_values, index);
@@ -255,9 +242,16 @@ void Zone::changeDailyLimit(int pump_id, float new_limit)
     }
 }
 
-void Zone::changeMoistureThreshold(float new_limit)
+void Zone::changeMoistureThreshold(float new_limit, int pump_id)
 {
-    MOISTURE_THRESHOLD = new_limit;
+    for(int i = 0; i < nr_pumps; i++)
+    {
+        if(pumps[i]->getPin() == pump_id)
+        {
+            MOISTURE_THRESHOLD[i] = new_limit;
+
+        }
+    }
 }
 
 bool Zone::caliSoilInAir(int soil_pin)

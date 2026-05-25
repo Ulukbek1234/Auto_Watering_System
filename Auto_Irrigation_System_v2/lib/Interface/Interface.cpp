@@ -106,10 +106,12 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
       }
     } else if (command == "CHG_MOI_THR") {
       String new_limit = "";
+      String pump_id = "";
       bool found_limit = Utils::findDataFromMessage(input, "NEW_LIM:", new_limit);
-      if(found_limit)
+      bool found_pump = Utils::findDataFromMessage(input, "PUMP:", pump_id);
+      if(found_limit && found_pump)
       {
-        zone.changeMoistureThreshold(new_limit.toInt());
+        zone.changeMoistureThreshold(new_limit.toInt(), pump_id.toInt());
         status = true;
       } else {
         DEBUG_PRINTLN("Failed to CHG_MOI_THR: find limit");
