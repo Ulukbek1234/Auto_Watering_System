@@ -37,42 +37,36 @@ void Zone::startAutoIrrigation()
     // if below a threshold, must start pumping
     // must not exceed maximum water limit
 
-    if (current_mode == MODE_OFF) {
-        DEBUG_PRINTLN("Zone is OFF, not auto irrigating.");
-        return;
-    }
-
     updateSensors();    
-
-    switch (current_mode)
+    for(int i = 0; i < nr_pumps; i++)
     {
-    case MODE_MANUAL:
-        DEBUG_PRINTLN("Zone is in MANUAL mode, not auto irrigating.");        
-        break;
-    case MODE_FLOOD:
-        DEBUG_PRINTLN("Zone is in FLOOD mode, irrigating all pumps to max daily limit.");
-        for(int i = 0; i < nr_pumps; i++)
+        switch (current_mode[i])
         {
-            pumps[i]->turnOnPump(0.2, false);
-        }
-        break;
-    case MODE_SOIL:
-        DEBUG_PRINTLN("Zone is in SOIL mode, irrigating based on soil moisture.");
-        for(int i = 0; i < nr_pumps; i++)
-        {
-            DEBUG_PRINT("moisture_percent for sensor: ");
-            DEBUG_PRINTLN(moisture_percent[i]);
-            if((MOISTURE_THRESHOLD - moisture_percent[i]) > epsilon )
-            {
+            case MODE_OFF:  
+                DEBUG_PRINTLN("Pump is off");
+                break;
+            case MODE_MANUAL:
+                DEBUG_PRINTLN("Pump is in MANUAL mode, not auto irrigating.");        
+                break;
+            case MODE_FLOOD:
+                DEBUG_PRINTLN("Pump is in FLOOD mode, irrigating all pumps to max daily limit.");
                 pumps[i]->turnOnPump(0.2, false);
-            }
+                break;
+            case MODE_SOIL:
+                DEBUG_PRINTLN("Pump is in SOIL mode, irrigating based on soil moisture.");
+                DEBUG_PRINT("moisture_percent for sensor: ");
+                DEBUG_PRINTLN(moisture_percent[i]);
+                if((MOISTURE_THRESHOLD - moisture_percent[i]) > epsilon )
+                {
+                    pumps[i]->turnOnPump(0.2, false);
+                }
+                break;
+            default:
+                break;
         }
-        break;
-    default:
-        break;
+    
     }
-
-
+    
 }
 
 void Zone::updateDay()
@@ -108,8 +102,7 @@ String Zone::getData()
     data_names[index] = "total_days";
     data_values[index++] = String(total_day_progressed, NR_DEC_POINTS);
 
-    data_names[index] = "current_mode_" + String(zone_id);
-    data_values[index++] = current_mode;
+
 
     data_names[index] = "moisture_threshold";
     data_values[index++] = MOISTURE_THRESHOLD;
@@ -129,6 +122,8 @@ String Zone::getData()
         String pump_pin = String(pumps[i]->getPin());
         data_names[index] = "pump_pin_" + pump_pin;
         data_values[index++] = pump_pin;
+        data_names[index] = "current_mode_" + pump_pin;
+        data_values[index++] = current_mode[i];
         data_names[index] = "daily_liter_" + pump_pin;
         data_values[index++] = String(pumps[i]->getDailyLiter(), NR_DEC_POINTS);
         data_names[index] = "total_liter_" + pump_pin;
@@ -152,29 +147,29 @@ String Zone::getData()
 }
 
 
-void Zone::setOperationMode(OperationModes mode)
+void Zone::setOperationMode(OperationModes mode, int pump_id)
 {
-    current_mode = mode;
-    switch (current_mode)
+    for(int i = 0; i < nr_pumps; i++)
     {
-    case MODE_OFF:
-        for(int i = 0; i < nr_pumps; i++)
+        if(pumps[i]->getPin() == pump_id)
         {
-            pumps[i]->deactivatePump();
+            current_mode[i] = mode;
+            switch (current_mode[i])
+            {
+                case MODE_OFF:
+                    pumps[i]->deactivatePump();
+                    break;
+                case MODE_MANUAL:
+                case MODE_FLOOD:
+                case MODE_SOIL:
+                    pumps[i]->activatePump();
+                    break;
+                default:
+                    break;
+            }
         }
-        break;
-    case MODE_MANUAL:
-    case MODE_FLOOD:
-    case MODE_SOIL:
-        for(int i = 0; i < nr_pumps; i++)
-        {
-            pumps[i]->activatePump();
-        }
-        break;
-    default:
-        break;
     }
-
+        
 }
 
 void Zone::updateSensors()

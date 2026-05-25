@@ -2,17 +2,17 @@
 
 Interface::Interface(EE_Data_t eeprom_data_param) : comms(), zone(0)
 {
-    eeprom_data = new EE_Data_t(eeprom_data_param);
-    zone.setOperationMode(MODE_MANUAL);
+  eeprom_data = new EE_Data_t(eeprom_data_param);
+  
+  zone.addPump(PUMP_0, 0.5);
+  zone.addPump(PUMP_1, 0.5);
+  zone.addPump(PUMP_2, 0.5);
+  zone.addPump(PUMP_3, 0.5);
+  zone.addSoilSensor(HUM_SNS_0, eeprom_data->cali_air[0], eeprom_data->cali_water[0]);
+  zone.addSoilSensor(HUM_SNS_1, eeprom_data->cali_air[1], eeprom_data->cali_water[1]);
+  zone.addSoilSensor(HUM_SNS_2, eeprom_data->cali_air[2], eeprom_data->cali_water[2]);
+  zone.addSoilSensor(HUM_SNS_3, eeprom_data->cali_air[3], eeprom_data->cali_water[3]);
 
-    zone.addPump(PUMP_0, 0.5);
-    zone.addPump(PUMP_1, 0.5);
-    zone.addPump(PUMP_2, 0.5);
-    zone.addPump(PUMP_3, 0.5);
-    zone.addSoilSensor(HUM_SNS_0, eeprom_data->cali_air[0], eeprom_data->cali_water[0]);
-    zone.addSoilSensor(HUM_SNS_1, eeprom_data->cali_air[1], eeprom_data->cali_water[1]);
-    zone.addSoilSensor(HUM_SNS_2, eeprom_data->cali_air[2], eeprom_data->cali_water[2]);
-    zone.addSoilSensor(HUM_SNS_3, eeprom_data->cali_air[3], eeprom_data->cali_water[3]);
 }
 
 /*
@@ -64,9 +64,12 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
     
     if (command == "SET_MODE") {
       String mode = "";
-      if(Utils::findDataFromMessage(input, "NEW_MODE:", mode))
+      String pump_id = "";
+      bool found_mode = Utils::findDataFromMessage(input, "NEW_MODE:", mode); 
+      bool found_pump = Utils::findDataFromMessage(input, "PUMP:", pump_id);
+      if(found_mode && found_pump)
       {
-        zone.setOperationMode(static_cast<OperationModes>(mode.toInt()));
+        zone.setOperationMode(static_cast<OperationModes>(mode.toInt()), pump_id.toInt());
         status = true;
         DEBUG_PRINTLN("Set operation mode to: " + mode);
       } else {

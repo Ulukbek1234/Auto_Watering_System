@@ -10,7 +10,7 @@
 #include <Config.h>
 // #include "EEPROMEx.h"
 
-const int ARRAY_SIZE = 16;
+const int ARRAY_SIZE = 8;
 
 enum OperationModes {
     MODE_OFF = 0,
@@ -38,7 +38,7 @@ private:
     SoilSensor *soil_sensors[ARRAY_SIZE];
     WaterLevelSensor *water_level_sensors[ARRAY_SIZE];
     
-    OperationModes current_mode = MODE_OFF;
+    OperationModes current_mode[ARRAY_SIZE] = {MODE_OFF};
 
 public:
     Zone(int id);
@@ -51,7 +51,7 @@ public:
     
     String getData();
     String parseDataForWriting(String data_names[], String data_values[], int size);
-    void setOperationMode(OperationModes mode);
+    void setOperationMode(OperationModes mode, int pump_id);
     void updateSensors();
     void manualIrrigation(int pump_id, float amount);
     void saveToEEPROM(EE_Data_t *eeprom_data);

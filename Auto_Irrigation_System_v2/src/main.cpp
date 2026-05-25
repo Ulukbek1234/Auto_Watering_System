@@ -10,6 +10,8 @@ const unsigned long wait_time = 60000; // 1 minute
 Interface *interface;
 
 void setup() {
+  Serial.begin(115200);
+  
   // Memory load
   Preferences prefs;
   prefs.begin("EE_Data");
