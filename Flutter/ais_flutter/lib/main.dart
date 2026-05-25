@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 void main() => runApp(const BottomNavigationBarExampleApp());
 
@@ -144,7 +145,7 @@ class PageCamera extends StatelessWidget {
 
 
 
-class PageSettings extends StatefulWidget {
+/*class PageSettings extends StatefulWidget {
   /* ToDo 
     - BLE connection 
     - WiFi credential input 
@@ -157,189 +158,180 @@ class PageSettings extends StatefulWidget {
 
   @override
   State<PageSettings> createState() => _PageSettingsState();
+}*/
+
+
+class PageSettings extends StatefulWidget {
+  const PageSettings({super.key});
+
+  @override
+  State<PageSettings> createState() => _PageSettingsState();
 }
 
 class _PageSettingsState extends State<PageSettings> {
-  final List<ScanResult> _devices = [];
-  BluetoothDevice? _connectedDevice;
-  bool _isScanning = false;
+  WebSocketChannel? channel;
+  String status = "Not connected";
+  String lastMessage = "";
 
-  StreamSubscription<List<ScanResult>>? _scanSubscription;
+  final TextEditingController ipController =
+      TextEditingController(text: "10.150.65.208");
 
-  @override
-  void initState() {
-    super.initState();
-    _requestPermissions();
-    _listenToScanResults();
-  }
+  void connectToEsp32() async {
+    final ip = ipController.text.trim();
 
-  Future<void> _requestPermissions() async {
-    await [
-      Permission.bluetoothScan,
-      Permission.bluetoothConnect,
-      Permission.location,
-    ].request();
-  }
-
-  void _listenToScanResults() {
-    _scanSubscription = FlutterBluePlus.scanResults.listen((results) {
-      if (!mounted) return;
-
+    try {
       setState(() {
-        _devices
-          ..clear()
-          ..addAll(results);
+        status = "Connecting...";
       });
-    });
-  }
 
-  Future<void> _startScan() async {
-    setState(() {
-      _devices.clear();
-      _isScanning = true;
-    });
-
-    try {
-      await FlutterBluePlus.startScan(timeout: const Duration(seconds: 8));
-    } catch (e) {
-      _showMessage('Scan failed: $e');
-    }
-
-    if (mounted) {
-      setState(() => _isScanning = false);
-    }
-  }
-
-  Future<void> _stopScan() async {
-    await FlutterBluePlus.stopScan();
-
-    if (mounted) {
-      setState(() => _isScanning = false);
-    }
-  }
-
-  Future<void> _connectToDevice(BluetoothDevice device) async {
-    try {
-      await FlutterBluePlus.stopScan();
-
-      await device.connect(
-        timeout: const Duration(seconds: 10),
-        autoConnect: false,
+      final ws = WebSocketChannel.connect(
+        Uri.parse("ws://$ip:81"),
       );
 
-      if (!mounted) return;
+      channel = ws;
+
+      await ws.ready;
 
       setState(() {
-        _connectedDevice = device;
-        _isScanning = false;
+        status = "Connected";
       });
 
-      _showMessage('Connected to ${_deviceName(device)}');
+      ws.stream.listen(
+        (message) {
+          if (!mounted) return;
+
+          setState(() {
+            lastMessage = message.toString();
+          });
+        },
+        onError: (error) {
+          if (!mounted) return;
+
+          setState(() {
+            status = "Connection error:\n$error";
+          });
+
+          channel = null;
+        },
+        onDone: () {
+          if (!mounted) return;
+
+          setState(() {
+            status = "Disconnected";
+          });
+
+          channel = null;
+        },
+      );
     } catch (e) {
-      _showMessage('Connection failed: $e');
+      setState(() {
+        status = "Failed:\n$e";
+      });
+
+      channel = null;
     }
   }
 
-  Future<void> _disconnectDevice() async {
-    final device = _connectedDevice;
-    if (device == null) return;
+  void sendCommand(String command) {
+    try {
+      if (channel == null) {
+        setState(() {
+          status = "Not connected";
+        });
+        return;
+      }
 
-    await device.disconnect();
+      channel!.sink.add(command);
 
-    if (mounted) {
-      setState(() => _connectedDevice = null);
+      setState(() {
+        status = "Sent: $command";
+      });
+    } catch (e) {
+      setState(() {
+        status = "Send failed:\n$e";
+      });
     }
-
-    _showMessage('Disconnected');
   }
 
-  String _deviceName(BluetoothDevice device) {
-    return device.platformName.isNotEmpty
-        ? device.platformName
-        : 'Unknown Device';
-  }
+  void disconnect() {
+    channel?.sink.close();
+    channel = null;
 
-  void _showMessage(String message) {
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    setState(() {
+      status = "Disconnected";
+    });
   }
 
   @override
   void dispose() {
-    _scanSubscription?.cancel();
-    FlutterBluePlus.stopScan();
+    ipController.dispose();
+    channel?.sink.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final connectedDevice = _connectedDevice;
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const Text(
+          "Wi-Fi ESP32 Connection",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
 
-    return Scaffold(
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const Text(
-            'Bluetooth Connection',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        const SizedBox(height: 16),
+
+        TextField(
+          controller: ipController,
+          decoration: const InputDecoration(
+            labelText: "ESP32 IP Address",
+            border: OutlineInputBorder(),
           ),
+        ),
 
-          const SizedBox(height: 16),
+        const SizedBox(height: 16),
 
-          if (connectedDevice != null)
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.bluetooth_connected),
-                title: Text('Connected: ${_deviceName(connectedDevice)}'),
-                subtitle: Text(connectedDevice.remoteId.str),
-                trailing: TextButton(
-                  onPressed: _disconnectDevice,
-                  child: const Text('Disconnect'),
-                ),
-              ),
-            ),
+        ElevatedButton.icon(
+          onPressed: connectToEsp32,
+          icon: const Icon(Icons.wifi),
+          label: const Text("Connect"),
+        ),
 
-          const SizedBox(height: 12),
+        const SizedBox(height: 12),
 
-          ElevatedButton.icon(
-            icon: Icon(_isScanning ? Icons.stop : Icons.search),
-            label: Text(_isScanning ? 'Stop Scan' : 'Scan Devices'),
-            onPressed: _isScanning ? _stopScan : _startScan,
-          ),
+        ElevatedButton(
+          onPressed: () => sendCommand("cmd: telem"),
+          child: const Text("Send get_telem"),
+        ),
 
-          const SizedBox(height: 16),
+        const SizedBox(height: 12),
 
-          if (_devices.isEmpty)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text('No Bluetooth devices found'),
-              ),
-            )
-          else
-            ..._devices.map((result) {
-              final device = result.device;
+        ElevatedButton(
+          onPressed: () => sendCommand("LED_OFF"),
+          child: const Text("Send LED_OFF"),
+        ),
 
-              return Card(
-                child: ListTile(
-                  leading: const Icon(Icons.bluetooth),
-                  title: Text(_deviceName(device)),
-                  subtitle: Text(
-                    '${device.remoteId.str}\nRSSI: ${result.rssi}',
-                  ),
-                  isThreeLine: true,
-                  trailing: ElevatedButton(
-                    onPressed: () => _connectToDevice(device),
-                    child: const Text('Connect'),
-                  ),
-                ),
-              );
-            }),
-        ],
-      ),
+        const SizedBox(height: 12),
+
+        ElevatedButton(
+          onPressed: disconnect,
+          child: const Text("Disconnect"),
+        ),
+
+        const SizedBox(height: 24),
+
+        Text(
+          "Status: $status",
+          style: const TextStyle(fontSize: 18),
+        ),
+
+        const SizedBox(height: 12),
+
+        Text(
+          "ESP32 says: $lastMessage",
+          style: const TextStyle(fontSize: 18),
+        ),
+      ],
     );
   }
 }

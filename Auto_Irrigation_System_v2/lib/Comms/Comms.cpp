@@ -8,8 +8,7 @@ Comms::Comms() : serial_comms(), web()
 
 String Comms::read(COMMS_TYPE comms_type)
 {
-    String tet;
-    switch (active_types[comms_type])
+    switch (comms_type)
     {
     case USB_SERIAL_COMMS:
         return serial_comms.read();

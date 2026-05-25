@@ -12,7 +12,7 @@ private:
     WebSocketsServer *web_socket;
     String last_message = "";
 public:
-    Web(uint16_t port = 5000);
+    Web(uint16_t port = 81);
 
     void begin();
     String read();

@@ -1,25 +1,39 @@
 #include "Web.h"
 
-// Constructor
 Web::Web(uint16_t port)
 {
-    // Wifi & server start 
-    WiFi.begin("InternetHandy", "thisisuluk");
-    while(WiFi.status() != WL_CONNECTED) {
-      delay(200);
-      Serial.println(".");
-    }
-    Serial.println("WiFi Connected");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
-    web_socket = new WebSocketsServer(5000);
-    web_socket->begin();
+  WiFi.begin("InternetHandy", "thisisuluk");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(200);
+    Serial.println(".");
+  }
+
+  Serial.println("WiFi Connected");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  web_socket = new WebSocketsServer(port);
+  web_socket->begin();
+
+  web_socket->onEvent([this](
+    uint8_t client,
+    WStype_t type,
+    uint8_t * payload,
+    size_t length
+  ) {
+    this->onWebSocketEvent(client, type, payload, length);
+  });
 }
 
 String Web::read()
 {
   web_socket->loop();
-  return last_message;
+
+  String msg = last_message;
+  last_message = ""; // optional: clear after reading
+
+  return msg;
 }
 
 void Web::onWebSocketEvent(
@@ -38,6 +52,7 @@ void Web::onWebSocketEvent(
 
     Serial.print("Received: ");
     Serial.println(msg);
+
     last_message = msg;
 
     web_socket->sendTXT(client, "ESP32 got: " + msg);
