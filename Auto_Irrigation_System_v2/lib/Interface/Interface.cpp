@@ -26,6 +26,7 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
 
     String command = "";
     bool real_command = Utils::findDataFromMessage(input, "CMD:", command);
+    
     if(!real_command)
     {
       DEBUG_PRINT("No command found: ");
@@ -61,22 +62,50 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
       status = false;
       return;
     }
-    
-    if (command == "SET_MODE") {
+
+    if(command == "CONFIG")
+    {
+      String pump_id = ""; 
       String mode = "";
-      String pump_id = "";
-      bool found_mode = Utils::findDataFromMessage(input, "NEW_MODE:", mode); 
+      String chg_dly_ltr = "";
+      String chg_moi_thr = "";
+
       bool found_pump = Utils::findDataFromMessage(input, "PUMP:", pump_id);
-      if(found_mode && found_pump)
+      bool found_mode = Utils::findDataFromMessage(input, "SET_MODE:", mode);
+      bool found_chg_dly_ltr = Utils::findDataFromMessage(input, "CHG_DLY_LTR:", chg_dly_ltr);
+      bool found_chg_moi_thr = Utils::findDataFromMessage(input, "CHG_MOI_THR:", chg_moi_thr);
+
+      if(found_pump)
       {
-        zone.setOperationMode(static_cast<OperationModes>(mode.toInt()), pump_id.toInt());
-        status = true;
-        DEBUG_PRINTLN("Set operation mode to: " + mode);
-      } else {
-        DEBUG_PRINTLN("Failed to NEW_MODE: Wrong operation mode");
-        status = false;
+        DEBUG_PRINTLN("CONFIG; Pump: " + pump_id);
+        
+        if(found_mode)
+        {
+          status = true;
+          zone.setOperationMode(static_cast<OperationModes>(mode.toInt()), pump_id.toInt());
+          DEBUG_PRINTLN("Set operation mode to: " + mode);
+        }
+        
+        if(found_chg_dly_ltr)
+        {
+          status = true;
+          zone.changeDailyLimit(pump_id.toInt(), chg_dly_ltr.toFloat());
+          DEBUG_PRINTLN("Changed daily limit to: " + chg_dly_ltr);
+        }
+        
+        if(found_chg_moi_thr)
+        {
+          status = true;
+          zone.changeMoistureThreshold(chg_moi_thr.toInt(), pump_id.toInt());
+          DEBUG_PRINTLN("Changed moi thr: " + chg_moi_thr);
+        }
       }
-    } else if (command == "MAN_IRR") {
+      comms.write(response + (status ? "SUCC" : "FAIL"), type);
+      return;
+    }
+      
+    
+    if (command == "MAN_IRR") {
       DEBUG_PRINTLN("Started manual irrigating.");
       String pump_id = "";
       String amount = "";
@@ -90,33 +119,7 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
         DEBUG_PRINTLN("Failed to MAN_IRR: find pump or amount");
         status = false;
       }
-    } else if (command == "CHG_DLY_LTR") {
-      String pump_id = "";
-      String new_limit = "";
-      bool found_pump = Utils::findDataFromMessage(input, "PUMP:", pump_id);
-      bool found_limit = Utils::findDataFromMessage(input, "NEW_LIM:", new_limit);
-      if(found_pump && found_limit)
-      {
-        zone.changeDailyLimit(pump_id.toInt(), new_limit.toFloat());
-        DEBUG_PRINTLN("Changed daily limit to: " + new_limit);
-        status = true;
-      } else {
-        DEBUG_PRINTLN("Failed to CHG_DLY_LTR: find pump or limit");
-        status = false;
-      }
     } else if (command == "CHG_MOI_THR") {
-      String new_limit = "";
-      String pump_id = "";
-      bool found_limit = Utils::findDataFromMessage(input, "NEW_LIM:", new_limit);
-      bool found_pump = Utils::findDataFromMessage(input, "PUMP:", pump_id);
-      if(found_limit && found_pump)
-      {
-        zone.changeMoistureThreshold(new_limit.toInt(), pump_id.toInt());
-        status = true;
-      } else {
-        DEBUG_PRINTLN("Failed to CHG_MOI_THR: find limit");
-        status = false;
-      }
     } else if (command == "CALI_AIR") {
       String soil_pin = "";
       Utils::findDataFromMessage(input, "SOIL_PIN:", soil_pin);

@@ -96,8 +96,8 @@ class Esp32Service {
             units.value = [
               IrrigationUnit(
                 name: "Plant 1",
-                pumpName: "Pump 16",
-                sensorName: "Sensor 32",
+                pumpName: "16",
+                sensorName: "32",
                 pumpStatus: int.tryParse(parsed["current_mode_16"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_32"] ?? "0") ?? 0,
                 moistureThreshold: double.tryParse(parsed["moisture_threshold_32"] ?? "0") ?? 0,
@@ -107,8 +107,8 @@ class Esp32Service {
               ),
               IrrigationUnit(
                 name: "Plant 2",
-                pumpName: "Pump 17",
-                sensorName: "Sensor 33",
+                pumpName: "17",
+                sensorName: "33",
                 pumpStatus: int.tryParse(parsed["current_mode_17"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_33"] ?? "0") ?? 0,
                 moistureThreshold: double.tryParse(parsed["moisture_threshold_33"] ?? "0") ?? 0,
@@ -118,8 +118,8 @@ class Esp32Service {
               ),
               IrrigationUnit(
                 name: "Plant 3",
-                pumpName: "Pump 18",
-                sensorName: "Sensor 34",
+                pumpName: "18",
+                sensorName: "34",
                 pumpStatus: int.tryParse(parsed["current_mode_18"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_34"] ?? "0") ?? 0,
                 moistureThreshold: double.tryParse(parsed["moisture_threshold_34"] ?? "0") ?? 0,
@@ -130,8 +130,8 @@ class Esp32Service {
               ),
               IrrigationUnit(
                 name: "Plant 4",
-                pumpName: "Pump 19",
-                sensorName: "Sensor 35",
+                pumpName: "19",
+                sensorName: "35",
                 pumpStatus: int.tryParse(parsed["current_mode_19"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_35"] ?? "0") ?? 0,
                 moistureThreshold: double.tryParse(parsed["moisture_threshold_35"] ?? "0") ?? 0,
@@ -254,6 +254,7 @@ class PageHome extends StatelessWidget {
 
   final Esp32Service esp32 = Esp32Service.instance;
   void openDetails(BuildContext context, IrrigationUnit unit) {
+    final pumpStatusController = TextEditingController(text: unit.pumpStatus.toString());
     final maxDailyLitersController = TextEditingController(text: unit.waterFlowDailyMax.toString());
     final thresholdController = TextEditingController(text: unit.moistureThreshold.toString());
 
@@ -272,8 +273,10 @@ class PageHome extends StatelessWidget {
                 "Sensor: ${unit.sensorName}\n\n"
                 "Pump status: ${unit.pumpStatus}\n"
                 "Soil humidity: ${unit.soilHumidity}%\n"
+                "Moisture threshold: ${unit.moistureThreshold}%\n" 
                 "Water flow today: ${unit.waterFlowDaily} L\n"
-                "Total water flow: ${unit.waterFlowTotal} L",
+                "Total water flow: ${unit.waterFlowTotal} L\n"
+                "Max water flow: ${unit.waterFlowDailyMax} L"
               ),
 
               const SizedBox(height: 20),
@@ -286,6 +289,17 @@ class PageHome extends StatelessWidget {
                 - Sensor calibration
                 - Manual irrigation
               */
+
+              TextField(
+                controller: pumpStatusController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Change Mode" ,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
+              const SizedBox(height: 12),
 
 
               TextField(
@@ -307,6 +321,9 @@ class PageHome extends StatelessWidget {
                   border: OutlineInputBorder(),
                 ),
               ),
+
+              // TODO CALIBRATION
+              
               
             ],
           ),
@@ -320,12 +337,13 @@ class PageHome extends StatelessWidget {
 
           ElevatedButton(
             onPressed: () {
+              final pumpStatusNew = pumpStatusController.text;
               final maxDailyLitersNew = maxDailyLitersController.text;
               final thresholdNew = thresholdController.text;
 
               // TODO change command, all in one
               esp32.send(
-                "cmd: irrigate,duration:$maxDailyLitersNew,threshold:$thresholdNew",
+                "cmd: config, pump: ${unit.pumpName} set_mode: $pumpStatusNew, chg_dly_ltr: $maxDailyLitersNew, chg_moi_thr: $thresholdNew",
               );
 
               Navigator.pop(context);

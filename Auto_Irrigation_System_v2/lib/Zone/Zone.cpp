@@ -103,9 +103,6 @@ String Zone::getData()
     data_values[index++] = String(total_day_progressed, NR_DEC_POINTS);
 
 
-
-
-
     for (int i = 0; i < nr_pumps; i++)
     {
         String pump_pin = String(pumps[i]->getPin());
