@@ -30,15 +30,15 @@ private:
     float day_exact = 0.0;
     float total_day_progressed = 0.0;
     float eeprom_total_day_progressed = 0.0;
-    float moisture_percent[ARRAY_SIZE] = {0.0f};
-    float water_level_percent[ARRAY_SIZE] = {0.0f};
+    float moisture_percent[ARRAY_SIZE] = {0.0f, 0.0f, 0.0f, 0.0f};
+    float water_level_percent[ARRAY_SIZE] = {0.0f, 0.0f, 0.0f, 0.0f};
     float MOISTURE_THRESHOLD = 50.0;
     
     Pump *pumps[ARRAY_SIZE]; 
     SoilSensor *soil_sensors[ARRAY_SIZE];
     WaterLevelSensor *water_level_sensors[ARRAY_SIZE];
     
-    OperationModes current_mode[ARRAY_SIZE] = {MODE_OFF};
+    OperationModes current_mode[ARRAY_SIZE] = {MODE_MANUAL, MODE_MANUAL, MODE_MANUAL, MODE_MANUAL};
 
 public:
     Zone(int id);

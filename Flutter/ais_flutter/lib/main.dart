@@ -10,6 +10,7 @@ class IrrigationUnit {
   final int soilHumidity;
   final double waterFlowDaily;
   final double waterFlowTotal;
+  final double waterFlowDailyMax;
 
   IrrigationUnit({
     required this.name,
@@ -19,6 +20,7 @@ class IrrigationUnit {
     required this.soilHumidity,
     required this.waterFlowDaily,
     required this.waterFlowTotal,
+    required this.waterFlowDailyMax,
   });
 
   factory IrrigationUnit.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class IrrigationUnit {
       soilHumidity: (json["soilHumidity"] as num?)?.toInt() ?? 0,
       waterFlowDaily: (json["waterFlowDaily"] as num?)?.toDouble() ?? 0.0,
       waterFlowTotal: (json["waterFlowTotal"] as num?)?.toDouble() ?? 0.0,
+      waterFlowDailyMax: (json["waterFlowDailyMax"] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
@@ -92,37 +95,42 @@ class Esp32Service {
                 name: "Plant 1",
                 pumpName: "Pump 16",
                 sensorName: "Sensor 32",
-                pumpStatus: int.tryParse(parsed["current_mode_0"] ?? "0") ?? 0,
+                pumpStatus: int.tryParse(parsed["current_mode_16"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_32"] ?? "0") ?? 0,
                 waterFlowDaily: double.tryParse(parsed["daily_liter_16"] ?? "0") ?? 0.0,
                 waterFlowTotal: double.tryParse(parsed["total_liter_16"] ?? "0") ?? 0.0,
+                waterFlowDailyMax: double.tryParse(parsed["max_liter_16"] ?? "0") ?? 0.0,
               ),
               IrrigationUnit(
                 name: "Plant 2",
                 pumpName: "Pump 17",
                 sensorName: "Sensor 33",
-                pumpStatus: int.tryParse(parsed["current_mode_0"] ?? "0") ?? 0,
+                pumpStatus: int.tryParse(parsed["current_mode_17"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_33"] ?? "0") ?? 0,
                 waterFlowDaily: double.tryParse(parsed["daily_liter_17"] ?? "0") ?? 0.0,
                 waterFlowTotal: double.tryParse(parsed["total_liter_17"] ?? "0") ?? 0.0,
+                waterFlowDailyMax: double.tryParse(parsed["max_liter_17"] ?? "0") ?? 0.0,
               ),
               IrrigationUnit(
                 name: "Plant 3",
                 pumpName: "Pump 18",
                 sensorName: "Sensor 34",
-                pumpStatus: int.tryParse(parsed["current_mode_0"] ?? "0") ?? 0,
+                pumpStatus: int.tryParse(parsed["current_mode_18"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_34"] ?? "0") ?? 0,
                 waterFlowDaily: double.tryParse(parsed["daily_liter_18"] ?? "0") ?? 0.0,
                 waterFlowTotal: double.tryParse(parsed["total_liter_18"] ?? "0") ?? 0.0,
+                waterFlowDailyMax: double.tryParse(parsed["max_liter_18"] ?? "0") ?? 0.0,
+
               ),
               IrrigationUnit(
                 name: "Plant 4",
                 pumpName: "Pump 19",
                 sensorName: "Sensor 35",
-                pumpStatus: int.tryParse(parsed["current_mode_0"] ?? "0") ?? 0,
+                pumpStatus: int.tryParse(parsed["current_mode_19"] ?? "0") ?? 0,
                 soilHumidity: int.tryParse(parsed["moisture_percent_35"] ?? "0") ?? 0,
                 waterFlowDaily: double.tryParse(parsed["daily_liter_19"] ?? "0") ?? 0.0,
                 waterFlowTotal: double.tryParse(parsed["total_liter_19"] ?? "0") ?? 0.0,
+                waterFlowDailyMax: double.tryParse(parsed["max_liter_19"] ?? "0") ?? 0.0,
               ),
             ];
           }
@@ -249,8 +257,8 @@ class PageHome extends StatelessWidget {
           "Sensor: ${unit.sensorName}\n\n"
           "Pump status: ${unit.pumpStatus}\n"
           "Soil humidity: ${unit.soilHumidity}%\n"
-          "Water flow: ${unit.waterFlowDaily} L/min\n"
-          "Temperature: ${unit.waterFlowTotal}°C",
+          "Water flow: ${unit.waterFlowDaily} L/Day\n"
+          "Water flow: ${unit.waterFlowTotal} L/Total",
         ),
         actions: [
           TextButton(
@@ -312,7 +320,7 @@ class PageHome extends StatelessWidget {
                     subtitle: Text(
                       "${unit.pumpName}: ${unit.pumpStatus}\n"
                       "${unit.sensorName}: ${unit.soilHumidity}%\n"
-                      "Flow: ${unit.waterFlowDaily} L/min",
+                      "Flow: ${unit.waterFlowDaily} L/Day",
                     ),
                     isThreeLine: true,
                     trailing: const Icon(Icons.chevron_right),
