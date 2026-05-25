@@ -20,23 +20,22 @@ Interface::Interface(EE_Data_t eeprom_data_param) : comms(), zone(0)
   Response: CMD: RESP, STATUS: (SUCC, FAIL)
 */
 
-void Interface::commandHandler(String serial_input) {
+void Interface::commandHandler(String input, COMMS_TYPE type) {
     bool status = false;
     String response = "CMD:RESP,STATUS:";
 
     String command = "";
-    bool real_command = Utils::findDataFromMessage(serial_input, "CMD:", command);
+    bool real_command = Utils::findDataFromMessage(input, "CMD:", command);
     if(!real_command)
     {
       DEBUG_PRINT("No command found: ");
-      DEBUG_PRINTLN(serial_input);
-      Serial.println(response + "FAIL");
+      DEBUG_PRINTLN(input);
+      comms.write(response + "FAIL", type);
       return;
     } 
 
     if (command == "TELEM") {
-      Serial.print(zone.getData());
-      Serial.println("");
+      comms.write(zone.getData(), type);
       DEBUG_PRINTLN("Sent telemetry data.");
       return;
     } 
@@ -65,7 +64,7 @@ void Interface::commandHandler(String serial_input) {
     
     if (command == "SET_MODE") {
       String mode = "";
-      if(Utils::findDataFromMessage(serial_input, "NEW_MODE:", mode))
+      if(Utils::findDataFromMessage(input, "NEW_MODE:", mode))
       {
         zone.setOperationMode(static_cast<OperationModes>(mode.toInt()));
         status = true;
@@ -78,8 +77,8 @@ void Interface::commandHandler(String serial_input) {
       DEBUG_PRINTLN("Started manual irrigating.");
       String pump_id = "";
       String amount = "";
-      bool found_pump = Utils::findDataFromMessage(serial_input, "PUMP:", pump_id);
-      bool found_amount = Utils::findDataFromMessage(serial_input, "AMOUNT:", amount);
+      bool found_pump = Utils::findDataFromMessage(input, "PUMP:", pump_id);
+      bool found_amount = Utils::findDataFromMessage(input, "AMOUNT:", amount);
       if(found_pump && found_amount)
       {
         zone.manualIrrigation(pump_id.toInt(), amount.toFloat());
@@ -91,8 +90,8 @@ void Interface::commandHandler(String serial_input) {
     } else if (command == "CHG_DLY_LTR") {
       String pump_id = "";
       String new_limit = "";
-      bool found_pump = Utils::findDataFromMessage(serial_input, "PUMP:", pump_id);
-      bool found_limit = Utils::findDataFromMessage(serial_input, "NEW_LIM:", new_limit);
+      bool found_pump = Utils::findDataFromMessage(input, "PUMP:", pump_id);
+      bool found_limit = Utils::findDataFromMessage(input, "NEW_LIM:", new_limit);
       if(found_pump && found_limit)
       {
         zone.changeDailyLimit(pump_id.toInt(), new_limit.toFloat());
@@ -104,7 +103,7 @@ void Interface::commandHandler(String serial_input) {
       }
     } else if (command == "CHG_MOI_THR") {
       String new_limit = "";
-      bool found_limit = Utils::findDataFromMessage(serial_input, "NEW_LIM:", new_limit);
+      bool found_limit = Utils::findDataFromMessage(input, "NEW_LIM:", new_limit);
       if(found_limit)
       {
         zone.changeMoistureThreshold(new_limit.toInt());
@@ -115,18 +114,18 @@ void Interface::commandHandler(String serial_input) {
       }
     } else if (command == "CALI_AIR") {
       String soil_pin = "";
-      Utils::findDataFromMessage(serial_input, "SOIL_PIN:", soil_pin);
+      Utils::findDataFromMessage(input, "SOIL_PIN:", soil_pin);
       status = zone.caliSoilInAir(soil_pin.toInt());
     } else if (command == "CALI_WATER") {
       String soil_pin = "";
-      Utils::findDataFromMessage(serial_input, "SOIL_PIN:", soil_pin);
+      Utils::findDataFromMessage(input, "SOIL_PIN:", soil_pin);
       status = zone.caliSoilInWater(soil_pin.toInt());
     } else {
       DEBUG_PRINT("Unknown command");
       DEBUG_PRINTLN(command);
       status = false;
     }
-    Serial.println(response + (status ? "SUCC" : "FAIL"));
+    comms.write(response + (status ? "SUCC" : "FAIL"), type);
 }
 
 void Interface::startAutoIrrigation() {
@@ -147,7 +146,7 @@ void Interface::readCommand() {
             DEBUG_PRINTLN("Received command: " + command);
             command.toUpperCase();
             command.trim();
-            commandHandler(command);
+            commandHandler(command, type);
         }
     }
 }

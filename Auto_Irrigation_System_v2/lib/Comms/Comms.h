@@ -21,7 +21,7 @@ public:
     COMMS_TYPE active_types[nr_active_types];
     Comms();
     String read(COMMS_TYPE comms_type);
-    void write(String output);
+    void write(String output, COMMS_TYPE type);
     HardwareSerial* getSource();
 };
 

@@ -11,6 +11,7 @@ private:
     const char* password = "thisisuluk";
     WebSocketsServer *web_socket;
     String last_message = "";
+    uint8_t local_client;
 public:
     Web(uint16_t port = 81);
 
@@ -20,7 +21,7 @@ public:
                             WStype_t type,
                             uint8_t * payload,
                             size_t length);
-    
+    void write(String output);
 
 };
 

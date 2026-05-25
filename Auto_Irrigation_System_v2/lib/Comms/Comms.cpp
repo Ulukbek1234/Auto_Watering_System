@@ -6,9 +6,9 @@ Comms::Comms() : serial_comms(), web()
     active_types[1] = WEB_SOCKET_COMMS;
 }
 
-String Comms::read(COMMS_TYPE comms_type)
+String Comms::read(COMMS_TYPE type)
 {
-    switch (comms_type)
+    switch (type)
     {
     case USB_SERIAL_COMMS:
         return serial_comms.read();
@@ -18,6 +18,25 @@ String Comms::read(COMMS_TYPE comms_type)
         return web.read();
     default:
         return "";
+        break;
+    }
+}
+
+void Comms::write(String output, COMMS_TYPE type)
+{
+    switch (type)
+    {
+    case USB_SERIAL_COMMS:
+        serial_comms.write(output);
+        break;    
+    case BLUETOOTH_COMMS:
+        // bluetooth->write();
+        break;    
+    case WEB_SOCKET_COMMS:
+        web.write(output);
+        break;    
+    default:
+        DEBUG_PRINTLN("ERROR: wrong output type");
         break;
     }
 }

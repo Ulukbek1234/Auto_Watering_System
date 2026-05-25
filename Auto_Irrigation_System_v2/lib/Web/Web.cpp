@@ -45,6 +45,7 @@ void Web::onWebSocketEvent(
   if (type == WStype_CONNECTED) {
     Serial.println("Phone connected");
     web_socket->sendTXT(client, "Hello from ESP32");
+    local_client = client;
   }
 
   if (type == WStype_TEXT) {
@@ -55,10 +56,14 @@ void Web::onWebSocketEvent(
 
     last_message = msg;
 
-    web_socket->sendTXT(client, "ESP32 got: " + msg);
   }
-
+  
   if (type == WStype_DISCONNECTED) {
     Serial.println("Phone disconnected");
   }
+}
+
+void Web::write(String output) {
+  web_socket->sendTXT(local_client, output);
+  
 }
