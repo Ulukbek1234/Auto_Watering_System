@@ -3,6 +3,10 @@
 SerialComms::SerialComms()
 {
     Serial.begin(115200);
+    if(!Serial)
+    {
+        delay(100);
+    }
     Serial.println("Finally running");
 }
 

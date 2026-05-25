@@ -10,14 +10,6 @@ const unsigned long wait_time = 60000; // 1 minute
 Interface *interface;
 
 void setup() {
-  Serial.begin(115200);
-  while (!Serial)
-  {
-    delay(100);
-  }
-
-  Serial.println("Work");
-
   // Memory load
   Preferences prefs;
   prefs.begin("EE_Data");
@@ -35,7 +27,7 @@ void setup() {
   
   
   interface = new Interface(eeprom_data);
-  Serial.println("Running on ESP32");
+  DEBUG_PRINTLN("Running on ESP32");
   
   prefs.end();
   start_time = millis();
@@ -44,7 +36,6 @@ void setup() {
 
 void loop() {
   // // server.loop();
-  Serial.println("Loop");
   interface->readCommand();
   delay(100);
 

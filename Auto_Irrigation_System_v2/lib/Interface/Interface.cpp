@@ -5,10 +5,10 @@ Interface::Interface(EE_Data_t eeprom_data_param) : comms(), zone(0)
     eeprom_data = new EE_Data_t(eeprom_data_param);
     zone.setOperationMode(MODE_MANUAL);
 
-    zone.addPump(PUMP_0, 1.0);
-    zone.addPump(PUMP_1, 1.0);
+    zone.addPump(PUMP_0, 0.5);
+    zone.addPump(PUMP_1, 0.5);
     zone.addPump(PUMP_2, 0.5);
-    zone.addPump(PUMP_3, 0.0);
+    zone.addPump(PUMP_3, 0.5);
     zone.addSoilSensor(HUM_SNS_0, eeprom_data->cali_air[0], eeprom_data->cali_water[0]);
     zone.addSoilSensor(HUM_SNS_1, eeprom_data->cali_air[1], eeprom_data->cali_water[1]);
     zone.addSoilSensor(HUM_SNS_2, eeprom_data->cali_air[2], eeprom_data->cali_water[2]);
@@ -137,7 +137,6 @@ void Interface::updateDay() {
 }
 
 void Interface::readCommand() {
-    
     for(int i = 0; i < comms.nr_active_types; i++) {
         COMMS_TYPE type = comms.active_types[i];
         String command = comms.read(type);

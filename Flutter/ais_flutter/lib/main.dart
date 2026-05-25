@@ -1,10 +1,69 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 void main() => runApp(const BottomNavigationBarExampleApp());
+
+class Esp32Service {
+  Esp32Service._();
+  static final Esp32Service instance = Esp32Service._();
+
+  WebSocketChannel? _channel;
+
+  final ValueNotifier<String> status = ValueNotifier("Disconnected");
+  final ValueNotifier<String> message = ValueNotifier("");
+
+  bool get connected => _channel != null;
+
+  Future<void> connect(String ip) async {
+    if (_channel != null) return;
+
+    try {
+      status.value = "Connecting...";
+
+      final ws = WebSocketChannel.connect(
+        Uri.parse("ws://$ip:81/"),
+      );
+
+      await ws.ready;
+
+      _channel = ws;
+      status.value = "Connected to $ip";
+
+      ws.stream.listen(
+        (data) {
+          message.value = data.toString();
+        },
+        onError: (error) {
+          _channel = null;
+          status.value = "Error: $error";
+        },
+        onDone: () {
+          _channel = null;
+          status.value = "Disconnected";
+        },
+      );
+    } catch (e) {
+      _channel = null;
+      status.value = "Failed: $e";
+    }
+  }
+
+  void send(String command) {
+    if (_channel == null) {
+      status.value = "Connect first";
+      return;
+    }
+
+    _channel!.sink.add(command);
+    status.value = "Sent: $command";
+  }
+
+  void disconnect() {
+    _channel?.sink.close();
+    _channel = null;
+    status.value = "Disconnected";
+  }
+}
 
 class BottomNavigationBarExampleApp extends StatelessWidget {
   const BottomNavigationBarExampleApp({super.key});
@@ -27,7 +86,6 @@ class BottomNavigationBarExample extends StatefulWidget {
 
 class _BottomNavigationBarExampleState
     extends State<BottomNavigationBarExample> {
-
   int _selectedIndex = 0;
 
   static final List<Widget> _pages = <Widget>[
@@ -49,14 +107,11 @@ class _BottomNavigationBarExampleState
       appBar: AppBar(
         title: const Text('Automatic Irrigation System'),
       ),
-
       body: _pages[_selectedIndex],
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
         onTap: _onItemTapped,
-
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -84,37 +139,178 @@ class _BottomNavigationBarExampleState
   }
 }
 
+
 class PageHome extends StatelessWidget {
-  /*
-    ToDo
-    - General information
-      - Environmental
-      - See active pumps
-    - Add pumps
-    - Pumps, when pressed 
-      - see current telemetry
-      - pump configurations
-  */
+  PageHome({super.key});
+
+  final Esp32Service esp32 = Esp32Service.instance;
+
+  final List<Map<String, dynamic>> units = const [
+    {
+      "name": "Plant Bed A",
+      "pumpName": "Pump 1",
+      "sensorName": "Soil Sensor 1",
+      "pumpStatus": "Active",
+      "soilHumidity": "42%",
+      "waterFlow": "2.4 L/min",
+      "waterLevel": "78%",
+      "temperature": "23°C",
+      "mode": "Automatic",
+    },
+    {
+      "name": "Plant Bed B",
+      "pumpName": "Pump 2",
+      "sensorName": "Soil Sensor 2",
+      "pumpStatus": "Off",
+      "soilHumidity": "61%",
+      "waterFlow": "0.0 L/min",
+      "waterLevel": "78%",
+      "temperature": "22°C",
+      "mode": "Manual",
+    },
+    {
+      "name": "Plant Bed C",
+      "pumpName": "Pump 3",
+      "sensorName": "Soil Sensor 3",
+      "pumpStatus": "Active",
+      "soilHumidity": "35%",
+      "waterFlow": "2.1 L/min",
+      "waterLevel": "78%",
+      "temperature": "24°C",
+      "mode": "Automatic",
+    },
+  ];
+
+  void openDetails(BuildContext context, Map<String, dynamic> unit) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(unit["name"]),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Pump: ${unit["pumpName"]}"),
+            Text("Sensor: ${unit["sensorName"]}"),
+            const SizedBox(height: 12),
+            Text("Pump status: ${unit["pumpStatus"]}"),
+            Text("Soil humidity: ${unit["soilHumidity"]}"),
+            Text("Water flow: ${unit["waterFlow"]}"),
+            Text("Water level: ${unit["waterLevel"]}"),
+            Text("Temperature: ${unit["temperature"]}"),
+            Text("Mode: ${unit["mode"]}"),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Close"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              esp32.send("cmd: telem");
+            },
+            child: const Text("Refresh"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Page Home',
-        style: TextStyle(fontSize: 30),
-      ),
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const Text(
+          "Irrigation Units",
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+        ),
+
+        const SizedBox(height: 16),
+
+        ...units.map((unit) {
+          return Card(
+            margin: const EdgeInsets.only(bottom: 14),
+            child: InkWell(
+              onTap: () => openDetails(context, unit),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      unit["name"],
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Row(
+                      children: [
+                        const Icon(Icons.water_drop, size: 20),
+                        const SizedBox(width: 8),
+                        Text("${unit["pumpName"]}: ${unit["pumpStatus"]}"),
+                      ],
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    Row(
+                      children: [
+                        const Icon(Icons.sensors, size: 20),
+                        const SizedBox(width: 8),
+                        Text("${unit["sensorName"]}: ${unit["soilHumidity"]}"),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Text("Flow: ${unit["waterFlow"]}"),
+                    Text("Temperature: ${unit["temperature"]}"),
+
+                    const Align(
+                      alignment: Alignment.centerRight,
+                      child: Icon(Icons.chevron_right),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }),
+
+        const SizedBox(height: 20),
+
+        ElevatedButton(
+          onPressed: () {
+            esp32.send("cmd: telem");
+          },
+          child: const Text("Refresh All Telemetry"),
+        ),
+
+        const SizedBox(height: 16),
+
+        ValueListenableBuilder(
+          valueListenable: esp32.message,
+          builder: (_, value, __) {
+            return Text(
+              "ESP32 says: $value",
+              style: const TextStyle(fontSize: 16),
+            );
+          },
+        ),
+      ],
     );
   }
 }
 
 class PageCharts extends StatelessWidget {
-  /*
-    ToDo
-    - See humidity 
-    - See water flow
-    - Different time interval
-    - y from 0 - 100
-   */
-  
+  const PageCharts({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Center(
@@ -127,11 +323,8 @@ class PageCharts extends StatelessWidget {
 }
 
 class PageCamera extends StatelessWidget {
-  /*
-    ToDo
-    - live feed
-    - timelapse?
-  */
+  const PageCamera({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Center(
@@ -143,24 +336,6 @@ class PageCamera extends StatelessWidget {
   }
 }
 
-
-
-/*class PageSettings extends StatefulWidget {
-  /* ToDo 
-    - BLE connection 
-    - WiFi credential input 
-    - WiFi connection 
-    - User profile 
-    - Delete Data 
-    - Other settings stuff 
-  */
-  const PageSettings({super.key});
-
-  @override
-  State<PageSettings> createState() => _PageSettingsState();
-}*/
-
-
 class PageSettings extends StatefulWidget {
   const PageSettings({super.key});
 
@@ -169,103 +344,26 @@ class PageSettings extends StatefulWidget {
 }
 
 class _PageSettingsState extends State<PageSettings> {
-  WebSocketChannel? channel;
-  String status = "Not connected";
-  String lastMessage = "";
+  final Esp32Service esp32 = Esp32Service.instance;
 
   final TextEditingController ipController =
       TextEditingController(text: "10.150.65.208");
 
-  void connectToEsp32() async {
-    final ip = ipController.text.trim();
-
-    try {
-      setState(() {
-        status = "Connecting...";
-      });
-
-      final ws = WebSocketChannel.connect(
-        Uri.parse("ws://$ip:81"),
-      );
-
-      channel = ws;
-
-      await ws.ready;
-
-      setState(() {
-        status = "Connected";
-      });
-
-      ws.stream.listen(
-        (message) {
-          if (!mounted) return;
-
-          setState(() {
-            lastMessage = message.toString();
-          });
-        },
-        onError: (error) {
-          if (!mounted) return;
-
-          setState(() {
-            status = "Connection error:\n$error";
-          });
-
-          channel = null;
-        },
-        onDone: () {
-          if (!mounted) return;
-
-          setState(() {
-            status = "Disconnected";
-          });
-
-          channel = null;
-        },
-      );
-    } catch (e) {
-      setState(() {
-        status = "Failed:\n$e";
-      });
-
-      channel = null;
-    }
+  void connectToEsp32() {
+    esp32.connect(ipController.text.trim());
   }
 
   void sendCommand(String command) {
-    try {
-      if (channel == null) {
-        setState(() {
-          status = "Not connected";
-        });
-        return;
-      }
-
-      channel!.sink.add(command);
-
-      setState(() {
-        status = "Sent: $command";
-      });
-    } catch (e) {
-      setState(() {
-        status = "Send failed:\n$e";
-      });
-    }
+    esp32.send(command);
   }
 
   void disconnect() {
-    channel?.sink.close();
-    channel = null;
-
-    setState(() {
-      status = "Disconnected";
-    });
+    esp32.disconnect();
   }
 
   @override
   void dispose() {
     ipController.dispose();
-    channel?.sink.close();
     super.dispose();
   }
 
@@ -320,16 +418,26 @@ class _PageSettingsState extends State<PageSettings> {
 
         const SizedBox(height: 24),
 
-        Text(
-          "Status: $status",
-          style: const TextStyle(fontSize: 18),
+        ValueListenableBuilder(
+          valueListenable: esp32.status,
+          builder: (_, value, __) {
+            return Text(
+              "Status: $value",
+              style: const TextStyle(fontSize: 18),
+            );
+          },
         ),
 
         const SizedBox(height: 12),
 
-        Text(
-          "ESP32 says: $lastMessage",
-          style: const TextStyle(fontSize: 18),
+        ValueListenableBuilder(
+          valueListenable: esp32.message,
+          builder: (_, value, __) {
+            return Text(
+              "ESP32 says: $value",
+              style: const TextStyle(fontSize: 18),
+            );
+          },
         ),
       ],
     );
