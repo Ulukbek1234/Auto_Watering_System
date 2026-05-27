@@ -1,3 +1,5 @@
+import 'dart:nativewrappers/_internal/vm/lib/ffi_native_type_patch.dart';
+
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:convert';
@@ -42,6 +44,23 @@ class IrrigationUnit {
   }
 }
 
+class ChartReading {
+  final DateTime time;
+  final Double humidity_1;
+  final Double humidity_2;
+  final Double humidity_3;
+  final Double humidity_4;
+
+
+  ChartReading({
+    required this.time,
+    required this.humidity_1,
+    required this.humidity_2,
+    required this.humidity_3,
+    required this.humidity_4,
+  });
+}
+
 Map<String, String> parseTelemetryText(String text) {
   final Map<String, String> data = {};
 
@@ -66,6 +85,8 @@ class Esp32Service {
 
   WebSocketChannel? _channel;
   final ValueNotifier<List<IrrigationUnit>> units = ValueNotifier([]);
+  final List<ChartReading> readings = [];
+
 
   final ValueNotifier<String> status = ValueNotifier("Disconnected");
   final ValueNotifier<String> message = ValueNotifier("");
@@ -142,6 +163,19 @@ class Esp32Service {
                 waterFlowDailyMax: double.tryParse(parsed["max_liter_19"] ?? "0") ?? 0.0,
               ),
             ];
+          
+            // To
+            readings.add(
+              ChartReading(
+                time: DateTime.now(),
+                humidity_1: double.tryParse(parsed["moisture_percent_32"] ?? "0") ?? 0,
+                humidity_2: double.tryParse(parsed["moisture_percent_33"] ?? "0") ?? 0,
+                humidity_3: double.tryParse(parsed["moisture_percent_34"] ?? "0") ?? 0,
+                humidity_4: double.tryParse(parsed["moisture_percent_35"] ?? "0") ?? 0,
+
+              ),
+            );
+          
           }
         },
         onError: (error) {
@@ -175,6 +209,7 @@ class Esp32Service {
     _channel = null;
     status.value = "Disconnected";
   }
+
 }
 
 class BottomNavigationBarExampleApp extends StatelessWidget {
@@ -343,7 +378,6 @@ class PageHome extends StatelessWidget {
               final maxDailyLitersNew = maxDailyLitersController.text;
               final thresholdNew = thresholdController.text;
 
-              // TODO change command, all in one
               esp32.send(
                 "cmd: config, pump: ${unit.pumpName} set_mode: $pumpStatusNew, chg_dly_ltr: $maxDailyLitersNew, chg_moi_thr: $thresholdNew",
               );
@@ -440,20 +474,14 @@ class PageHome extends StatelessWidget {
 
 enum ChartRange { hour, day, week, month }
 
-class ChartReading {
-  final DateTime time;
-  final double humidity;
-  final double dailyLiters;
-
-  ChartReading({
-    required this.time,
-    required this.humidity,
-    required this.dailyLiters,
-  });
-}
 
 class PageCharts extends StatefulWidget {
-  const PageCharts({super.key});
+  final List<ChartReading> readings;
+
+  const PageCharts({
+    super.key,
+    required this.readings,
+  });
 
   @override
   State<PageCharts> createState() => _PageChartsState();
@@ -461,36 +489,7 @@ class PageCharts extends StatefulWidget {
 
 class _PageChartsState extends State<PageCharts> {
   ChartRange selectedRange = ChartRange.day;
-  final Esp32Service esp32 = Esp32Service.instance;
 
-  // TODO make this work with real data
-  final List<ChartReading> readings = [
-    ChartReading(
-      time: DateTime.now().subtract(const Duration(hours: 5)),
-      humidity: 45,
-      dailyLiters: 20,
-    ),
-    ChartReading(
-      time: DateTime.now().subtract(const Duration(hours: 4)),
-      humidity: 50,
-      dailyLiters: 30,
-    ),
-    ChartReading(
-      time: DateTime.now().subtract(const Duration(hours: 3)),
-      humidity: 48,
-      dailyLiters: 40,
-    ),
-    ChartReading(
-      time: DateTime.now().subtract(const Duration(hours: 2)),
-      humidity: 55,
-      dailyLiters: 60,
-    ),
-    ChartReading(
-      time: DateTime.now().subtract(const Duration(hours: 1)),
-      humidity: 52,
-      dailyLiters: 75,
-    ),
-  ];
 
   Duration get selectedDuration {
     switch (selectedRange) {
@@ -508,17 +507,17 @@ class _PageChartsState extends State<PageCharts> {
   List<ChartReading> get filteredReadings {
     final from = DateTime.now().subtract(selectedDuration);
 
-    return readings.where((reading) {
+    return widget.readings.where((reading) {
       return reading.time.isAfter(from);
     }).toList();
   }
 
-  List<FlSpot> getHumiditySpots() {
+  List<FlSpot> getHumiditySpots(int sensor) {
     final from = DateTime.now().subtract(selectedDuration);
 
     return filteredReadings.map((reading) {
       final x = reading.time.difference(from).inMinutes.toDouble();
-      return FlSpot(x, reading.humidity);
+      return FlSpot(x, reading.humidity_1);
     }).toList();
   }
 
@@ -602,7 +601,6 @@ class _PageChartsState extends State<PageCharts> {
                     barWidth: 3,
                     dotData: const FlDotData(show: false),
                   ),
-
                 ],
               ),
             ),
