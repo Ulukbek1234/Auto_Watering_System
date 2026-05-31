@@ -594,6 +594,11 @@ class _PageSettingsState extends State<PageSettings> {
         ),
         const SizedBox(height: 12),
         OutlinedButton(
+          onPressed: () => esp32.send('cmd: updt_firm'),
+          child: const Text('Update Firmware'),
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton(
           onPressed: esp32.disconnect,
           child: const Text('Disconnect'),
         ),
