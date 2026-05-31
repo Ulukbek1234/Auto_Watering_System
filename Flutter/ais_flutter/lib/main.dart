@@ -1,23 +1,37 @@
-import 'dart:nativewrappers/_internal/vm/lib/ffi_native_type_patch.dart';
-
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'dart:convert';
-import 'package:fl_chart/fl_chart.dart';
 
+void main() => runApp(const IrrigationApp());
+
+class IrrigationApp extends StatelessWidget {
+  const IrrigationApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        useMaterial3: true,
+      ),
+      home: const MainScreen(),
+    );
+  }
+}
 
 class IrrigationUnit {
   final String name;
   final String pumpName;
   final String sensorName;
   final int pumpStatus;
-  final int soilHumidity;
+  final double soilHumidity;
   final double moistureThreshold;
   final double waterFlowDaily;
   final double waterFlowTotal;
   final double waterFlowDailyMax;
 
-  IrrigationUnit({
+  const IrrigationUnit({
     required this.name,
     required this.pumpName,
     required this.sensorName,
@@ -29,257 +43,194 @@ class IrrigationUnit {
     required this.waterFlowDailyMax,
   });
 
-  factory IrrigationUnit.fromJson(Map<String, dynamic> json) {
+  factory IrrigationUnit.fromTelemetry({
+    required Map<String, String> data,
+    required int index,
+    required String pumpPin,
+    required String sensorPin,
+  }) {
     return IrrigationUnit(
-      name: json["name"] ?? "Unknown Unit",
-      pumpName: json["pumpName"] ?? "Unknown Pump",
-      sensorName: json["sensorName"] ?? "Unknown Sensor",
-      pumpStatus: json["pumpStatus"] ?? "Unknown",
-      soilHumidity: (json["soilHumidity"] as num?)?.toInt() ?? 0,
-      moistureThreshold: (json["moistureThreshold" as num?]?.toDouble() ?? 0.0),
-      waterFlowDaily: (json["waterFlowDaily"] as num?)?.toDouble() ?? 0.0,
-      waterFlowTotal: (json["waterFlowTotal"] as num?)?.toDouble() ?? 0.0,
-      waterFlowDailyMax: (json["waterFlowDailyMax"] as num?)?.toDouble() ?? 0.0,
+      name: 'Plant $index',
+      pumpName: pumpPin,
+      sensorName: sensorPin,
+      pumpStatus: _intValue(data, 'current_mode_$pumpPin'),
+      soilHumidity: _doubleValue(data, 'moisture_percent_$sensorPin'),
+      moistureThreshold: _doubleValue(data, 'moisture_threshold_$sensorPin'),
+      waterFlowDaily: _doubleValue(data, 'daily_liter_$pumpPin'),
+      waterFlowTotal: _doubleValue(data, 'total_liter_$pumpPin'),
+      waterFlowDailyMax: _doubleValue(data, 'max_liter_$pumpPin'),
     );
   }
 }
 
 class ChartReading {
   final DateTime time;
-  final Double humidity_1;
-  final Double humidity_2;
-  final Double humidity_3;
-  final Double humidity_4;
+  final List<double> humidities;
 
-
-  ChartReading({
+  const ChartReading({
     required this.time,
-    required this.humidity_1,
-    required this.humidity_2,
-    required this.humidity_3,
-    required this.humidity_4,
+    required this.humidities,
   });
 }
 
+int _intValue(Map<String, String> data, String key) {
+  return int.tryParse(data[key] ?? '') ?? 0;
+}
+
+double _doubleValue(Map<String, String> data, String key) {
+  return double.tryParse(data[key] ?? '') ?? 0.0;
+}
+
 Map<String, String> parseTelemetryText(String text) {
-  final Map<String, String> data = {};
+  final result = <String, String>{};
 
-  final parts = text.split(',');
+  for (final part in text.split(',')) {
+    final separatorIndex = part.indexOf(':');
+    if (separatorIndex == -1) continue;
 
-  for (final part in parts) {
-    final keyValue = part.trim().split(':');
+    final key = part.substring(0, separatorIndex).trim();
+    final value = part.substring(separatorIndex + 1).trim();
 
-    if (keyValue.length == 2) {
-      data[keyValue[0].trim()] = keyValue[1].trim();
+    if (key.isNotEmpty) {
+      result[key] = value;
     }
   }
 
-  return data;
+  return result;
 }
-
-void main() => runApp(const BottomNavigationBarExampleApp());
 
 class Esp32Service {
   Esp32Service._();
   static final Esp32Service instance = Esp32Service._();
 
+  static const _pumpPins = ['16', '17', '18', '19'];
+  static const _sensorPins = ['32', '33', '34', '35'];
+
   WebSocketChannel? _channel;
+
   final ValueNotifier<List<IrrigationUnit>> units = ValueNotifier([]);
-  final List<ChartReading> readings = [];
-
-
-  final ValueNotifier<String> status = ValueNotifier("Disconnected");
-  final ValueNotifier<String> message = ValueNotifier("");
+  final ValueNotifier<List<ChartReading>> readings = ValueNotifier([]);
+  final ValueNotifier<String> status = ValueNotifier('Disconnected');
+  final ValueNotifier<String> message = ValueNotifier('');
 
   bool get connected => _channel != null;
 
   Future<void> connect(String ip) async {
-    if (_channel != null) return;
-
-    try {
-      status.value = "Connecting...";
-
-      final ws = WebSocketChannel.connect(
-        Uri.parse("ws://$ip:81/"),
-      );
-
-      await ws.ready;
-
-      _channel = ws;
-      status.value = "Connected to $ip";
-
-      ws.stream.listen(
-        (data) {
-          final text = data.toString();
-          message.value = text;
-
-          final parsed = parseTelemetryText(text);
-
-          if (parsed.isNotEmpty) {
-            units.value = [
-              IrrigationUnit(
-                name: "Plant 1",
-                pumpName: "16",
-                sensorName: "32",
-                pumpStatus: int.tryParse(parsed["current_mode_16"] ?? "0") ?? 0,
-                soilHumidity: int.tryParse(parsed["moisture_percent_32"] ?? "0") ?? 0,
-                moistureThreshold: double.tryParse(parsed["moisture_threshold_32"] ?? "0") ?? 0,
-                waterFlowDaily: double.tryParse(parsed["daily_liter_16"] ?? "0") ?? 0.0,
-                waterFlowTotal: double.tryParse(parsed["total_liter_16"] ?? "0") ?? 0.0,
-                waterFlowDailyMax: double.tryParse(parsed["max_liter_16"] ?? "0") ?? 0.0,
-              ),
-              IrrigationUnit(
-                name: "Plant 2",
-                pumpName: "17",
-                sensorName: "33",
-                pumpStatus: int.tryParse(parsed["current_mode_17"] ?? "0") ?? 0,
-                soilHumidity: int.tryParse(parsed["moisture_percent_33"] ?? "0") ?? 0,
-                moistureThreshold: double.tryParse(parsed["moisture_threshold_33"] ?? "0") ?? 0,
-                waterFlowDaily: double.tryParse(parsed["daily_liter_17"] ?? "0") ?? 0.0,
-                waterFlowTotal: double.tryParse(parsed["total_liter_17"] ?? "0") ?? 0.0,
-                waterFlowDailyMax: double.tryParse(parsed["max_liter_17"] ?? "0") ?? 0.0,
-              ),
-              IrrigationUnit(
-                name: "Plant 3",
-                pumpName: "18",
-                sensorName: "34",
-                pumpStatus: int.tryParse(parsed["current_mode_18"] ?? "0") ?? 0,
-                soilHumidity: int.tryParse(parsed["moisture_percent_34"] ?? "0") ?? 0,
-                moistureThreshold: double.tryParse(parsed["moisture_threshold_34"] ?? "0") ?? 0,
-                waterFlowDaily: double.tryParse(parsed["daily_liter_18"] ?? "0") ?? 0.0,
-                waterFlowTotal: double.tryParse(parsed["total_liter_18"] ?? "0") ?? 0.0,
-                waterFlowDailyMax: double.tryParse(parsed["max_liter_18"] ?? "0") ?? 0.0,
-
-              ),
-              IrrigationUnit(
-                name: "Plant 4",
-                pumpName: "19",
-                sensorName: "35",
-                pumpStatus: int.tryParse(parsed["current_mode_19"] ?? "0") ?? 0,
-                soilHumidity: int.tryParse(parsed["moisture_percent_35"] ?? "0") ?? 0,
-                moistureThreshold: double.tryParse(parsed["moisture_threshold_35"] ?? "0") ?? 0,
-                waterFlowDaily: double.tryParse(parsed["daily_liter_19"] ?? "0") ?? 0.0,
-                waterFlowTotal: double.tryParse(parsed["total_liter_19"] ?? "0") ?? 0.0,
-                waterFlowDailyMax: double.tryParse(parsed["max_liter_19"] ?? "0") ?? 0.0,
-              ),
-            ];
-          
-            // To
-            readings.add(
-              ChartReading(
-                time: DateTime.now(),
-                humidity_1: double.tryParse(parsed["moisture_percent_32"] ?? "0") ?? 0,
-                humidity_2: double.tryParse(parsed["moisture_percent_33"] ?? "0") ?? 0,
-                humidity_3: double.tryParse(parsed["moisture_percent_34"] ?? "0") ?? 0,
-                humidity_4: double.tryParse(parsed["moisture_percent_35"] ?? "0") ?? 0,
-
-              ),
-            );
-          
-          }
-        },
-        onError: (error) {
-          _channel = null;
-          status.value = "Error: $error";
-        },
-        onDone: () {
-          _channel = null;
-          status.value = "Disconnected";
-        },
-      );
-
-    } catch (e) {
-      _channel = null;
-      status.value = "Failed: $e";
-    }
-  }
-
-  void send(String command) {
-    if (_channel == null) {
-      status.value = "Connect first";
+    final trimmedIp = ip.trim();
+    if (trimmedIp.isEmpty) {
+      status.value = 'Enter an ESP32 IP address';
       return;
     }
 
-    _channel!.sink.add(command);
-    status.value = "Sent: $command";
+    if (_channel != null) return;
+
+    try {
+      status.value = 'Connecting...';
+      final ws = WebSocketChannel.connect(Uri.parse('ws://$trimmedIp:81/'));
+      await ws.ready;
+
+      _channel = ws;
+      status.value = 'Connected to $trimmedIp';
+
+      ws.stream.listen(
+        _handleMessage,
+        onError: (Object error) {
+          _channel = null;
+          status.value = 'Error: $error';
+        },
+        onDone: () {
+          _channel = null;
+          status.value = 'Disconnected';
+        },
+      );
+    } catch (error) {
+      _channel = null;
+      status.value = 'Failed: $error';
+    }
+  }
+
+  void _handleMessage(dynamic data) {
+    final text = data.toString();
+    message.value = text;
+
+    final parsed = parseTelemetryText(text);
+    if (parsed.isEmpty) return;
+
+    final nextUnits = List<IrrigationUnit>.generate(_pumpPins.length, (i) {
+      return IrrigationUnit.fromTelemetry(
+        data: parsed,
+        index: i + 1,
+        pumpPin: _pumpPins[i],
+        sensorPin: _sensorPins[i],
+      );
+    });
+
+    units.value = nextUnits;
+
+    final nextReading = ChartReading(
+      time: DateTime.now(),
+      humidities: _sensorPins
+          .map((pin) => _doubleValue(parsed, 'moisture_percent_$pin'))
+          .toList(),
+    );
+
+    final history = [...readings.value, nextReading];
+    const maxHistoryItems = 1000;
+    readings.value = history.length > maxHistoryItems
+        ? history.sublist(history.length - maxHistoryItems)
+        : history;
+  }
+
+  void send(String command) {
+    final channel = _channel;
+    if (channel == null) {
+      status.value = 'Connect first';
+      return;
+    }
+
+    channel.sink.add(command);
+    status.value = 'Sent: $command';
   }
 
   void disconnect() {
     _channel?.sink.close();
     _channel = null;
-    status.value = "Disconnected";
-  }
-
-}
-
-class BottomNavigationBarExampleApp extends StatelessWidget {
-  const BottomNavigationBarExampleApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: BottomNavigationBarExample(),
-    );
+    status.value = 'Disconnected';
   }
 }
 
-class BottomNavigationBarExample extends StatefulWidget {
-  const BottomNavigationBarExample({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  State<BottomNavigationBarExample> createState() =>
-      _BottomNavigationBarExampleState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-class _BottomNavigationBarExampleState
-    extends State<BottomNavigationBarExample> {
+class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  static final List<Widget> _pages = <Widget>[
+  final _pages = const [
     PageHome(),
     PageCharts(),
     PageCamera(),
     PageSettings(),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Automatic Irrigation System'),
-      ),
+      appBar: AppBar(title: const Text('Automatic Irrigation System')),
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-            backgroundColor: Colors.red,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Charts',
-            backgroundColor: Colors.yellow,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera),
-            label: 'Camera',
-            backgroundColor: Colors.green,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-            backgroundColor: Colors.purple,
-          ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (index) => setState(() => _selectedIndex = index),
+        destinations: const [
+          NavigationDestination(
+              icon: Icon(Icons.home), 
+              label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.show_chart), label: 'Charts'),
+          NavigationDestination(icon: Icon(Icons.camera_alt), label: 'Camera'),
+          NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
         ],
       ),
     );
@@ -287,115 +238,68 @@ class _BottomNavigationBarExampleState
 }
 
 class PageHome extends StatelessWidget {
-  PageHome({super.key});
+  const PageHome({super.key});
 
-  final Esp32Service esp32 = Esp32Service.instance;
-  void openDetails(BuildContext context, IrrigationUnit unit) {
-    final pumpStatusController = TextEditingController(text: unit.pumpStatus.toString());
-    final maxDailyLitersController = TextEditingController(text: unit.waterFlowDailyMax.toString());
+  Esp32Service get esp32 => Esp32Service.instance;
+
+  void _openDetails(BuildContext context, IrrigationUnit unit) {
+    final modeController = TextEditingController(text: unit.pumpStatus.toString());
+    final maxLitersController = TextEditingController(text: unit.waterFlowDailyMax.toString());
     final thresholdController = TextEditingController(text: unit.moistureThreshold.toString());
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(unit.name),
-
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Pump: ${unit.pumpName}\n"
-                "Sensor: ${unit.sensorName}\n\n"
-                "Pump status: ${unit.pumpStatus}\n"
-                "Soil humidity: ${unit.soilHumidity}%\n"
-                "Moisture threshold: ${unit.moistureThreshold}%\n" 
-                "Water flow today: ${unit.waterFlowDaily} L\n"
-                "Total water flow: ${unit.waterFlowTotal} L\n"
-                "Max water flow: ${unit.waterFlowDailyMax} L"
-              ),
-
+              _DetailRow(label: 'Pump', value: unit.pumpName),
+              _DetailRow(label: 'Sensor', value: unit.sensorName),
+              _DetailRow(label: 'Mode', value: '${unit.pumpStatus}'),
+              _DetailRow(label: 'Humidity', value: '${unit.soilHumidity.toStringAsFixed(1)}%'),
+              _DetailRow(label: 'Threshold', value: '${unit.moistureThreshold.toStringAsFixed(1)}%'),
+              _DetailRow(label: 'Today', value: '${unit.waterFlowDaily.toStringAsFixed(2)} L'),
+              _DetailRow(label: 'Total', value: '${unit.waterFlowTotal.toStringAsFixed(2)} L'),
               const SizedBox(height: 20),
-
-              // Change pump setting
-              /*
-                - Set Mode
-                - Daily liters
-                - Moisture threshold
-                - Sensor calibration
-                - Manual irrigation
-              */
-
-              TextField(
-                controller: pumpStatusController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: "Change Mode" ,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
+              _NumberField(controller: modeController, label: 'Change mode'),
               const SizedBox(height: 12),
-
-
-              TextField(
-                controller: maxDailyLitersController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: "Max Daily (L)" ,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
+              _NumberField(controller: maxLitersController, label: 'Max daily liters'),
               const SizedBox(height: 12),
-
-              TextField(
-                controller: thresholdController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: "Humidity threshold (%)",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              // TODO CALIBRATION
-              
-              
+              _NumberField(controller: thresholdController, label: 'Humidity threshold (%)'),
             ],
           ),
         ),
-
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Close"),
+            child: const Text('Close'),
           ),
-
-          ElevatedButton(
+          TextButton(
+            onPressed: () => esp32.send('cmd: telem'),
+            child: const Text('Refresh'),
+          ),
+          FilledButton(
             onPressed: () {
-              final pumpStatusNew = pumpStatusController.text;
-              final maxDailyLitersNew = maxDailyLitersController.text;
-              final thresholdNew = thresholdController.text;
-
               esp32.send(
-                "cmd: config, pump: ${unit.pumpName} set_mode: $pumpStatusNew, chg_dly_ltr: $maxDailyLitersNew, chg_moi_thr: $thresholdNew",
+                'cmd: config, pump: ${unit.pumpName}, '
+                'set_mode: ${modeController.text.trim()}, '
+                'chg_dly_ltr: ${maxLitersController.text.trim()}, '
+                'chg_moi_thr: ${thresholdController.text.trim()}',
               );
-
               Navigator.pop(context);
             },
-            child: const Text("Send"),
-          ),
-
-          ElevatedButton(
-            onPressed: () {
-              esp32.send("cmd: telem");
-            },
-            child: const Text("Refresh"),
+            child: const Text('Send'),
           ),
         ],
       ),
-    );
+    ).whenComplete(() {
+      modeController.dispose();
+      maxLitersController.dispose();
+      thresholdController.dispose();
+    });
   }
 
   @override
@@ -403,85 +307,92 @@ class PageHome extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
-          "Irrigation Units",
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-        ),
-
+        Text('Irrigation Units', style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 16),
-
-        ElevatedButton(
-          onPressed: () {
-            esp32.send("cmd: telem");
-          },
-          child: const Text("Refresh Telemetry"),
+        FilledButton.icon(
+          onPressed: () => esp32.send('cmd: telem'),
+          icon: const Icon(Icons.refresh),
+          label: const Text('Refresh telemetry'),
         ),
-
         const SizedBox(height: 16),
-
         ValueListenableBuilder<List<IrrigationUnit>>(
           valueListenable: esp32.units,
           builder: (_, units, __) {
             if (units.isEmpty) {
-              return const Text(
-                "No telemetry yet. Connect in Settings, then press Refresh Telemetry.",
-                style: TextStyle(fontSize: 16),
-              );
+              return const Text('No telemetry yet. Connect in Settings, then press Refresh telemetry.');
             }
 
             return Column(
               children: units.map((unit) {
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 14),
+                  margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
-                    leading: const Icon(Icons.water_drop),
-                    title: Text(
-                      unit.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    leading: Icon(
+                      unit.pumpStatus == 1 ? Icons.water_drop : Icons.water_drop_outlined,
                     ),
+                    title: Text(unit.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text(
-                      "${unit.pumpName}: ${unit.pumpStatus}\n"
-                      "${unit.sensorName}: ${unit.soilHumidity}%\n"
-                      "Flow: ${unit.waterFlowDaily} L/Day",
+                      'Pump ${unit.pumpName}: mode ${unit.pumpStatus}\n'
+                      'Sensor ${unit.sensorName}: ${unit.soilHumidity.toStringAsFixed(1)}%\n'
+                      'Flow today: ${unit.waterFlowDaily.toStringAsFixed(2)} L',
                     ),
                     isThreeLine: true,
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () => openDetails(context, unit),
+                    onTap: () => _openDetails(context, unit),
                   ),
                 );
               }).toList(),
             );
           },
         ),
-
         const SizedBox(height: 16),
-
-        ValueListenableBuilder(
+        ValueListenableBuilder<String>(
           valueListenable: esp32.message,
-          builder: (_, value, __) {
-            return Text(
-              "Last ESP32 message: $value",
-              style: const TextStyle(fontSize: 16),
-            );
-          },
+          builder: (_, value, __) => Text('Last ESP32 message: $value'),
         ),
       ],
     );
   }
 }
 
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
 
+  const _DetailRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Text('$label: $value'),
+    );
+  }
+}
+
+class _NumberField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+
+  const _NumberField({required this.controller, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+    );
+  }
+}
 
 enum ChartRange { hour, day, week, month }
 
-
 class PageCharts extends StatefulWidget {
-  final List<ChartReading> readings;
-
-  const PageCharts({
-    super.key,
-    required this.readings,
-  });
+  const PageCharts({super.key});
 
   @override
   State<PageCharts> createState() => _PageChartsState();
@@ -489,7 +400,6 @@ class PageCharts extends StatefulWidget {
 
 class _PageChartsState extends State<PageCharts> {
   ChartRange selectedRange = ChartRange.day;
-
 
   Duration get selectedDuration {
     switch (selectedRange) {
@@ -504,111 +414,88 @@ class _PageChartsState extends State<PageCharts> {
     }
   }
 
-  List<ChartReading> get filteredReadings {
-    final from = DateTime.now().subtract(selectedDuration);
-
-    return widget.readings.where((reading) {
-      return reading.time.isAfter(from);
-    }).toList();
-  }
-
-  List<FlSpot> getHumiditySpots(int sensor) {
-    final from = DateTime.now().subtract(selectedDuration);
-
-    return filteredReadings.map((reading) {
-      final x = reading.time.difference(from).inMinutes.toDouble();
-      return FlSpot(x, reading.humidity_1);
-    }).toList();
-  }
-
-
   double get maxX => selectedDuration.inMinutes.toDouble();
+
+  List<ChartReading> _filteredReadings(List<ChartReading> readings) {
+    final from = DateTime.now().subtract(selectedDuration);
+    return readings.where((reading) => reading.time.isAfter(from)).toList();
+  }
+
+  List<FlSpot> _humiditySpots(List<ChartReading> readings, int sensorIndex) {
+    final from = DateTime.now().subtract(selectedDuration);
+
+    return readings.where((reading) => reading.humidities.length > sensorIndex).map((reading) {
+      final x = reading.time.difference(from).inMinutes.toDouble();
+      return FlSpot(x, reading.humidities[sensorIndex]);
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final esp32 = Esp32Service.instance;
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           SegmentedButton<ChartRange>(
             segments: const [
-              ButtonSegment(
-                value: ChartRange.hour,
-                label: Text("1h"),
-              ),
-              ButtonSegment(
-                value: ChartRange.day,
-                label: Text("1d"),
-              ),
-              ButtonSegment(
-                value: ChartRange.week,
-                label: Text("1w"),
-              ),
-              ButtonSegment(
-                value: ChartRange.month,
-                label: Text("1m"),
-              ),
+              ButtonSegment(value: ChartRange.hour, label: Text('1h')),
+              ButtonSegment(value: ChartRange.day, label: Text('1d')),
+              ButtonSegment(value: ChartRange.week, label: Text('1w')),
+              ButtonSegment(value: ChartRange.month, label: Text('1m')),
             ],
             selected: {selectedRange},
-            onSelectionChanged: (value) {
-              setState(() {
-                selectedRange = value.first;
-              });
-            },
+            onSelectionChanged: (value) => setState(() => selectedRange = value.first),
           ),
-
           const SizedBox(height: 20),
-
           Expanded(
-            child: LineChart(
-              LineChartData(
-                minY: 0,
-                maxY: 100,
-                minX: 0,
-                maxX: maxX,
+            child: ValueListenableBuilder<List<ChartReading>>(
+              valueListenable: esp32.readings,
+              builder: (_, allReadings, __) {
+                final readings = _filteredReadings(allReadings);
 
-                gridData: const FlGridData(show: true),
+                if (readings.isEmpty) {
+                  return const Center(child: Text('No chart data yet. Refresh telemetry first.'));
+                }
 
-                titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  leftTitles: const AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      interval: 20,
+                return LineChart(
+                  LineChartData(
+                    minY: 0,
+                    maxY: 100,
+                    minX: 0,
+                    maxX: maxX,
+                    gridData: const FlGridData(show: true),
+                    titlesData: FlTitlesData(
+                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: true, reservedSize: 40, interval: 20),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 32,
+                          interval: maxX / 4,
+                          getTitlesWidget: (value, _) => Text(_bottomLabel(value)),
+                        ),
+                      ),
                     ),
+                    lineBarsData: List.generate(4, (index) {
+                      return LineChartBarData(
+                        spots: _humiditySpots(readings, index),
+                        isCurved: true,
+                        barWidth: 3,
+                        dotData: const FlDotData(show: false),
+                      );
+                    }),
                   ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      interval: maxX / 4,
-                      getTitlesWidget: (value, meta) {
-                        return Text(_bottomLabel(value));
-                      },
-                    ),
-                  ),
-                ),
-
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: getHumiditySpots(),
-                    isCurved: true,
-                    barWidth: 3,
-                    dotData: const FlDotData(show: false),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
           ),
-
           const SizedBox(height: 12),
-
-          const Text("Humidity and daily liters over time"),
+          const Text('Soil humidity over time'),
         ],
       ),
     );
@@ -617,13 +504,12 @@ class _PageChartsState extends State<PageCharts> {
   String _bottomLabel(double value) {
     switch (selectedRange) {
       case ChartRange.hour:
-        return "${value.toInt()}m";
+        return '${value.toInt()}m';
       case ChartRange.day:
-        return "${(value / 60).toInt()}h";
+        return '${(value / 60).toInt()}h';
       case ChartRange.week:
-        return "${(value / 1440).toInt()}d";
       case ChartRange.month:
-        return "${(value / 1440).toInt()}d";
+        return '${(value / 1440).toInt()}d';
     }
   }
 }
@@ -634,10 +520,7 @@ class PageCamera extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text(
-        'Camera Page',
-        style: TextStyle(fontSize: 30),
-      ),
+      child: Text('Camera Page', style: TextStyle(fontSize: 30)),
     );
   }
 }
@@ -650,22 +533,8 @@ class PageSettings extends StatefulWidget {
 }
 
 class _PageSettingsState extends State<PageSettings> {
-  final Esp32Service esp32 = Esp32Service.instance;
-
-  final TextEditingController ipController =
-      TextEditingController(text: "10.150.65.208");
-
-  void connectToEsp32() {
-    esp32.connect(ipController.text.trim());
-  }
-
-  void sendCommand(String command) {
-    esp32.send(command);
-  }
-
-  void disconnect() {
-    esp32.disconnect();
-  }
+  final esp32 = Esp32Service.instance;
+  final ipController = TextEditingController(text: '10.69.106.208');
 
   @override
   void dispose() {
@@ -678,72 +547,40 @@ class _PageSettingsState extends State<PageSettings> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
-          "Wi-Fi ESP32 Connection",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-
+        Text('Wi-Fi ESP32 Connection', style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 16),
-
         TextField(
           controller: ipController,
           decoration: const InputDecoration(
-            labelText: "ESP32 IP Address",
+            labelText: 'ESP32 IP address',
             border: OutlineInputBorder(),
           ),
         ),
-
         const SizedBox(height: 16),
-
-        ElevatedButton.icon(
-          onPressed: connectToEsp32,
+        FilledButton.icon(
+          onPressed: () => esp32.connect(ipController.text),
           icon: const Icon(Icons.wifi),
-          label: const Text("Connect"),
+          label: const Text('Connect'),
         ),
-
         const SizedBox(height: 12),
-
-        ElevatedButton(
-          onPressed: () => sendCommand("cmd: telem"),
-          child: const Text("Send get_telem"),
+        OutlinedButton(
+          onPressed: () => esp32.send('cmd: telem'),
+          child: const Text('Request telemetry'),
         ),
-
         const SizedBox(height: 12),
-
-        ElevatedButton(
-          onPressed: () => sendCommand("LED_OFF"),
-          child: const Text("Send LED_OFF"),
+        OutlinedButton(
+          onPressed: esp32.disconnect,
+          child: const Text('Disconnect'),
         ),
-
-        const SizedBox(height: 12),
-
-        ElevatedButton(
-          onPressed: disconnect,
-          child: const Text("Disconnect"),
-        ),
-
         const SizedBox(height: 24),
-
-        ValueListenableBuilder(
+        ValueListenableBuilder<String>(
           valueListenable: esp32.status,
-          builder: (_, value, __) {
-            return Text(
-              "Status: $value",
-              style: const TextStyle(fontSize: 18),
-            );
-          },
+          builder: (_, value, __) => Text('Status: $value'),
         ),
-
         const SizedBox(height: 12),
-
-        ValueListenableBuilder(
+        ValueListenableBuilder<String>(
           valueListenable: esp32.message,
-          builder: (_, value, __) {
-            return Text(
-              "ESP32 says: $value",
-              style: const TextStyle(fontSize: 18),
-            );
-          },
+          builder: (_, value, __) => Text('ESP32 says: $value'),
         ),
       ],
     );
