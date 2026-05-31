@@ -63,6 +63,12 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
       return;
     }
 
+    if(command == "UPDT_FIRM")
+    {
+      comms.updateFirmware();
+      status = true;
+    }
+
     if(command == "CONFIG")
     {
       String pump_id = ""; 

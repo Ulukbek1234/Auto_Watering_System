@@ -23,6 +23,7 @@ public:
     String read(COMMS_TYPE comms_type);
     void write(String output, COMMS_TYPE type);
     HardwareSerial* getSource();
+    void updateFirmware();
 };
 
 #endif

@@ -41,3 +41,7 @@ void Comms::write(String output, COMMS_TYPE type)
     }
 }
 
+void Comms::updateFirmware()
+{
+    web.updateFirmware();
+}
