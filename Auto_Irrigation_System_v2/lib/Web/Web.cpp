@@ -67,3 +67,41 @@ void Web::write(String output) {
   web_socket->sendTXT(local_client, output);
   
 }
+
+
+void Web::updateFirmware() {
+  WiFiClientSecure client;
+  client.setInsecure(); // easier, but not ideal for production
+
+  HTTPClient http;
+  http.begin(client, firmwareUrl);
+
+  int httpCode = http.GET();
+  if (httpCode != HTTP_CODE_OK) {
+    Serial.printf("HTTP error: %d\n", httpCode);
+    http.end();
+    return;
+  }
+
+  int contentLength = http.getSize();
+
+  if (!Update.begin(contentLength)) {
+    Serial.println("Not enough space for OTA");
+    http.end();
+    return;
+  }
+
+  WiFiClient* stream = http.getStreamPtr();
+  size_t written = Update.writeStream(*stream);
+
+  if (written == contentLength && Update.end()) {
+    if (Update.isFinished()) {
+      Serial.println("Update complete. Rebooting...");
+      ESP.restart();
+    }
+  } else {
+    Serial.printf("Update failed: %s\n", Update.errorString());
+  }
+
+  http.end();
+}
