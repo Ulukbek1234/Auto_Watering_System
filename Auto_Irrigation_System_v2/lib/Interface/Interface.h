@@ -16,7 +16,6 @@ EE_Data_t *eeprom_data;
 
 public:
     Interface(EE_Data_t eeprom_data_param);
-    
     void commandHandler(String serial_input, COMMS_TYPE type);
     void startAutoIrrigation();
     void updateDay();

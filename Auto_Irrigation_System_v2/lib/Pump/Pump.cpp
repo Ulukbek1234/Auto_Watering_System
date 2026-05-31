@@ -1,11 +1,12 @@
 #include "Pump.h"
 
 
-Pump::Pump(int pin, float max_liters) 
+Pump::Pump(int pin, float max_liters_ee, float total_liters_ee) 
 {
     // Construct Pump
     this->pin = pin;
-    this->max_liters = max_liters;
+    this->max_liters = max_liters_ee;
+    this->total_liter = total_liters_ee;
     this->limit_reached = false;
     // this->total_liter = ee_total_liters;
     pinMode(pin, OUTPUT);

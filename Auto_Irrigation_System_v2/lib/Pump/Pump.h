@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Arduino.h"
-#include <Config.h>
+#include <Utils.h>
 
 #define PUMP_ON 0
 #define PUMP_OFF 1
@@ -21,7 +21,7 @@ private:
     bool limit_reached = false;
 
 public:
-    Pump(int pin, float max_liters);
+    Pump(int pin, float max_liters_ee, float total_liters_ee);
     void turnOnPump(float liters, bool override);
     void deactivatePump();
     void activatePump();

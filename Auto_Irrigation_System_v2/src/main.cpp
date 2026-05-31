@@ -1,8 +1,7 @@
-#include <Zone.h>
 #include <Utils.h>
-#include <Config.h>
-#include <Interface.h>
 #include <Preferences.h>
+#include <Zone.h>
+#include <Interface.h>
 
 unsigned long start_time = 0;
 const unsigned long wait_time = 60000; // 1 minute

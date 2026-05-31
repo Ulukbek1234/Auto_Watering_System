@@ -599,6 +599,11 @@ class _PageSettingsState extends State<PageSettings> {
         ),
         const SizedBox(height: 12),
         OutlinedButton(
+          onPressed: () => esp32.send('cmd: sav_eep'),
+          child: const Text('Save to EEPROM'),
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton(
           onPressed: esp32.disconnect,
           child: const Text('Disconnect'),
         ),

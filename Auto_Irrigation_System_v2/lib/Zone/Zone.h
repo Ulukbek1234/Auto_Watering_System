@@ -7,17 +7,10 @@
 #include <SoilSensor.h>
 #include <WaterLevelSensor.h>
 #include <Utils.h>
-#include <Config.h>
 // #include "EEPROMEx.h"
 
-const int ARRAY_SIZE = 8;
+const int ARRAY_SIZE = 4;
 
-enum OperationModes {
-    MODE_OFF = 0,
-    MODE_MANUAL = 1, // Manual control from master, (which pump, how much)
-    MODE_FLOOD = 2, // Floods tray of pot, until max daily limit reached (also use water level sensor for dry back)
-    MODE_SOIL = 3 // Automatic based on soil moisture
-};
 
 class Zone 
 {
@@ -42,8 +35,9 @@ private:
 
 public:
     Zone(int id);
-
-    void addPump(int pin, float max_liter);
+    
+    void addEEPROMData(EE_Data_t eeprom_data);
+    void addPump(int pin, float max_liter, float total_liters);
     void addSoilSensor(uint8_t pin, int cali_air, int cali_water);
     void addWaterLevelSensor(uint8_t pin);
     void startAutoIrrigation();

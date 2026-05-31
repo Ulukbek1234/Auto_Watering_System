@@ -3,22 +3,20 @@
 Zone::Zone(int id) : zone_id(id)
 {
     // Construct Pump
-
-    // EEPROM.get(absolute_offset, eeprom_total_day_progressed);
-    // absolute_offset += 4;
-
-    // for(int i = 0; i < 4; i++)
-    // {
-    //     EEPROM.get(absolute_offset, eeprom_values[i]);
-    //     absolute_offset += 4;
-    // }
-    // eeprom_offset_end = absolute_offset;
 }
 
-void Zone::addPump(int pin, float max_liters)
+void Zone::addEEPROMData(EE_Data_t eeprom_data)
 {
-    pumps[nr_pumps++] = new Pump(pin, max_liters);
-    // EEPROM.getAddress();
+    for(int i = 0; i < nr_pumps; i++)
+    {
+        MOISTURE_THRESHOLD[i] = eeprom_data.moisture_threshold[i];
+        current_mode[i] = static_cast<OperationModes>(eeprom_data.pump_mode[i]);
+    }
+}
+
+void Zone::addPump(int pin, float max_liters, float total_liters)
+{
+    pumps[nr_pumps++] = new Pump(pin, max_liters, total_liters);
 }
 
 void Zone::addSoilSensor(uint8_t pin, int cali_air, int cali_water)
@@ -199,14 +197,14 @@ void Zone::manualIrrigation(int pump_id, float amount)
 
 void Zone::saveToEEPROM(EE_Data_t *eeprom_data)
 {
-    for(int i = 0; i < nr_soil_sensors; i++)
+    for(int i = 0; i < nr_pumps; i++)
     {
         eeprom_data->cali_air[i] = soil_sensors[i]->getCaliAir();
         eeprom_data->cali_water[i] = soil_sensors[i]->getCaliWater();
-    }
-    for(int i = 0; i < nr_pumps; i++)
-    {
         eeprom_data->total_liters[i] = pumps[i]->getTotalLiter();
+        eeprom_data->max_liters[i] = pumps[i]->getMaxLiter();
+        eeprom_data->moisture_threshold[i] = MOISTURE_THRESHOLD[i];
+        eeprom_data->pump_mode[i] = current_mode[i];
     }
 }
 
