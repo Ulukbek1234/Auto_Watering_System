@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:async';
 
 void main() => runApp(const IrrigationApp());
 
@@ -107,6 +108,7 @@ class Esp32Service {
   static const _sensorPins = ['32', '33', '34', '35'];
 
   WebSocketChannel? _channel;
+  Timer? _telemetryTimer;
 
   final ValueNotifier<List<IrrigationUnit>> units = ValueNotifier([]);
   final ValueNotifier<List<ChartReading>> readings = ValueNotifier([]);
@@ -131,15 +133,19 @@ class Esp32Service {
 
       _channel = ws;
       status.value = 'Connected to $trimmedIp';
+      send("cmd: telem");
+      _startTelemetryPolling();
 
       ws.stream.listen(
         _handleMessage,
         onError: (Object error) {
           _channel = null;
+          _stopTelemetryPolling();
           status.value = 'Error: $error';
         },
         onDone: () {
           _channel = null;
+          _stopTelemetryPolling();
           status.value = 'Disconnected';
         },
       );
@@ -147,6 +153,24 @@ class Esp32Service {
       _channel = null;
       status.value = 'Failed: $error';
     }
+  }
+
+  void _startTelemetryPolling() {
+    _telemetryTimer?.cancel();
+
+    _telemetryTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) {
+        if (_channel != null) {
+          send("cmd: telem");
+        }
+      },
+    );
+  }
+
+  void _stopTelemetryPolling() {
+    _telemetryTimer?.cancel();
+    _telemetryTimer = null;
   }
 
   void _handleMessage(dynamic data) {
@@ -193,6 +217,7 @@ class Esp32Service {
   }
 
   void disconnect() {
+    _stopTelemetryPolling();
     _channel?.sink.close();
     _channel = null;
     status.value = 'Disconnected';
