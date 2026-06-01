@@ -26,6 +26,10 @@ public:
     int getMoistureRaw() {return moisture_raw;};
     int getCaliWater() {return cali_water_raw;};
     int getCaliAir() {return cali_air_raw;};
+
+    void setCaliAir(int new_cali_air) {cali_air_raw = new_cali_air;};
+    void setCaliWater(int new_cali_water) {cali_water_raw = new_cali_water;};
+
 };
 
 #endif

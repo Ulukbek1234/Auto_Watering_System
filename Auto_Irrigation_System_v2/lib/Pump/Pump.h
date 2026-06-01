@@ -35,6 +35,8 @@ public:
     float getTotalLiter() {return total_liter;};
     float getMaxLiter() {return max_liters;};
     int getIsActive() {return is_active;};
+
+    void setTotalLiters(float new_total_liters) {total_liter = new_total_liters;};
 };
 
 #endif

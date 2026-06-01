@@ -13,19 +13,19 @@ void setup() {
   
   // Memory load
   Preferences prefs;
-  prefs.begin("EE_Data");
+  prefs.begin("settings");
   // EEPROM 
-  EE_Data_t eeprom_data;
+  EE_Data_t *eeprom_data;
     
   // Read the data back
-  size_t schLen = prefs.getBytesLength("EE_Data");
-  char buffer[schLen];
-  prefs.getBytes("EE_Data", buffer, schLen);
+  if(prefs.isKey("EE_Data") && prefs.getBytesLength("EE_Data") == sizeof(EE_Data_t)) {
+    prefs.getBytes("EE_Data", eeprom_data, sizeof(EE_Data_t));
+  } 
+  else {
+    eeprom_data = new EE_Data_t();
+  }
   
-  // Cast the buffer back to the struct type
-  EE_Data_t *retrieved = (EE_Data_t *)buffer;
-  eeprom_data = *retrieved;
-  interface = new Interface(eeprom_data);
+  interface = new Interface(*eeprom_data);
   prefs.end();
 
   start_time = millis();

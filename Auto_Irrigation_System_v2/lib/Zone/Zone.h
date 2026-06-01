@@ -36,7 +36,10 @@ private:
 public:
     Zone(int id);
     
-    void addEEPROMData(EE_Data_t eeprom_data);
+    void saveToEEPROMData(EE_Data_t *eeprom_data);
+    void saveFromEEPROMData(EE_Data_t *eeprom_data);
+    void resetEEPROM();
+
     void addPump(int pin, float max_liter, float total_liters);
     void addSoilSensor(uint8_t pin, int cali_air, int cali_water);
     void addWaterLevelSensor(uint8_t pin);
@@ -48,10 +51,8 @@ public:
     void setOperationMode(OperationModes mode, int pump_id);
     void updateSensors();
     void manualIrrigation(int pump_id, float amount);
-    void saveToEEPROM(EE_Data_t *eeprom_data);
     void changeDailyLimit(int pump_id, float new_limit);
     void changeMoistureThreshold(float new_limit, int pump_id);
-    void resetEEPROM();
     bool caliSoilInAir(int soil_pin);
     bool caliSoilInWater(int soil_pin);
 

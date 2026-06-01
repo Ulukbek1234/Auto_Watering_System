@@ -67,7 +67,7 @@ typedef struct
   float total_liters[4] = {0.0, 0.0, 0.0, 0.0};
   float max_liters[4] = {0.0, 0.0, 0.0, 0.0};
   float moisture_threshold[4] = {0.0, 0.0, 0.0, 0.0};
-  int pump_mode[4] = {MODE_OFF, MODE_OFF, MODE_OFF, MODE_OFF};
+  int pump_mode[4] = {0, 0, 0, 0};
 } EE_Data_t;
 
 class Utils 

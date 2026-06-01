@@ -12,7 +12,6 @@ Interface::Interface(EE_Data_t eeprom_data_param) : comms(), zone(0)
   zone.addSoilSensor(HUM_SNS_1, eeprom_data->cali_air[1], eeprom_data->cali_water[1]);
   zone.addSoilSensor(HUM_SNS_2, eeprom_data->cali_air[2], eeprom_data->cali_water[2]);
   zone.addSoilSensor(HUM_SNS_3, eeprom_data->cali_air[3], eeprom_data->cali_water[3]);
-  zone.addEEPROMData(eeprom_data_param);
 }
 
 /*
@@ -85,11 +84,23 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
 
 bool Interface::handleSaveEEPROM()
 {
-  zone.saveToEEPROM(eeprom_data);
+  EE_Data_t *eeprom_data = new EE_Data_t;
+  zone.saveToEEPROMData(eeprom_data);
+
   Preferences prefs;
-  prefs.begin("EE_Data");
-  // Store the struct as bytes
-  prefs.putBytes("EE_Data", &eeprom_data, sizeof(eeprom_data));
+  prefs.begin("settings");
+
+  if(prefs.isKey("EE_Data") && prefs.getBytesLength("EE_Data") == sizeof(EE_Data_t))
+  {
+      prefs.putBytes("EE_Data",
+                    &eeprom_data,
+                    sizeof(EE_Data_t));
+  }
+  else
+  {
+      Serial.println("Using default settings");
+  }
+
   prefs.end();
   return true;
 }

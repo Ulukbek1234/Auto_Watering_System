@@ -5,13 +5,50 @@ Zone::Zone(int id) : zone_id(id)
     // Construct Pump
 }
 
-void Zone::addEEPROMData(EE_Data_t eeprom_data)
+void Zone::saveToEEPROMData(EE_Data_t *eeprom_data)
 {
     for(int i = 0; i < nr_pumps; i++)
     {
-        MOISTURE_THRESHOLD[i] = eeprom_data.moisture_threshold[i];
-        current_mode[i] = static_cast<OperationModes>(eeprom_data.pump_mode[i]);
+        eeprom_data->cali_air[i] = soil_sensors[i]->getCaliAir();
+        eeprom_data->cali_water[i] = soil_sensors[i]->getCaliWater();
+        eeprom_data->total_liters[i] = pumps[i]->getTotalLiter();
+        eeprom_data->max_liters[i] = pumps[i]->getMaxLiter();
+        eeprom_data->moisture_threshold[i] = MOISTURE_THRESHOLD[i];
+        eeprom_data->pump_mode[i] = current_mode[i];
     }
+}
+
+void Zone::saveFromEEPROMData(EE_Data_t *eeprom_data)
+{
+    for(int i = 0; i < nr_pumps; i++)
+    {
+        // TODO, is this necessary?
+        // soil_sensors[i]->setCaliAir(eeprom_data->cali_air[i]); 
+        // soil_sensors[i]->setCaliWater(eeprom_data->cali_water[i]); 
+        // pumps[i]->setTotalLiters(eeprom_data->total_liters[i]); 
+        // pumps[i]->updateMaxLiters(eeprom_data->max_liters[i]); 
+        // MOISTURE_THRESHOLD[i] = eeprom_data->moisture_threshold[i]; 
+        // current_mode[i] = static_cast<OperationModes> *eeprom_data->pump_mode[i]; 
+    }
+}
+
+
+void Zone::resetEEPROM()
+{
+    // int offset = eeprom_offset_start;
+    // eeprom_total_day_progressed = 0.0;
+
+    // EEPROM.put(offset, 0);
+    // offset += 4;
+
+    // for(int i = 0; i < nr_pumps; i++)
+    // {
+    //     // 4 byte offset from total_day_progressed
+    //     // increment by float size
+    //     eeprom_values[i] = 0.0;
+    //     EEPROM.put(offset + (i * 4), 0.0);
+    //     offset += 4;
+    // }
 }
 
 void Zone::addPump(int pin, float max_liters, float total_liters)
@@ -195,36 +232,7 @@ void Zone::manualIrrigation(int pump_id, float amount)
     }
 }
 
-void Zone::saveToEEPROM(EE_Data_t *eeprom_data)
-{
-    for(int i = 0; i < nr_pumps; i++)
-    {
-        eeprom_data->cali_air[i] = soil_sensors[i]->getCaliAir();
-        eeprom_data->cali_water[i] = soil_sensors[i]->getCaliWater();
-        eeprom_data->total_liters[i] = pumps[i]->getTotalLiter();
-        eeprom_data->max_liters[i] = pumps[i]->getMaxLiter();
-        eeprom_data->moisture_threshold[i] = MOISTURE_THRESHOLD[i];
-        eeprom_data->pump_mode[i] = current_mode[i];
-    }
-}
 
-void Zone::resetEEPROM()
-{
-    // int offset = eeprom_offset_start;
-    // eeprom_total_day_progressed = 0.0;
-
-    // EEPROM.put(offset, 0);
-    // offset += 4;
-
-    // for(int i = 0; i < nr_pumps; i++)
-    // {
-    //     // 4 byte offset from total_day_progressed
-    //     // increment by float size
-    //     eeprom_values[i] = 0.0;
-    //     EEPROM.put(offset + (i * 4), 0.0);
-    //     offset += 4;
-    // }
-}
 
 void Zone::changeDailyLimit(int pump_id, float new_limit)
 {
