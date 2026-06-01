@@ -267,7 +267,50 @@ class PageHome extends StatelessWidget {
 
   Esp32Service get esp32 => Esp32Service.instance;
 
-  void _openDetails(BuildContext context, IrrigationUnit unit) {
+  void _openSplash(BuildContext context, IrrigationUnit unit) {
+    final amountController = TextEditingController(text: "0.1");
+
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(unit.name),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _DetailRow(label: 'Pump', value: unit.pumpName),
+              _DetailRow(label: 'Today', value: '${unit.waterFlowDaily.toStringAsFixed(2)} L'),
+              _DetailRow(label: 'Total', value: '${unit.waterFlowTotal.toStringAsFixed(2)} L'),
+              const SizedBox(height: 20),
+              _NumberField(controller: amountController, label: 'Splash Amount'),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          FilledButton(
+            onPressed: () {
+              esp32.send(
+                'cmd: man_irr, pump: ${unit.pumpName}, '
+                'amount: ${amountController.text.trim()}, '
+              );
+              Navigator.pop(context);
+            },
+            child: const Text('Send'),
+          ),
+        ],
+      ),
+    ).whenComplete(() {
+      amountController.dispose();
+    });
+  }
+
+  void _openConfig(BuildContext context, IrrigationUnit unit) {
     final modeController = TextEditingController(text: unit.pumpStatus.toString());
     final maxLitersController = TextEditingController(text: unit.waterFlowDailyMax.toString());
     final thresholdController = TextEditingController(text: unit.moistureThreshold.toString());
@@ -301,10 +344,6 @@ class PageHome extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Close'),
-          ),
-          TextButton(
-            onPressed: () => esp32.send('cmd: telem'),
-            child: const Text('Refresh'),
           ),
           FilledButton(
             onPressed: () {
@@ -343,27 +382,58 @@ class PageHome extends StatelessWidget {
         ValueListenableBuilder<List<IrrigationUnit>>(
           valueListenable: esp32.units,
           builder: (_, units, __) {
-            if (units.isEmpty) {
-              return const Text('No telemetry yet. Connect in Settings, then press Refresh telemetry.');
-            }
+            final visibleUnits = units.isEmpty
+                ? [
+                    IrrigationUnit(
+                      name: 'Pump -1',
+                      pumpName: '-1',
+                      sensorName: '-1',
+                      pumpStatus:-1,
+                      soilHumidity: 0,
+                      moistureThreshold: 0,
+                      waterFlowDaily: 0,
+                      waterFlowDailyMax: 0,
+                      waterFlowTotal: 0,
+                    ),
+                  ]
+                : units;
 
             return Column(
-              children: units.map((unit) {
+              children: visibleUnits.map((unit) {
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
                     leading: Icon(
-                      unit.pumpStatus == 1 ? Icons.water_drop : Icons.water_drop_outlined,
+                      unit.pumpStatus == 3
+                          ? Icons.water_drop
+                          : Icons.water_drop_outlined,
                     ),
-                    title: Text(unit.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    title: Text(
+                      unit.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     subtitle: Text(
                       'Pump ${unit.pumpName}: mode ${unit.pumpStatus}\n'
                       'Sensor ${unit.sensorName}: ${unit.soilHumidity.toStringAsFixed(1)}%\n'
                       'Flow today: ${unit.waterFlowDaily.toStringAsFixed(2)} L',
                     ),
                     isThreeLine: true,
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => _openDetails(context, unit),
+                    trailing: PopupMenuButton<String>(
+                      onSelected: (cmd) {
+                        switch (cmd) {
+                          case 'config':
+                            _openConfig(context, unit);
+                            break;
+                          case 'splash':
+                            _openSplash(context, unit);
+                            break;
+                        }
+                      },
+                      itemBuilder: (_) => const [
+                        PopupMenuItem(value: 'config', child: Text('Config')),
+                        PopupMenuItem(value: 'splash', child: Text('Splash')),
+                      ],
+                    ),
                   ),
                 );
               }).toList(),
@@ -601,6 +671,11 @@ class _PageSettingsState extends State<PageSettings> {
         OutlinedButton(
           onPressed: () => esp32.send('cmd: sav_eep'),
           child: const Text('Save to EEPROM'),
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton(
+          onPressed: () => esp32.send('cmd: rst_eep'),
+          child: const Text('Reset EEPROM'),
         ),
         const SizedBox(height: 12),
         OutlinedButton(
