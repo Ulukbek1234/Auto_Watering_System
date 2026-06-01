@@ -23,15 +23,15 @@ private:
     float day_exact = 0.0;
     float total_day_progressed = 0.0;
     float eeprom_total_day_progressed = 0.0;
-    float moisture_percent[ARRAY_SIZE] = {0.0f, 0.0f, 0.0f, 0.0f};
-    float water_level_percent[ARRAY_SIZE] = {0.0f, 0.0f, 0.0f, 0.0f};
-    float MOISTURE_THRESHOLD[ARRAY_SIZE] = {50.0, 50.0, 50.0, 50.0};
+    float moisture_percent[ARRAY_SIZE] = {0.0, 0.0, 0.0, 0.0};
+    float water_level_percent[ARRAY_SIZE] = {0.0, 0.0, 0.0, 0.0};
+    float moisture_threshold[ARRAY_SIZE] = {50.0, 50.0, 50.0, 50.0}; 
     
     Pump *pumps[ARRAY_SIZE]; 
     SoilSensor *soil_sensors[ARRAY_SIZE];
     WaterLevelSensor *water_level_sensors[ARRAY_SIZE];
     
-    OperationModes current_mode[ARRAY_SIZE] = {MODE_MANUAL, MODE_MANUAL, MODE_MANUAL, MODE_MANUAL};
+    OperationModes current_mode = MODE_OFF; 
 
 public:
     Zone(int id);
@@ -50,7 +50,7 @@ public:
     void manualIrrigation(int pump_id, float amount);
     void saveToEEPROM(EE_Data_t *eeprom_data);
     void changeDailyLimit(int pump_id, float new_limit);
-    void changeMoistureThreshold(float new_limit, int pump_id);
+    void changeMoistureThreshold(int pump_id, float new_threshold);
     void resetEEPROM();
     bool caliSoilInAir(int soil_pin);
     bool caliSoilInWater(int soil_pin);

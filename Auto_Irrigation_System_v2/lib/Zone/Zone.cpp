@@ -100,6 +100,21 @@ String Zone::getData()
     data_names[index] = "total_days";
     data_values[index++] = String(total_day_progressed, NR_DEC_POINTS);
 
+    data_names[index] = "current_mode_" + String(zone_id);
+    data_values[index++] = current_mode;
+
+    
+    for (int i = 0; i < nr_soil_sensors; i++)
+    {
+        soil_sensors[i]->checkRawValues();
+        String soil_pin = String(soil_sensors[i]->getPin());
+        data_names[index] = "moisture_percent_" + soil_pin;
+        data_values[index++] = soil_sensors[i]->getMoisturePercent();
+        data_names[index] = "moisture_raw_" + soil_pin;
+        data_values[index++] = soil_sensors[i]->getMoistureRaw(); 
+        data_names[index] = "moisture_threshold_" + soil_pin;
+        data_values[index++] = moisture_threshold[i];
+    }
 
     for (int i = 0; i < nr_pumps; i++)
     {
@@ -237,14 +252,13 @@ void Zone::changeDailyLimit(int pump_id, float new_limit)
     }
 }
 
-void Zone::changeMoistureThreshold(float new_limit, int pump_id)
+void Zone::changeMoistureThreshold(int pump_id, float new_threshold)
 {
     for(int i = 0; i < nr_pumps; i++)
     {
-        if(pumps[i]->getPin() == pump_id)
-        {
-            MOISTURE_THRESHOLD[i] = new_limit;
-
+        if(pumps[i]->getPin() == pump_id){
+            moisture_threshold[i] = new_threshold;
+            return;
         }
     }
 }
