@@ -25,13 +25,11 @@ void setup() {
   // Cast the buffer back to the struct type
   EE_Data_t *retrieved = (EE_Data_t *)buffer;
   eeprom_data = *retrieved;
-  
-  
   interface = new Interface(eeprom_data);
-  DEBUG_PRINTLN("Running on ESP32");
-  
   prefs.end();
+
   start_time = millis();
+  DEBUG_PRINTLN("Running on ESP32");
 }
 
 

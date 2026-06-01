@@ -17,6 +17,12 @@ EE_Data_t *eeprom_data;
 public:
     Interface(EE_Data_t eeprom_data_param);
     void commandHandler(String serial_input, COMMS_TYPE type);
+    bool handleSaveEEPROM();
+    bool handleResetEEPROM();
+    bool handleUpdateFirmware();
+    bool handleManualIrrigation(String input);
+    bool handleConfig(String input);
+    bool handleCalibration(String input);
     void startAutoIrrigation();
     void updateDay();
     void readCommand();
