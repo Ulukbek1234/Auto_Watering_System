@@ -2,7 +2,7 @@
 
 Web::Web(uint16_t port)
 {
-  WiFi.begin("InternetHandy", "thisisuluk");
+  WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(200);

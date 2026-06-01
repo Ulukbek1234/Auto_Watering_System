@@ -9,7 +9,7 @@
 
 class Web {
 private:
-    const char* ssid = "InternetUluk";
+    const char* ssid = "InternetHandy";
     const char* password = "thisisuluk";
     const char* firmwareUrl =
     "https://github.com/Ulukbek1234/Auto_Watering_System/releases/download/v0.0.1/firmware.bin";
