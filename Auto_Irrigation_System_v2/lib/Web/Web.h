@@ -3,9 +3,11 @@
 #pragma once
 
 #include <WiFi.h>
+#include <WebServer.h>
 #include <WebSocketsServer.h>
 #include <HTTPClient.h>
 #include <Update.h>
+#include <Preferences.h>
 
 class Web {
 private:
@@ -14,13 +16,19 @@ private:
     const char* firmwareUrl =
     "https://github.com/Ulukbek1234/Auto_Watering_System/releases/download/v0.0.1/firmware.bin";
 
-    WebSocketsServer *web_socket;
+    WebServer* config_server = nullptr;
+    WebSocketsServer *web_socket = nullptr;
     String last_message = "";
     uint8_t local_client;
+    Preferences prefs;
 public:
     Web(uint16_t port = 81);
 
     void begin();
+    void startProvisioningPortal();
+    bool connectSavedWiFi();
+    bool connectWiFi(String ssid, String password);
+    
     String read();
     void onWebSocketEvent(  uint8_t client,
                             WStype_t type,

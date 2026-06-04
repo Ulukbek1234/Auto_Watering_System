@@ -133,6 +133,10 @@ bool Interface::handleResetEEPROM()
 
   eeprom_data = &eeprom_data_local;
   zone.saveFromEEPROMData(eeprom_data);
+
+  prefs.begin("wifi");
+  prefs.putString("ssid", "");
+  prefs.putString("pass", "");
   return true;
 }
 

@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(const IrrigationApp());
 
@@ -672,12 +673,60 @@ class PageSettings extends StatefulWidget {
 
 class _PageSettingsState extends State<PageSettings> {
   final esp32 = Esp32Service.instance;
+
   final ipController = TextEditingController(text: '10.219.18.208');
+
+  final wifiSsidController = TextEditingController();
+  final wifiPasswordController = TextEditingController();
+
+  bool provisioning = false;
+  String provisioningStatus = '';
 
   @override
   void dispose() {
     ipController.dispose();
+    wifiSsidController.dispose();
+    wifiPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> provisionWifi() async {
+    setState(() {
+      provisioning = true;
+      provisioningStatus = 'Sending Wi-Fi credentials...';
+    });
+
+    try {
+      final response = await http
+          .post(
+            Uri.parse('http://192.168.4.1/wifi'),
+            body: {
+              'ssid': wifiSsidController.text.trim(),
+              'pass': wifiPasswordController.text,
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        setState(() {
+          provisioningStatus =
+              'Credentials sent. ESP32 will connect to your home Wi-Fi and restart.';
+        });
+      } else {
+        setState(() {
+          provisioningStatus = 'Failed: ${response.body}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        provisioningStatus =
+            'Could not reach ESP32. Connect your phone to ESP32-Setup Wi-Fi first.';
+      });
+    } finally {
+      setState(() {
+        provisioning = false;
+      });
+    }
   }
 
   @override
@@ -685,8 +734,67 @@ class _PageSettingsState extends State<PageSettings> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text('Wi-Fi ESP32 Connection', style: Theme.of(context).textTheme.headlineSmall),
+        Text(
+          'Wi-Fi ESP32 Connection',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+
         const SizedBox(height: 16),
+
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Setup ESP32 Wi-Fi',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'First connect your phone to the ESP32-Setup Wi-Fi network, then enter your home Wi-Fi credentials below.',
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: wifiSsidController,
+                  decoration: const InputDecoration(
+                    labelText: 'Home Wi-Fi SSID',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: wifiPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Home Wi-Fi password',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  onPressed: provisioning ? null : provisionWifi,
+                  icon: provisioning
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.settings_input_antenna),
+                  label: const Text('Send Wi-Fi to ESP32'),
+                ),
+                if (provisioningStatus.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(provisioningStatus),
+                ],
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
         TextField(
           controller: ipController,
           decoration: const InputDecoration(
@@ -696,10 +804,10 @@ class _PageSettingsState extends State<PageSettings> {
         ),
         const SizedBox(height: 16),
         FilledButton.icon(
-          onPressed: () => esp32.connect(ipController.text),
+          onPressed: () => esp32.connect(ipController.text.trim()),
           icon: const Icon(Icons.wifi),
           label: const Text('Connect'),
-        ),        
+        ),
         const SizedBox(height: 12),
         OutlinedButton(
           onPressed: esp32.disconnect,
@@ -730,7 +838,9 @@ class _PageSettingsState extends State<PageSettings> {
           onPressed: () => esp32.send('cmd: rstrt'),
           child: const Text('Restart'),
         ),
+
         const SizedBox(height: 24),
+
         ValueListenableBuilder<String>(
           valueListenable: esp32.status,
           builder: (_, value, __) => Text('Status: $value'),
