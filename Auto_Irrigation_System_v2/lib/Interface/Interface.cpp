@@ -58,7 +58,7 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
       status = handleSaveEEPROM();
     } else if (command == "RST_EEP") {
       // CMD: RST_EEP
-      status = handleSaveEEPROM();
+      status = handleResetEEPROM();
     } else if(command == "UPDT_FIRM") {
       // CMD: UPDT_FIRM
       status = handleUpdateFirmware();
@@ -85,6 +85,9 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
         CHG_MOI_THR: 50,
       */
       status = handleConfig(input);
+    } else if(command == "RSTRT") {
+      // CMD: RSTRT
+      ESP.restart();
     } else {
       DEBUG_PRINT("Unknown command: ");
       DEBUG_PRINTLN(command);
@@ -103,15 +106,13 @@ bool Interface::handleSaveEEPROM()
 
   if(prefs.isKey("EE_Data") && prefs.getBytesLength("EE_Data") == sizeof(EE_Data_t))
   {
-    Serial.print("pump_mode_i: ");
-    Serial.println(eeprom_data.pump_mode[0]);
     prefs.putBytes("EE_Data",
                     &eeprom_data,
                     sizeof(EE_Data_t));
   }
   else
   {
-      Serial.println("Using default settings");
+    DEBUG_PRINTLN("Using default settings");
   }
 
   prefs.end();
@@ -120,7 +121,17 @@ bool Interface::handleSaveEEPROM()
 
 bool Interface::handleResetEEPROM()
 {
-  // TODO reset
+  // Memory load
+  Preferences prefs;
+  prefs.begin("settings");
+  // EEPROM 
+  EE_Data_t eeprom_data_local{};
+
+  Serial.println("Default data");
+  prefs.putBytes("EE_Data", &eeprom_data_local, sizeof(EE_Data_t));
+  prefs.end();
+
+  eeprom_data = &eeprom_data_local;
   return false;
 }
 

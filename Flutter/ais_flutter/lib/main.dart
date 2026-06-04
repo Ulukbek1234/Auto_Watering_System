@@ -656,6 +656,11 @@ class _PageSettingsState extends State<PageSettings> {
           onPressed: () => esp32.connect(ipController.text),
           icon: const Icon(Icons.wifi),
           label: const Text('Connect'),
+        ),        
+        const SizedBox(height: 12),
+        OutlinedButton(
+          onPressed: esp32.disconnect,
+          child: const Text('Disconnect'),
         ),
         const SizedBox(height: 12),
         OutlinedButton(
@@ -679,8 +684,8 @@ class _PageSettingsState extends State<PageSettings> {
         ),
         const SizedBox(height: 12),
         OutlinedButton(
-          onPressed: esp32.disconnect,
-          child: const Text('Disconnect'),
+          onPressed: () => esp32.send('cmd: rstrt'),
+          child: const Text('Restart'),
         ),
         const SizedBox(height: 24),
         ValueListenableBuilder<String>(

@@ -23,7 +23,7 @@ void setup() {
     Serial.println("Found data to load");
   } 
   else {
-    Serial.println("Default data");
+    DEBUG_PRINTLN("Default data");
     prefs.putBytes("EE_Data", &eeprom_data, sizeof(EE_Data_t));
   }
   
