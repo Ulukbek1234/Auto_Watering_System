@@ -674,13 +674,22 @@ class PageSettings extends StatefulWidget {
 class _PageSettingsState extends State<PageSettings> {
   final esp32 = Esp32Service.instance;
 
-  final ipController = TextEditingController(text: '10.219.18.208');
+  final ipController = TextEditingController(text: 'esp32.local');
 
   final wifiSsidController = TextEditingController();
   final wifiPasswordController = TextEditingController();
 
   bool provisioning = false;
   String provisioningStatus = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      esp32.connect(ipController.text.trim());
+    });
+  }
 
   @override
   void dispose() {
@@ -806,7 +815,7 @@ class _PageSettingsState extends State<PageSettings> {
         FilledButton.icon(
           onPressed: () => esp32.connect(ipController.text.trim()),
           icon: const Icon(Icons.wifi),
-          label: const Text('Connect'),
+          label: const Text('Reconnect'),
         ),
         const SizedBox(height: 12),
         OutlinedButton(

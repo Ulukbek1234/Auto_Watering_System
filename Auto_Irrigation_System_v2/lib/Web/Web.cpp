@@ -106,6 +106,10 @@ bool Web::connectWiFi(String ssid, String password)
     Serial.println("WiFi Connected");
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
+
+    if(MDNS.begin("esp32")) {
+      MDNS.addService("ws", "tcp", 80);
+    }
     return true;
   }
 

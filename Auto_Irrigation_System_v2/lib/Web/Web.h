@@ -8,6 +8,7 @@
 #include <HTTPClient.h>
 #include <Update.h>
 #include <Preferences.h>
+#include <ESPmDNS.h>
 
 class Web {
 private:
