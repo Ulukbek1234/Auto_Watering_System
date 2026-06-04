@@ -267,6 +267,45 @@ class PageHome extends StatelessWidget {
 
   Esp32Service get esp32 => Esp32Service.instance;
 
+
+  void _openCalibrate(BuildContext context, IrrigationUnit unit) {
+    final amountController = TextEditingController(text: "0.1");
+
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(unit.name),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          TextButton(
+            onPressed: () {esp32.send(
+                'cmd: cali_snsr, soil_pin: ${unit.sensorName}, '
+                'cali_type: cali_air'
+              );
+              Navigator.pop(context);
+            },
+            child: const Text('Air'),
+          ),
+          TextButton(
+            onPressed: () {esp32.send(
+                'cmd: cali_snsr, soil_pin: ${unit.sensorName}, '
+                'cali_type: cali_water'
+              );
+              Navigator.pop(context);
+            },
+            child: const Text('Water'),
+          ),
+        ],
+      ),
+    ).whenComplete(() {
+      amountController.dispose();
+    });
+  }
+
+
   void _openSplash(BuildContext context, IrrigationUnit unit) {
     final amountController = TextEditingController(text: "0.1");
 
@@ -427,11 +466,15 @@ class PageHome extends StatelessWidget {
                           case 'splash':
                             _openSplash(context, unit);
                             break;
+                          case 'calibrate':
+                            _openCalibrate(context, unit);
+                            break;
                         }
                       },
                       itemBuilder: (_) => const [
                         PopupMenuItem(value: 'config', child: Text('Config')),
                         PopupMenuItem(value: 'splash', child: Text('Splash')),
+                        PopupMenuItem(value: 'calibrate', child: Text('Calibrate')),
                       ],
                     ),
                   ),
