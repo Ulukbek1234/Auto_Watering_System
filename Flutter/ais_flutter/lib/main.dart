@@ -629,7 +629,7 @@ class PageSettings extends StatefulWidget {
 
 class _PageSettingsState extends State<PageSettings> {
   final esp32 = Esp32Service.instance;
-  final ipController = TextEditingController(text: '10.69.106.208');
+  final ipController = TextEditingController(text: '10.219.18.208');
 
   @override
   void dispose() {

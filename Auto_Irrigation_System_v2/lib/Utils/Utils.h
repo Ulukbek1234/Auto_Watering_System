@@ -38,7 +38,7 @@ constexpr int NR_DEC_POINTS = 8;
 #define HUM_SNS_1 33
 #define HUM_SNS_2 34
 #define HUM_SNS_3 35
-//#define NR_ACTIVE_COMP 4
+#define NR_ACTIVE_COMP 4
 
 
 enum COMMS_TYPE {
@@ -60,15 +60,15 @@ typedef struct Dictionary
     String value_;
 } Dictionary;
 
-typedef struct 
+struct EE_Data_t
 {
   int cali_air[4] = {-1, -1, -1, -1}; 
   int cali_water[4] = {-1, -1, -1, -1};
+  int pump_mode[4] = {0, 0, 0, 0};
   float total_liters[4] = {0.0, 0.0, 0.0, 0.0};
   float max_liters[4] = {0.0, 0.0, 0.0, 0.0};
   float moisture_threshold[4] = {0.0, 0.0, 0.0, 0.0};
-  int pump_mode[4] = {0, 0, 0, 0};
-} EE_Data_t;
+};
 
 class Utils 
 {

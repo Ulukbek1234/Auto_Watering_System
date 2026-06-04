@@ -4,6 +4,7 @@ Interface::Interface(EE_Data_t eeprom_data_param) : comms(), zone(0)
 {
   eeprom_data = new EE_Data_t(eeprom_data_param);
   
+  // TODO probably use for loop for this
   zone.addPump(PUMP_0, eeprom_data->max_liters[0], eeprom_data->total_liters[0]);
   zone.addPump(PUMP_1, eeprom_data->max_liters[1], eeprom_data->total_liters[1]);
   zone.addPump(PUMP_2, eeprom_data->max_liters[2], eeprom_data->total_liters[2]);
@@ -12,6 +13,16 @@ Interface::Interface(EE_Data_t eeprom_data_param) : comms(), zone(0)
   zone.addSoilSensor(HUM_SNS_1, eeprom_data->cali_air[1], eeprom_data->cali_water[1]);
   zone.addSoilSensor(HUM_SNS_2, eeprom_data->cali_air[2], eeprom_data->cali_water[2]);
   zone.addSoilSensor(HUM_SNS_3, eeprom_data->cali_air[3], eeprom_data->cali_water[3]);
+  
+  zone.setOperationMode(static_cast<OperationModes>(eeprom_data->pump_mode[0]), PUMP_0);
+  zone.setOperationMode(static_cast<OperationModes>(eeprom_data->pump_mode[1]), PUMP_1);
+  zone.setOperationMode(static_cast<OperationModes>(eeprom_data->pump_mode[2]), PUMP_2);
+  zone.setOperationMode(static_cast<OperationModes>(eeprom_data->pump_mode[3]), PUMP_3);
+
+  zone.changeMoistureThreshold(eeprom_data->moisture_threshold[0], PUMP_0);
+  zone.changeMoistureThreshold(eeprom_data->moisture_threshold[1], PUMP_1);
+  zone.changeMoistureThreshold(eeprom_data->moisture_threshold[2], PUMP_2);
+  zone.changeMoistureThreshold(eeprom_data->moisture_threshold[3], PUMP_3);
 }
 
 /*
@@ -84,15 +95,17 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
 
 bool Interface::handleSaveEEPROM()
 {
-  EE_Data_t *eeprom_data = new EE_Data_t;
-  zone.saveToEEPROMData(eeprom_data);
+  EE_Data_t eeprom_data{};
+  zone.saveToEEPROMData(&eeprom_data);
 
   Preferences prefs;
   prefs.begin("settings");
 
   if(prefs.isKey("EE_Data") && prefs.getBytesLength("EE_Data") == sizeof(EE_Data_t))
   {
-      prefs.putBytes("EE_Data",
+    Serial.print("pump_mode_i: ");
+    Serial.println(eeprom_data.pump_mode[0]);
+    prefs.putBytes("EE_Data",
                     &eeprom_data,
                     sizeof(EE_Data_t));
   }

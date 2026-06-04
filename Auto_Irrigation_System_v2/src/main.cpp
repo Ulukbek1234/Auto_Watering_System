@@ -15,17 +15,19 @@ void setup() {
   Preferences prefs;
   prefs.begin("settings");
   // EEPROM 
-  EE_Data_t *eeprom_data;
+  EE_Data_t eeprom_data{};
     
   // Read the data back
   if(prefs.isKey("EE_Data") && prefs.getBytesLength("EE_Data") == sizeof(EE_Data_t)) {
-    prefs.getBytes("EE_Data", eeprom_data, sizeof(EE_Data_t));
+    prefs.getBytes("EE_Data", &eeprom_data, sizeof(EE_Data_t));
+    Serial.println("Found data to load");
   } 
   else {
-    eeprom_data = new EE_Data_t();
+    Serial.println("Default data");
+    prefs.putBytes("EE_Data", &eeprom_data, sizeof(EE_Data_t));
   }
   
-  interface = new Interface(*eeprom_data);
+  interface = new Interface(eeprom_data);
   prefs.end();
 
   start_time = millis();
