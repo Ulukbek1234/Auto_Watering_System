@@ -128,12 +128,12 @@ bool Interface::handleResetEEPROM()
   // EEPROM 
   EE_Data_t eeprom_data_local{};
 
-  Serial.println("Default data");
   prefs.putBytes("EE_Data", &eeprom_data_local, sizeof(EE_Data_t));
   prefs.end();
 
   eeprom_data = &eeprom_data_local;
-  return false;
+  zone.saveFromEEPROMData(eeprom_data);
+  return true;
 }
 
 bool Interface::handleUpdateFirmware()
