@@ -116,6 +116,7 @@ bool Interface::handleSaveEEPROM()
   }
 
   prefs.end();
+  zone.saveFromEEPROMData(&eeprom_data);
   return true;
 }
 

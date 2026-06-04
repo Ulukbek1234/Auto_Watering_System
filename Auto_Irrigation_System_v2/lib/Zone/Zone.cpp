@@ -22,13 +22,12 @@ void Zone::saveFromEEPROMData(EE_Data_t *eeprom_data)
 {
     for(int i = 0; i < nr_pumps; i++)
     {
-        // TODO, is this necessary?
-        // soil_sensors[i]->setCaliAir(eeprom_data->cali_air[i]); 
-        // soil_sensors[i]->setCaliWater(eeprom_data->cali_water[i]); 
-        // pumps[i]->setTotalLiters(eeprom_data->total_liters[i]); 
-        // pumps[i]->updateMaxLiters(eeprom_data->max_liters[i]); 
-        // MOISTURE_THRESHOLD[i] = eeprom_data->moisture_threshold[i]; 
-        // current_mode[i] = static_cast<OperationModes> *eeprom_data->pump_mode[i]; 
+        soil_sensors[i]->setCaliAir(eeprom_data->cali_air[i]); 
+        soil_sensors[i]->setCaliWater(eeprom_data->cali_water[i]); 
+        pumps[i]->setTotalLiters(eeprom_data->total_liters[i]); 
+        pumps[i]->updateMaxLiters(eeprom_data->max_liters[i]); 
+        MOISTURE_THRESHOLD[i] = eeprom_data->moisture_threshold[i]; 
+        current_mode[i] = static_cast<OperationModes>(eeprom_data->pump_mode[i]); 
     }
 }
 
