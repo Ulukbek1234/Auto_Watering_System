@@ -200,3 +200,37 @@ void Web::updateFirmware() {
 
   http.end();
 }
+
+void Web::checkFirmwareVersion()
+{
+  WiFiClientSecure client;
+  client.setInsecure(); // easier, but not ideal for production
+
+  HTTPClient http;
+  http.begin(client, versionUrl);
+
+  int httpCode = http.GET();
+  if (httpCode != HTTP_CODE_OK) {
+    Serial.printf("HTTP error: %d\n", httpCode);
+    http.end();
+    return;
+  }
+
+  String payload = http.getString();
+  http.end();
+
+  // Parse JSON
+  JSONVar myObject = JSON.parse(payload);
+  if (JSON.typeof(myObject) == "undefined") {
+    Serial.println("Parsing input failed!");
+    return;
+  }
+
+  // Iterate through keys
+  JSONVar keys = myObject.keys();
+  for (int i = 0; i < keys.length(); i++) {
+    Serial.print(keys[i]);
+    Serial.print(" = ");
+    Serial.println(myObject[keys[i]]);
+  }
+}

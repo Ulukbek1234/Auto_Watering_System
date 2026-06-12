@@ -9,13 +9,16 @@
 #include <Update.h>
 #include <Preferences.h>
 #include <ESPmDNS.h>
+#include <Arduino_JSON.h>
 
 class Web {
 private:
     const char* ssid = "InternetHandy";
     const char* password = "thisisuluk";
     const char* firmwareUrl =
-    "https://github.com/Ulukbek1234/Auto_Watering_System/releases/download/v0.0.1/firmware.bin";
+    "find it";
+    const char* versionUrl = 
+    "https://raw.githubusercontent.com/Ulukbek1234/Auto_Watering_System/ESP/Auto_Irrigation_System_v2/releases/version.json";
 
     WebServer* config_server = nullptr;
     WebSocketsServer *web_socket = nullptr;
@@ -37,7 +40,7 @@ public:
                             size_t length);
     void write(String output);
     void updateFirmware();
-
+    void checkFirmwareVersion();
 };
 
 #endif
