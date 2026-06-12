@@ -44,8 +44,5 @@ void Comms::write(String output, COMMS_TYPE type)
 void Comms::updateFirmware()
 {
     web.checkFirmwareVersion();
-    return;
-    // TODO check if new version is available
-    //if()
     web.updateFirmware();
 }

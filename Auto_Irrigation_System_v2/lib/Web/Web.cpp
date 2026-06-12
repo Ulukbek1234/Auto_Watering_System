@@ -27,6 +27,8 @@ bool Web::connectSavedWiFi()
   prefs.begin("wifi", true);
   String savedSsid = prefs.getString("ssid", "");
   String savedPass = prefs.getString("pass", "");
+  firmwareUrl = prefs.getString("url");
+  firmwareVersion = prefs.getString("version");
   prefs.end();
 
   if (savedSsid == "") {
@@ -165,6 +167,7 @@ void Web::write(String output) {
 
 
 void Web::updateFirmware() {
+  Serial.println("Updating firmware");
   WiFiClientSecure client;
   client.setInsecure(); // easier, but not ideal for production
 
@@ -233,4 +236,23 @@ void Web::checkFirmwareVersion()
     Serial.print(" = ");
     Serial.println(myObject[keys[i]]);
   }
+
+  if(JSON.stringify(myObject["version"]) == firmwareVersion){
+    // Same version
+    return;
+  }
+
+  // different version, gotta update 
+  // TODO check if older version?
+  Serial.println("New version found");
+  String newVersion = JSON.stringify(myObject["version"]);
+  String newFirmwareUrl = JSON.stringify(myObject["url"]);
+
+  prefs.begin("wifi", true);
+  prefs.putString("version", newVersion);
+  prefs.putString("url", newFirmwareUrl);
+  prefs.end();
+
+  firmwareVersion = newVersion;
+  firmwareUrl = newFirmwareUrl;
 }
