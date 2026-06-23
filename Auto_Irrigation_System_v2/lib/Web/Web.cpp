@@ -169,8 +169,8 @@ void Web::write(String output) {
 void Web::updateFirmware() {
   HTTPClient http;
   DEBUG_PRINTLN("Updating firmware");
-  firmwareUrl.replace("\"", "");
-  http.begin(firmwareUrl);
+  newFirmwareUrl.replace("\"", "");
+  http.begin(newFirmwareUrl);
   int httpCode = http.GET();
   if (httpCode != HTTP_CODE_OK) {
     Serial.printf("HTTP error: %d\n", httpCode);
