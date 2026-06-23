@@ -16,7 +16,7 @@ private:
     const char* ssid = "InternetHandy";
     const char* password = "thisisuluk";
     const String versionUrl = "https://raw.githubusercontent.com/Ulukbek1234/Auto_Watering_System/ESP/Auto_Irrigation_System_v2/releases/version.json";
-    String firmwareUrl = "";
+    String firmwareUrl = "https://raw.githubusercontent.com/Ulukbek1234/Auto_Watering_System/ESP/Auto_Irrigation_System_v2/releases/firmware.bin";
     String firmwareVersion = "0.0.1";
 
     WebServer* config_server = nullptr;
