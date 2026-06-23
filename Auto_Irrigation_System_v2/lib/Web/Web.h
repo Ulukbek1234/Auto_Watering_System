@@ -38,8 +38,8 @@ public:
                             uint8_t * payload,
                             size_t length);
     void write(String output);
-    void updateFirmware();
-    void checkFirmwareVersion();
+    void updateFirmware(WiFiClientSecure client);
+    void checkFirmwareVersion(WiFiClientSecure client);
 };
 
 #endif

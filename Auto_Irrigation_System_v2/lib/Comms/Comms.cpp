@@ -44,6 +44,10 @@ void Comms::write(String output, COMMS_TYPE type)
 void Comms::updateFirmware()
 {
     // TODO make it only update when new version available
-    web.checkFirmwareVersion();
-    web.updateFirmware();
+    WiFiClientSecure client;
+    client.setInsecure();
+    client.setTimeout(15000);
+    web.checkFirmwareVersion(client);
+    web.updateFirmware(client);
+    client.stop();
 }

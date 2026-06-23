@@ -166,14 +166,12 @@ void Web::write(String output) {
 }
 
 
-void Web::updateFirmware() {
+void Web::updateFirmware(WiFiClientSecure client) {
   Serial.println("Updating firmware");
-  WiFiClientSecure client;
-  client.setInsecure(); // easier, but not ideal for production
-
   HTTPClient http;
+  Serial.println(firmwareUrl);
   http.begin(client, firmwareUrl);
-
+  Serial.println(http.getString());
   int httpCode = http.GET();
   if (httpCode != HTTP_CODE_OK) {
     Serial.printf("HTTP error: %d\n", httpCode);
@@ -195,6 +193,7 @@ void Web::updateFirmware() {
   if (written == contentLength && Update.end()) {
     if (Update.isFinished()) {
       Serial.println("Update complete. Rebooting...");
+      http.end();
       ESP.restart();
     }
   } else {
@@ -204,11 +203,8 @@ void Web::updateFirmware() {
   http.end();
 }
 
-void Web::checkFirmwareVersion()
+void Web::checkFirmwareVersion(WiFiClientSecure client)
 {
-  WiFiClientSecure client;
-  client.setInsecure(); // easier, but not ideal for production
-
   HTTPClient http;
   http.begin(client, versionUrl);
 
@@ -226,6 +222,7 @@ void Web::checkFirmwareVersion()
   JSONVar myObject = JSON.parse(payload);
   if (JSON.typeof(myObject) == "undefined") {
     Serial.println("Parsing input failed!");
+    http.end();
     return;
   }
 
@@ -239,6 +236,7 @@ void Web::checkFirmwareVersion()
 
   if(JSON.stringify(myObject["version"]) == firmwareVersion){
     // Same version
+    http.end();
     return;
   }
 
@@ -247,7 +245,8 @@ void Web::checkFirmwareVersion()
   Serial.println("New version found");
   String newVersion = JSON.stringify(myObject["version"]);
   String newFirmwareUrl = JSON.stringify(myObject["url"]);
-
+  Serial.println(newVersion);
+  Serial.println(newFirmwareUrl);
   prefs.begin("wifi", true);
   prefs.putString("version", newVersion);
   prefs.putString("url", newFirmwareUrl);
@@ -255,4 +254,8 @@ void Web::checkFirmwareVersion()
 
   firmwareVersion = newVersion;
   firmwareUrl = newFirmwareUrl;
+  Serial.println("To end");
+  http.end();
+  client.stop();
+  delay(1000);
 }
