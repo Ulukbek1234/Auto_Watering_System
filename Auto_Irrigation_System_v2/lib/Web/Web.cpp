@@ -27,8 +27,8 @@ bool Web::connectSavedWiFi()
   prefs.begin("wifi", true);
   String savedSsid = prefs.getString("ssid", "");
   String savedPass = prefs.getString("pass", "");
-  firmwareUrl = "";// prefs.getString("url", "");
-  firmwareVersion = "0.0.1";// prefs.getString("version", "0.0.1");
+  firmwareUrl = prefs.getString("url", "");
+  firmwareVersion = prefs.getString("version", "0.0.1");
   prefs.end();
 
   if (savedSsid == "") {
