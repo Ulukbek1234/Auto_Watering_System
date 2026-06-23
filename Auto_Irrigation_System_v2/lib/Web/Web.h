@@ -16,7 +16,7 @@ private:
     const char* ssid = "InternetHandy";
     const char* password = "thisisuluk";
     const String versionUrl = "https://raw.githubusercontent.com/Ulukbek1234/Auto_Watering_System/ESP/Auto_Irrigation_System_v2/releases/version.json";
-    String firmwareUrl = "https://raw.githubusercontent.com/Ulukbek1234/Auto_Watering_System/ESP/Auto_Irrigation_System_v2/releases/firmware.bin";
+    String firmwareUrl = "https://github.com/Ulukbek1234/Auto_Watering_System/releases/download/v0.0.2/firmware.bin";
     String firmwareVersion = "0.0.1";
 
     WebServer* config_server = nullptr;
@@ -38,8 +38,8 @@ public:
                             uint8_t * payload,
                             size_t length);
     void write(String output);
-    void updateFirmware(WiFiClientSecure client);
-    void checkFirmwareVersion(WiFiClientSecure client);
+    void updateFirmware();
+    bool checkFirmwareVersion();
 };
 
 #endif

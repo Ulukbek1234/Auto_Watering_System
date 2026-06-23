@@ -27,8 +27,8 @@ bool Web::connectSavedWiFi()
   prefs.begin("wifi", true);
   String savedSsid = prefs.getString("ssid", "");
   String savedPass = prefs.getString("pass", "");
-  firmwareUrl = prefs.getString("url");
-  firmwareVersion = prefs.getString("version");
+  firmwareUrl = "https://github.com/Ulukbek1234/Auto_Watering_System/releases/download/v0.0.2/firmware.bin";//prefs.getString("url", "https://github.com/Ulukbek1234/Auto_Watering_System/releases/download/v0.0.2/firmware.bin");
+  firmwareVersion = "0.0.1";//prefs.getString("version", "0.0.1");
   prefs.end();
 
   if (savedSsid == "") {
@@ -166,12 +166,11 @@ void Web::write(String output) {
 }
 
 
-void Web::updateFirmware(WiFiClientSecure client) {
-  Serial.println("Updating firmware");
+void Web::updateFirmware() {
   HTTPClient http;
-  Serial.println(firmwareUrl);
-  http.begin(client, firmwareUrl);
-  Serial.println(http.getString());
+  Serial.println("Updating firmware");
+  firmwareUrl.replace("\"", "");
+  http.begin(firmwareUrl);
   int httpCode = http.GET();
   if (httpCode != HTTP_CODE_OK) {
     Serial.printf("HTTP error: %d\n", httpCode);
@@ -203,16 +202,16 @@ void Web::updateFirmware(WiFiClientSecure client) {
   http.end();
 }
 
-void Web::checkFirmwareVersion(WiFiClientSecure client)
+bool Web::checkFirmwareVersion()
 {
   HTTPClient http;
-  http.begin(client, versionUrl);
+  http.begin(versionUrl);
 
   int httpCode = http.GET();
   if (httpCode != HTTP_CODE_OK) {
     Serial.printf("HTTP error: %d\n", httpCode);
     http.end();
-    return;
+    return false;
   }
 
   String payload = http.getString();
@@ -223,7 +222,7 @@ void Web::checkFirmwareVersion(WiFiClientSecure client)
   if (JSON.typeof(myObject) == "undefined") {
     Serial.println("Parsing input failed!");
     http.end();
-    return;
+    return false;
   }
 
   // Iterate through keys
@@ -237,7 +236,7 @@ void Web::checkFirmwareVersion(WiFiClientSecure client)
   if(JSON.stringify(myObject["version"]) == firmwareVersion){
     // Same version
     http.end();
-    return;
+    return false;
   }
 
   // different version, gotta update 
@@ -247,15 +246,13 @@ void Web::checkFirmwareVersion(WiFiClientSecure client)
   String newFirmwareUrl = JSON.stringify(myObject["url"]);
   Serial.println(newVersion);
   Serial.println(newFirmwareUrl);
-  prefs.begin("wifi", true);
+  prefs.begin("wifi");
   prefs.putString("version", newVersion);
   prefs.putString("url", newFirmwareUrl);
   prefs.end();
 
   firmwareVersion = newVersion;
   firmwareUrl = newFirmwareUrl;
-  Serial.println("To end");
   http.end();
-  client.stop();
-  delay(1000);
+  return true;
 }
