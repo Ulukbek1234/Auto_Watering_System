@@ -27,12 +27,12 @@ bool Web::connectSavedWiFi()
   prefs.begin("wifi", true);
   String savedSsid = prefs.getString("ssid", "");
   String savedPass = prefs.getString("pass", "");
-  firmwareUrl = "https://github.com/Ulukbek1234/Auto_Watering_System/releases/download/v0.0.2/firmware.bin";//prefs.getString("url", "https://github.com/Ulukbek1234/Auto_Watering_System/releases/download/v0.0.2/firmware.bin");
-  firmwareVersion = "0.0.1";//prefs.getString("version", "0.0.1");
+  firmwareUrl = prefs.getString("url", "");
+  firmwareVersion = prefs.getString("version", "0.0.1");
   prefs.end();
 
   if (savedSsid == "") {
-    Serial.println("No saved WiFi credentials");
+    DEBUG_PRINTLN("No saved WiFi credentials");
     return false;
   }
 
@@ -41,13 +41,13 @@ bool Web::connectSavedWiFi()
 
 void Web::startProvisioningPortal()
 {
-  Serial.println("Starting ESP32 setup access point");
+  DEBUG_PRINTLN("Starting ESP32 setup access point");
 
   WiFi.mode(WIFI_AP);
   WiFi.softAP("ESP32-Setup", "12345678");
 
-  Serial.print("Setup AP IP: ");
-  Serial.println(WiFi.softAPIP());
+  DEBUG_PRINT("Setup AP IP: ");
+  DEBUG_PRINTLN(WiFi.softAPIP());
 
   config_server = new WebServer(80);
 
@@ -70,11 +70,11 @@ void Web::startProvisioningPortal()
       prefs.putString("pass", newPass);
       prefs.end();
 
-      Serial.println("WiFi saved. Restarting...");
+      DEBUG_PRINTLN("WiFi saved. Restarting...");
       delay(1000);
       ESP.restart();
     } else {
-      Serial.println("Invalid WiFi credentials");
+      DEBUG_PRINTLN("Invalid WiFi credentials");
       WiFi.mode(WIFI_AP);
       WiFi.softAP("ESP32-Setup", "12345678");
     }
@@ -89,8 +89,8 @@ void Web::startProvisioningPortal()
 
 bool Web::connectWiFi(String ssid, String password)
 {
-  Serial.print("Connecting to WiFi: ");
-  Serial.println(ssid);
+  DEBUG_PRINT("Connecting to WiFi: ");
+  DEBUG_PRINTLN(ssid);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid.c_str(), password.c_str());
@@ -99,15 +99,15 @@ bool Web::connectWiFi(String ssid, String password)
 
   while (WiFi.status() != WL_CONNECTED && millis() - start < 15000) {
     delay(200);
-    Serial.print(".");
+    DEBUG_PRINT(".");
   }
 
-  Serial.println();
+  DEBUG_PRINTLN();
 
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("WiFi Connected");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    DEBUG_PRINTLN("WiFi Connected");
+    DEBUG_PRINT("IP address: ");
+    DEBUG_PRINTLN(WiFi.localIP());
 
     if(MDNS.begin("esp32")) {
       MDNS.addService("ws", "tcp", 80);
@@ -115,7 +115,7 @@ bool Web::connectWiFi(String ssid, String password)
     return true;
   }
 
-  Serial.println("WiFi connection failed");
+  DEBUG_PRINTLN("WiFi connection failed");
   return false;
 }
 
@@ -140,7 +140,7 @@ void Web::onWebSocketEvent(
   size_t length
 ) {
   if (type == WStype_CONNECTED) {
-    Serial.println("Phone connected");
+    DEBUG_PRINTLN("Phone connected");
     web_socket->sendTXT(client, "Hello from ESP32");
     local_client = client;
   }
@@ -148,15 +148,15 @@ void Web::onWebSocketEvent(
   if (type == WStype_TEXT) {
     String msg = String((char*)payload);
 
-    Serial.print("Received: ");
-    Serial.println(msg);
+    DEBUG_PRINT("Received: ");
+    DEBUG_PRINTLN(msg);
 
     last_message = msg;
 
   }
   
   if (type == WStype_DISCONNECTED) {
-    Serial.println("Phone disconnected");
+    DEBUG_PRINTLN("Phone disconnected");
   }
 }
 
@@ -168,7 +168,7 @@ void Web::write(String output) {
 
 void Web::updateFirmware() {
   HTTPClient http;
-  Serial.println("Updating firmware");
+  DEBUG_PRINTLN("Updating firmware");
   firmwareUrl.replace("\"", "");
   http.begin(firmwareUrl);
   int httpCode = http.GET();
@@ -181,7 +181,7 @@ void Web::updateFirmware() {
   int contentLength = http.getSize();
 
   if (!Update.begin(contentLength)) {
-    Serial.println("Not enough space for OTA");
+    DEBUG_PRINTLN("Not enough space for OTA");
     http.end();
     return;
   }
@@ -191,7 +191,7 @@ void Web::updateFirmware() {
 
   if (written == contentLength && Update.end()) {
     if (Update.isFinished()) {
-      Serial.println("Update complete. Rebooting...");
+      DEBUG_PRINTLN("Update complete. Rebooting...");
       http.end();
       ESP.restart();
     }
@@ -220,7 +220,7 @@ bool Web::checkFirmwareVersion()
   // Parse JSON
   JSONVar myObject = JSON.parse(payload);
   if (JSON.typeof(myObject) == "undefined") {
-    Serial.println("Parsing input failed!");
+    DEBUG_PRINTLN("Parsing input failed!");
     http.end();
     return false;
   }
@@ -228,24 +228,25 @@ bool Web::checkFirmwareVersion()
   // Iterate through keys
   JSONVar keys = myObject.keys();
   for (int i = 0; i < keys.length(); i++) {
-    Serial.print(keys[i]);
-    Serial.print(" = ");
-    Serial.println(myObject[keys[i]]);
+    DEBUG_PRINT(keys[i]);
+    DEBUG_PRINT(" = ");
+    DEBUG_PRINTLN(myObject[keys[i]]);
   }
 
   if(JSON.stringify(myObject["version"]) == firmwareVersion){
     // Same version
+    DEBUG_PRINTLN("Same version, returning");
     http.end();
     return false;
   }
 
   // different version, gotta update 
   // TODO check if older version?
-  Serial.println("New version found");
+  DEBUG_PRINTLN("New version found");
   String newVersion = JSON.stringify(myObject["version"]);
   String newFirmwareUrl = JSON.stringify(myObject["url"]);
-  Serial.println(newVersion);
-  Serial.println(newFirmwareUrl);
+  DEBUG_PRINTLN(newVersion);
+  DEBUG_PRINTLN(newFirmwareUrl);
   prefs.begin("wifi");
   prefs.putString("version", newVersion);
   prefs.putString("url", newFirmwareUrl);
