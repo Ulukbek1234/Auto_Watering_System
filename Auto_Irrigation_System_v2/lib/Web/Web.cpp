@@ -27,8 +27,8 @@ bool Web::connectSavedWiFi()
   prefs.begin("wifi", true);
   String savedSsid = prefs.getString("ssid", "");
   String savedPass = prefs.getString("pass", "");
-  firmwareUrl = prefs.getString("url", "");
-  firmwareVersion = prefs.getString("version", "0.0.1");
+  firmwareUrl = "";// prefs.getString("url", "");
+  firmwareVersion = "0.0.1";// prefs.getString("version", "0.0.1");
   prefs.end();
 
   if (savedSsid == "") {
@@ -192,6 +192,13 @@ void Web::updateFirmware() {
   if (written == contentLength && Update.end()) {
     if (Update.isFinished()) {
       DEBUG_PRINTLN("Update complete. Rebooting...");
+      prefs.begin("wifi");
+      prefs.putString("version", newVersion);
+      prefs.putString("url", newFirmwareUrl);
+      prefs.end();
+
+      firmwareVersion = newVersion;
+      firmwareUrl = newFirmwareUrl;
       http.end();
       ESP.restart();
     }
@@ -243,17 +250,11 @@ bool Web::checkFirmwareVersion()
   // different version, gotta update 
   // TODO check if older version?
   DEBUG_PRINTLN("New version found");
-  String newVersion = JSON.stringify(myObject["version"]);
-  String newFirmwareUrl = JSON.stringify(myObject["url"]);
+  newVersion = JSON.stringify(myObject["version"]);
+  newFirmwareUrl = JSON.stringify(myObject["url"]);
   DEBUG_PRINTLN(newVersion);
   DEBUG_PRINTLN(newFirmwareUrl);
-  prefs.begin("wifi");
-  prefs.putString("version", newVersion);
-  prefs.putString("url", newFirmwareUrl);
-  prefs.end();
 
-  firmwareVersion = newVersion;
-  firmwareUrl = newFirmwareUrl;
   http.end();
   return true;
 }
