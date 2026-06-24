@@ -128,7 +128,7 @@ String Zone::getData()
     String data_names[32];
     String data_values[32];
     int index = 0;
-
+    
 
     data_names[index] = "current_day";
     data_values[index++] = String(day_exact, NR_DEC_POINTS);

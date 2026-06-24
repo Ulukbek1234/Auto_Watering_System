@@ -48,3 +48,13 @@ void Comms::updateFirmware()
         web.updateFirmware();
     }
 }
+
+String Comms::getTelem() {
+    String data_names[32];
+    String data_values[32];
+    int index = 0;
+
+    // TODO all important information
+    data_names[index] = "firmware_version";
+    data_values[index++] = web.getFirmwareVersion();
+}

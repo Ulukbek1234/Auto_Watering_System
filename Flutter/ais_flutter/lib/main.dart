@@ -115,6 +115,7 @@ class Esp32Service {
   final ValueNotifier<List<ChartReading>> readings = ValueNotifier([]);
   final ValueNotifier<String> status = ValueNotifier('Disconnected');
   final ValueNotifier<String> message = ValueNotifier('');
+  final ValueNotifier<String?> firmwareVersion = ValueNotifier("0.0.0");
 
   bool get connected => _channel != null;
 
@@ -180,6 +181,7 @@ class Esp32Service {
 
     final parsed = parseTelemetryText(text);
     if (parsed.isEmpty) return;
+    firmwareVersion.value = parsed['firmwareVersion'];
 
     final nextUnits = List<IrrigationUnit>.generate(_pumpPins.length, (i) {
       return IrrigationUnit.fromTelemetry(
@@ -746,6 +748,11 @@ class _PageSettingsState extends State<PageSettings> {
         Text(
           'Wi-Fi ESP32 Connection',
           style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        
+        ValueListenableBuilder<String?>(
+          valueListenable: esp32.firmwareVersion,
+          builder: (_, value, __) => Text('Firmware Version: $value'),
         ),
 
         const SizedBox(height: 16),

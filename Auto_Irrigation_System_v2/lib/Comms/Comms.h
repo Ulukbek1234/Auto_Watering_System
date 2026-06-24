@@ -24,6 +24,8 @@ public:
     void write(String output, COMMS_TYPE type);
     HardwareSerial* getSource();
     void updateFirmware();
+    String getTelem();
+
 };
 
 #endif

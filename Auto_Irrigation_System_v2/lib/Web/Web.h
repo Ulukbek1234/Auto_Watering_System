@@ -43,6 +43,7 @@ public:
     void write(String output);
     void updateFirmware();
     bool checkFirmwareVersion();
+    String getFirmwareVersion() {return firmwareVersion;}
 };
 
 #endif

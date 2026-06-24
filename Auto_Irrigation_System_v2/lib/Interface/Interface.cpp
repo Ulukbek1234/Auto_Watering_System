@@ -46,14 +46,11 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
     } 
 
     // TODO maybe make telem also respond with succ or fail?
-    if (command == "TELEM") {
-      comms.write(zone.getData(), type);
-      DEBUG_PRINTLN("Sent telemetry data.");
-      return;
-    } 
-
     // Standard commands, with response to user
-    if (command == "SAV_EEP") {
+    if (command == "TELEM") {
+      // CMD: TELEM
+      status = handleTelem(type);
+    } else if (command == "SAV_EEP") {
       // CMD: SAV_EEP
       status = handleSaveEEPROM();
     } else if (command == "RST_EEP") {
@@ -96,6 +93,14 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
     comms.write(response + (status ? "SUCC" : "FAIL"), type);
 }
 
+bool Interface::handleTelem(COMMS_TYPE type)
+{
+  comms.write(comms.getTelem(), type);
+  comms.write(zone.getData(), type);
+  DEBUG_PRINTLN("Sent telemetry data.");
+  return true;
+}
+
 bool Interface::handleSaveEEPROM()
 {
   EE_Data_t eeprom_data{};
@@ -127,7 +132,6 @@ bool Interface::handleResetEEPROM()
   prefs.begin("settings");
   // EEPROM 
   EE_Data_t eeprom_data_local{};
-
   prefs.putBytes("EE_Data", &eeprom_data_local, sizeof(EE_Data_t));
   prefs.end();
 
