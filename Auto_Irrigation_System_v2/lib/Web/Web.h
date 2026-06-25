@@ -16,6 +16,7 @@ class Web {
 private:
     const char* ssid = "InternetHandy";
     const char* password = "thisisuluk";
+    const int port = 81;
     const String versionUrl = "https://raw.githubusercontent.com/Ulukbek1234/Auto_Watering_System/ESP/Auto_Irrigation_System_v2/releases/version.json";
     String firmwareUrl = "";
     String firmwareVersion = "0.0.1";
@@ -28,7 +29,7 @@ private:
     uint8_t local_client;
     Preferences prefs;
 public:
-    Web(uint16_t port = 81);
+    Web();
 
     void begin();
     void startProvisioningPortal();
@@ -44,6 +45,7 @@ public:
     void updateFirmware();
     bool checkFirmwareVersion();
     String getFirmwareVersion() {return firmwareVersion;}
+    void initConnection();
 };
 
 #endif

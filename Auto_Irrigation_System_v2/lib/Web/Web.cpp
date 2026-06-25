@@ -1,25 +1,8 @@
 #include "Web.h"
 
-Web::Web(uint16_t port)
+Web::Web()
 {
-
-  bool connected = connectSavedWiFi();
-
-  if (!connected) {
-    startProvisioningPortal();
-  }
-
-  web_socket = new WebSocketsServer(port);
-  web_socket->begin();
-
-  web_socket->onEvent([this](
-    uint8_t client,
-    WStype_t type,
-    uint8_t * payload,
-    size_t length
-  ) {
-    this->onWebSocketEvent(client, type, payload, length);
-  });
+  initConnection();
 }
 
 bool Web::connectSavedWiFi()
@@ -121,6 +104,11 @@ bool Web::connectWiFi(String ssid, String password)
 
 String Web::read()
 {
+  // Provisioning has to be finished, otherwise this wouldnt run
+  if (WiFi.status() != WL_CONNECTED) {
+    connectSavedWiFi();
+  }
+
   if (config_server != nullptr) {
     config_server->handleClient();
   }
@@ -257,4 +245,24 @@ bool Web::checkFirmwareVersion()
 
   http.end();
   return true;
+}
+
+void Web::initConnection() {
+  bool connected = connectSavedWiFi();
+
+  if (!connected) {
+    startProvisioningPortal();
+  }
+
+  web_socket = new WebSocketsServer(port);
+  web_socket->begin();
+
+  web_socket->onEvent([this](
+    uint8_t client,
+    WStype_t type,
+    uint8_t * payload,
+    size_t length
+  ) {
+    this->onWebSocketEvent(client, type, payload, length);
+  });
 }

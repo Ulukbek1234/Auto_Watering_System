@@ -43,7 +43,6 @@ void Comms::write(String output, COMMS_TYPE type)
 
 void Comms::updateFirmware()
 {
-    // TODO make it only update when new version available
     if(web.checkFirmwareVersion()) {
         web.updateFirmware();
     }
@@ -57,4 +56,5 @@ String Comms::getTelem() {
     // TODO all important information
     data_names[index] = "firmware_version";
     data_values[index++] = web.getFirmwareVersion();
+    return Utils::parseDataForWriting(data_names, data_values, index);
 }

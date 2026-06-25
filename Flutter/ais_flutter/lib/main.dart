@@ -181,7 +181,11 @@ class Esp32Service {
 
     final parsed = parseTelemetryText(text);
     if (parsed.isEmpty) return;
-    firmwareVersion.value = parsed['firmwareVersion'];
+    if (parsed.containsKey('RESP')) return; // TODO check if repsonse is successful
+
+    if(parsed.containsKey('firmware_version')) {
+      firmwareVersion.value = parsed['firmware_version'];
+    }
 
     final nextUnits = List<IrrigationUnit>.generate(_pumpPins.length, (i) {
       return IrrigationUnit.fromTelemetry(
