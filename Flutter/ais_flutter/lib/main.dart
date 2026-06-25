@@ -289,7 +289,7 @@ class PageHome extends StatelessWidget {
           TextButton(
             onPressed: () {esp32.send(
                 'cmd: cali_snsr, soil_pin: ${unit.sensorName}, '
-                'cali_type: cali_air'
+                'cali_type: air'
               );
               Navigator.pop(context);
             },
@@ -298,7 +298,7 @@ class PageHome extends StatelessWidget {
           TextButton(
             onPressed: () {esp32.send(
                 'cmd: cali_snsr, soil_pin: ${unit.sensorName}, '
-                'cali_type: cali_water'
+                'cali_type: water'
               );
               Navigator.pop(context);
             },
@@ -362,7 +362,7 @@ class PageHome extends StatelessWidget {
 
     showDialog<void>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(unit.name),
         content: SingleChildScrollView(
           child: Column(
@@ -387,7 +387,7 @@ class PageHome extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Close'),
           ),
           FilledButton(
@@ -398,7 +398,8 @@ class PageHome extends StatelessWidget {
                 'chg_dly_ltr: ${maxLitersController.text.trim()}, '
                 'chg_moi_thr: ${thresholdController.text.trim()}',
               );
-              Navigator.pop(context);
+
+              Navigator.of(dialogContext).pop();
             },
             child: const Text('Send'),
           ),
