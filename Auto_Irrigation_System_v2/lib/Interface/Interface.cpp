@@ -50,6 +50,7 @@ void Interface::commandHandler(String input, COMMS_TYPE type) {
     if (command == "TELEM") {
       // CMD: TELEM
       status = handleTelem(type);
+      return;
     } else if (command == "SAV_EEP") {
       // CMD: SAV_EEP
       status = handleSaveEEPROM();

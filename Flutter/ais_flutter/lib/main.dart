@@ -181,7 +181,6 @@ class Esp32Service {
 
     final parsed = parseTelemetryText(text);
     if (parsed.isEmpty) return;
-    if (parsed.containsKey('RESP')) return; // TODO check if repsonse is successful
 
     if(parsed.containsKey('firmware_version')) {
       firmwareVersion.value = parsed['firmware_version'];
