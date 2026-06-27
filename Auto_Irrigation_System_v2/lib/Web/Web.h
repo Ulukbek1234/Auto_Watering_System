@@ -14,8 +14,8 @@
 
 class Web {
 private:
-    const char* ssid = "InternetHandy";
-    const char* password = "thisisuluk";
+    const char* ssid = "";
+    const char* password = "";
     const int port = 81;
     const String versionUrl = "https://raw.githubusercontent.com/Ulukbek1234/Auto_Watering_System/ESP/Auto_Irrigation_System_v2/releases/version.json";
     String firmwareUrl = "";

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-
+import 'package:multicast_dns/multicast_dns.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 void main() => runApp(const IrrigationApp());
 
 class IrrigationApp extends StatelessWidget {
@@ -119,22 +120,59 @@ class Esp32Service {
 
   bool get connected => _channel != null;
 
+
+
+  Future<String?> _resolveEsp32Host(String host) async {
+    final client = MDnsClient();
+    await client.start();
+
+    try {
+      await for (final record in client.lookup<IPAddressResourceRecord>(
+        ResourceRecordQuery.addressIPv4(host),
+      )) {
+        return record.address.address;
+      }
+    } finally {
+      client.stop();
+    }
+
+    return null;
+  }
+
   Future<void> connect(String ip) async {
-    final trimmedIp = ip.trim();
+    var trimmedIp = ip.trim();
+
     if (trimmedIp.isEmpty) {
-      status.value = 'Enter an ESP32 IP address';
-      return;
+      trimmedIp = 'esp32.local';
     }
 
     if (_channel != null) return;
 
     try {
+      status.value = 'Resolving $trimmedIp...';
+
+      if (trimmedIp.endsWith('.local')) {
+        final resolvedIp = await _resolveEsp32Host(trimmedIp);
+
+        if (resolvedIp == null) {
+          status.value = 'Could not find $trimmedIp';
+          return;
+        }
+
+        trimmedIp = resolvedIp;
+      }
+
       status.value = 'Connecting...';
-      final ws = WebSocketChannel.connect(Uri.parse('ws://$trimmedIp:81/'));
+
+      final ws = WebSocketChannel.connect(
+        Uri.parse('ws://$trimmedIp:81/'),
+      );
+
       await ws.ready;
 
       _channel = ws;
       status.value = 'Connected to $trimmedIp';
+
       send("cmd: telem");
       _startTelemetryPolling();
 
@@ -153,6 +191,7 @@ class Esp32Service {
       );
     } catch (error) {
       _channel = null;
+      _stopTelemetryPolling();
       status.value = 'Failed: $error';
     }
   }
