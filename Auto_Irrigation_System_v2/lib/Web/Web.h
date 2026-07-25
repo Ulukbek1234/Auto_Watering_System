@@ -11,6 +11,7 @@
 #include <Preferences.h>
 #include <ESPmDNS.h>
 #include <Arduino_JSON.h>
+#include <time.h>
 
 class Web {
 private:
@@ -28,6 +29,9 @@ private:
     String last_message = "";
     uint8_t local_client;
     Preferences prefs;
+    const char* ntpServer = "pool.ntp.org";
+    const long  gmtOffset_sec = 0; // maybe change?
+    const int   daylightOffset_sec = 0;
 public:
     Web();
 
@@ -46,6 +50,7 @@ public:
     bool checkFirmwareVersion();
     String getFirmwareVersion() {return firmwareVersion;}
     void initConnection();
+    String getCurrentTime();
 };
 
 #endif

@@ -56,5 +56,10 @@ String Comms::getTelem() {
     // TODO all important information
     data_names[index] = "firmware_version";
     data_values[index++] = web.getFirmwareVersion();
+
+    data_names[index] = "time";
+    data_values[index++] = web.getCurrentTime();
+    Serial.println(Utils::parseDataForWriting(data_names, data_values, index));
+
     return Utils::parseDataForWriting(data_names, data_values, index);
 }

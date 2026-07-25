@@ -4,7 +4,6 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:multicast_dns/multicast_dns.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 void main() => runApp(const IrrigationApp());
 
 class IrrigationApp extends StatelessWidget {
@@ -117,6 +116,7 @@ class Esp32Service {
   final ValueNotifier<String> status = ValueNotifier('Disconnected');
   final ValueNotifier<String> message = ValueNotifier('');
   final ValueNotifier<String?> firmwareVersion = ValueNotifier("0.0.0");
+  final ValueNotifier<String> time = ValueNotifier('');
 
   bool get connected => _channel != null;
 
@@ -237,7 +237,7 @@ class Esp32Service {
     units.value = nextUnits;
 
     final nextReading = ChartReading(
-      time: DateTime.now(),
+      time: parseTime(parsed['time']),
       humidities: _sensorPins
           .map((pin) => _doubleValue(parsed, 'moisture_percent_$pin'))
           .toList(),
@@ -248,6 +248,20 @@ class Esp32Service {
     readings.value = history.length > maxHistoryItems
         ? history.sublist(history.length - maxHistoryItems)
         : history;
+  }
+
+  DateTime parseTime(String? inputTime)
+  {
+    String outputTime = "";
+    if(inputTime?.isEmpty ?? true) {
+      outputTime = time.value; 
+    }
+    else {
+      outputTime = inputTime?.replaceAll(";", ":") ?? time.value;
+      time.value = outputTime;
+    }
+    //String dateString = '2023-06-04 14:30:00';
+    return DateTime.parse(outputTime);   
   }
 
   void send(String command) {

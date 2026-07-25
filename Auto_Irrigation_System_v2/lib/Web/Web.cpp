@@ -3,6 +3,8 @@
 Web::Web()
 {
   initConnection();
+  // Sync time from NTP server
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 }
 
 bool Web::connectSavedWiFi()
@@ -265,4 +267,20 @@ void Web::initConnection() {
   ) {
     this->onWebSocketEvent(client, type, payload, length);
   });
+}
+
+String Web::getCurrentTime() {
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+      DEBUG_PRINTLN("Failed to obtain time");
+      return "FAILED";
+  }
+    // 1. Create a character buffer
+  char timeStringBuff[50];
+
+  // "yyyy-MM-dd HH:mm:ss
+  // 2. Use strftime to format the time into the buffer
+  strftime(timeStringBuff, sizeof(timeStringBuff), "%Y-%m-%d %H;%M;%S", &timeinfo);
+
+  return (timeStringBuff);
 }
