@@ -27,8 +27,9 @@ class SerialComms:
         # Establish serial connection with Slave
         # USB = ttyACM0
         # GPIO = serial0 
+        # ESP = ttyUSB0
         
-        self.ser = serial.Serial(port='/dev/ttyUSB0', baudrate=9600, timeout=1) 
+        self.ser = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=1) 
 
         time.sleep(2)  # wait for the serial connection to initialize
         self.ser.write(b"SYNCH\n")
@@ -37,7 +38,7 @@ class SerialComms:
         self.SLAVE_COMMAND_INTER = 1
         self.SLAVE_COMMAND_PATH = DATA_BUS_PATH / "slave_command.txt"
 
-        self.TELEM_INTER = 10 # telemetry data gets requested every 10 seconds
+        self.TELEM_INTER = 60 # telemetry data gets requested every 60 seconds
 
 
     def request_telemetry(self):
