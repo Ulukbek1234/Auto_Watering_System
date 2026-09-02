@@ -271,6 +271,8 @@ void Web::initConnection() {
 
 String Web::getCurrentTime() {
   struct tm timeinfo;
+  setenv("TZ", "UTC", 1); 
+  tzset();
   if (!getLocalTime(&timeinfo)) {
       DEBUG_PRINTLN("Failed to obtain time");
       return "FAILED";
