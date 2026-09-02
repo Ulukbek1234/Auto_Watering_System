@@ -389,104 +389,19 @@ class PageHome extends StatelessWidget {
   }
 
   void _openSplash(BuildContext context, IrrigationUnit unit) {
-    final amountController = TextEditingController(text: '0.1');
-
     showDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(unit.name),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _DetailRow(label: 'Pump', value: unit.pumpName),
-              _DetailRow(label: 'Today', value: '${unit.waterFlowDaily.toStringAsFixed(2)} L'),
-              _DetailRow(label: 'Total', value: '${unit.waterFlowTotal.toStringAsFixed(2)} L'),
-              const SizedBox(height: 20),
-              _NumberField(controller: amountController, label: 'Splash Amount'),
-              const SizedBox(height: 12),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Close'),
-          ),
-          FilledButton(
-            onPressed: () {
-              esp32.send(
-                Esp32Commands.irrigate(unit.pumpName, amountController.text),
-              );
-            },
-            child: const Text('Send'),
-          ),
-        ],
-      ),
-    ).whenComplete(() {
-      amountController.dispose();
-    });
+      builder: (_) => _SplashDialog(unit: unit, service: esp32),
+    );
   }
 
   void _openConfig(BuildContext context, IrrigationUnit unit) {
-    final modeController = TextEditingController(text: unit.pumpStatus.toString());
-    final maxLitersController = TextEditingController(text: unit.waterFlowDailyMax.toString());
-    final thresholdController = TextEditingController(text: unit.moistureThreshold.toString());
-
     showDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(unit.name),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _DetailRow(label: 'Pump', value: unit.pumpName),
-              _DetailRow(label: 'Sensor', value: unit.sensorName),
-              _DetailRow(label: 'Mode', value: '${unit.pumpStatus}'),
-              _DetailRow(label: 'Humidity', value: '${unit.soilHumidity.toStringAsFixed(1)}%'),
-              _DetailRow(label: 'Threshold', value: '${unit.moistureThreshold.toStringAsFixed(1)}%'),
-              _DetailRow(label: 'Today', value: '${unit.waterFlowDaily.toStringAsFixed(2)} L'),
-              _DetailRow(label: 'Total', value: '${unit.waterFlowTotal.toStringAsFixed(2)} L'),
-              const SizedBox(height: 20),
-              _NumberField(controller: modeController, label: 'Change mode'),
-              const SizedBox(height: 12),
-              _NumberField(controller: maxLitersController, label: 'Max daily liters'),
-              const SizedBox(height: 12),
-              _NumberField(controller: thresholdController, label: 'Humidity threshold (%)'),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Close'),
-          ),
-          FilledButton(
-            onPressed: () {
-              esp32.send(
-                Esp32Commands.configure(
-                  pumpPin: unit.pumpName,
-                  mode: modeController.text,
-                  maxDailyLiters: maxLitersController.text,
-                  moistureThreshold: thresholdController.text,
-                ),
-              );
-
-              Navigator.of(dialogContext).pop();
-            },
-            child: const Text('Send'),
-          ),
-        ],
-      ),
-    ).whenComplete(() {
-      modeController.dispose();
-      maxLitersController.dispose();
-      thresholdController.dispose();
-    });
+      builder: (_) => _ConfigDialog(unit: unit, service: esp32),
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -570,6 +485,150 @@ class PageHome extends StatelessWidget {
         ValueListenableBuilder<String>(
           valueListenable: esp32.message,
           builder: (_, value, __) => Text('Last ESP32 message: $value'),
+        ),
+      ],
+    );
+  }
+}
+
+class _SplashDialog extends StatefulWidget {
+  const _SplashDialog({required this.unit, required this.service});
+
+  final IrrigationUnit unit;
+  final Esp32Service service;
+
+  @override
+  State<_SplashDialog> createState() => _SplashDialogState();
+}
+
+class _SplashDialogState extends State<_SplashDialog> {
+  late final TextEditingController amountController;
+
+  @override
+  void initState() {
+    super.initState();
+    amountController = TextEditingController(text: '0.1');
+  }
+
+  @override
+  void dispose() {
+    amountController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.unit.name),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _DetailRow(label: 'Pump', value: widget.unit.pumpName),
+            _DetailRow(label: 'Today', value: '${widget.unit.waterFlowDaily.toStringAsFixed(2)} L'),
+            _DetailRow(label: 'Total', value: '${widget.unit.waterFlowTotal.toStringAsFixed(2)} L'),
+            const SizedBox(height: 20),
+            _NumberField(controller: amountController, label: 'Splash Amount'),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+        FilledButton(
+          onPressed: () {
+            FocusScope.of(context).unfocus();
+            widget.service.send(
+              Esp32Commands.irrigate(widget.unit.pumpName, amountController.text),
+            );
+          },
+          child: const Text('Send'),
+        ),
+      ],
+    );
+  }
+}
+
+class _ConfigDialog extends StatefulWidget {
+  const _ConfigDialog({required this.unit, required this.service});
+
+  final IrrigationUnit unit;
+  final Esp32Service service;
+
+  @override
+  State<_ConfigDialog> createState() => _ConfigDialogState();
+}
+
+class _ConfigDialogState extends State<_ConfigDialog> {
+  late final TextEditingController modeController;
+  late final TextEditingController maxLitersController;
+  late final TextEditingController thresholdController;
+
+  @override
+  void initState() {
+    super.initState();
+    modeController = TextEditingController(text: widget.unit.pumpStatus.toString());
+    maxLitersController = TextEditingController(text: widget.unit.waterFlowDailyMax.toString());
+    thresholdController = TextEditingController(text: widget.unit.moistureThreshold.toString());
+  }
+
+  @override
+  void dispose() {
+    modeController.dispose();
+    maxLitersController.dispose();
+    thresholdController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.unit.name),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _DetailRow(label: 'Pump', value: widget.unit.pumpName),
+            _DetailRow(label: 'Sensor', value: widget.unit.sensorName),
+            _DetailRow(label: 'Mode', value: '${widget.unit.pumpStatus}'),
+            _DetailRow(label: 'Humidity', value: '${widget.unit.soilHumidity.toStringAsFixed(1)}%'),
+            _DetailRow(label: 'Threshold', value: '${widget.unit.moistureThreshold.toStringAsFixed(1)}%'),
+            _DetailRow(label: 'Today', value: '${widget.unit.waterFlowDaily.toStringAsFixed(2)} L'),
+            _DetailRow(label: 'Total', value: '${widget.unit.waterFlowTotal.toStringAsFixed(2)} L'),
+            const SizedBox(height: 20),
+            _NumberField(controller: modeController, label: 'Change mode'),
+            const SizedBox(height: 12),
+            _NumberField(controller: maxLitersController, label: 'Max daily liters'),
+            const SizedBox(height: 12),
+            _NumberField(controller: thresholdController, label: 'Humidity threshold (%)'),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+        FilledButton(
+          onPressed: () {
+            FocusScope.of(context).unfocus();
+            widget.service.send(
+              Esp32Commands.configure(
+                pumpPin: widget.unit.pumpName,
+                mode: modeController.text,
+                maxDailyLiters: maxLitersController.text,
+                moistureThreshold: thresholdController.text,
+              ),
+            );
+  
+            Navigator.of(context).pop();
+          },
+          child: const Text('Send'),
         ),
       ],
     );
