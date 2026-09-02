@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:multicast_dns/multicast_dns.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+
 void main() => runApp(const IrrigationApp());
 
 class IrrigationApp extends StatelessWidget {
@@ -101,11 +103,60 @@ Map<String, String> parseTelemetryText(String text) {
   return result;
 }
 
+/// Device commands are kept in one place to preserve the firmware protocol.
+class Esp32Commands {
+  Esp32Commands._();
+
+  static const telemetry = 'cmd: telem';
+  static const updateFirmware = 'cmd: updt_firm';
+  static const saveSettings = 'cmd: sav_eep';
+  static const resetSettings = 'cmd: rst_eep';
+  static const restart = 'cmd: rstrt';
+
+  static String calibrate(String sensorPin, String type) =>
+      'cmd: cali_snsr, soil_pin: $sensorPin, cali_type: $type';
+
+  static String irrigate(String pumpPin, String amount) =>
+      'cmd: man_irr, pump: $pumpPin, amount: ${amount.trim()}, ';
+
+  static String configure({
+    required String pumpPin,
+    required String mode,
+    required String maxDailyLiters,
+    required String moistureThreshold,
+  }) =>
+      'cmd: config, pump: $pumpPin, '
+      'set_mode: ${mode.trim()}, '
+      'chg_dly_ltr: ${maxDailyLiters.trim()}, '
+      'chg_moi_thr: ${moistureThreshold.trim()}';
+}
+
+class WifiProvisioningService {
+  const WifiProvisioningService();
+
+  Future<String> provision({
+    required String ssid,
+    required String password,
+  }) async {
+    final response = await http.post(
+      Uri.parse('http://192.168.4.1/wifi'),
+      body: {'ssid': ssid.trim(), 'pass': password},
+    ).timeout(const Duration(seconds: 10));
+
+    return response.statusCode == 200
+        ? 'Credentials sent. ESP32 will connect to your home Wi-Fi and restart.'
+        : 'Failed: ${response.body}';
+  }
+}
+
 class Esp32Service {
   Esp32Service._();
   static final Esp32Service instance = Esp32Service._();
 
   static const _pumpPins = ['16', '17', '18', '19'];
+  static const telemetryInterval = Duration(minutes: 1);
+  static const maxHistoryItems = 1000;
+
   static const _sensorPins = ['32', '33', '34', '35'];
 
   WebSocketChannel? _channel;
@@ -115,12 +166,10 @@ class Esp32Service {
   final ValueNotifier<List<ChartReading>> readings = ValueNotifier([]);
   final ValueNotifier<String> status = ValueNotifier('Disconnected');
   final ValueNotifier<String> message = ValueNotifier('');
-  final ValueNotifier<String?> firmwareVersion = ValueNotifier("0.0.0");
+  final ValueNotifier<String?> firmwareVersion = ValueNotifier('0.0.0');
   final ValueNotifier<String> time = ValueNotifier('');
 
   bool get connected => _channel != null;
-
-
 
   Future<String?> _resolveEsp32Host(String host) async {
     final client = MDnsClient();
@@ -173,7 +222,7 @@ class Esp32Service {
       _channel = ws;
       status.value = 'Connected to $trimmedIp';
 
-      send("cmd: telem");
+      send(Esp32Commands.telemetry);
       _startTelemetryPolling();
 
       ws.stream.listen(
@@ -200,10 +249,10 @@ class Esp32Service {
     _telemetryTimer?.cancel();
 
     _telemetryTimer = Timer.periodic(
-      const Duration(minutes: 1),
+      telemetryInterval,
       (_) {
         if (_channel != null) {
-          send("cmd: telem");
+          send(Esp32Commands.telemetry);
         }
       },
     );
@@ -221,7 +270,7 @@ class Esp32Service {
     final parsed = parseTelemetryText(text);
     if (parsed.isEmpty) return;
 
-    if(parsed.containsKey('firmware_version')) {
+    if (parsed.containsKey('firmware_version')) {
       firmwareVersion.value = parsed['firmware_version'];
     }
 
@@ -244,24 +293,16 @@ class Esp32Service {
     );
 
     final history = [...readings.value, nextReading];
-    const maxHistoryItems = 1000;
     readings.value = history.length > maxHistoryItems
         ? history.sublist(history.length - maxHistoryItems)
         : history;
   }
 
-  DateTime parseTime(String? inputTime)
-  {
-    String outputTime = "";
-    if(inputTime?.isEmpty ?? true) {
-      outputTime = time.value; 
+  DateTime parseTime(String? inputTime) {
+    if (inputTime != null && inputTime.isNotEmpty) {
+      time.value = inputTime.replaceAll(';', ':');
     }
-    else {
-      outputTime = inputTime?.replaceAll(";", ":") ?? time.value;
-      time.value = outputTime;
-    }
-    //String dateString = '2023-06-04 14:30:00';
-    return DateTime.parse(outputTime);   
+    return DateTime.parse(time.value);
   }
 
   void send(String command) {
@@ -309,9 +350,7 @@ class _MainScreenState extends State<MainScreen> {
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) => setState(() => _selectedIndex = index),
         destinations: const [
-          NavigationDestination(
-              icon: Icon(Icons.home), 
-              label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.show_chart), label: 'Charts'),
           NavigationDestination(icon: Icon(Icons.camera_alt), label: 'Camera'),
           NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
@@ -326,51 +365,35 @@ class PageHome extends StatelessWidget {
 
   Esp32Service get esp32 => Esp32Service.instance;
 
-
   void _openCalibrate(BuildContext context, IrrigationUnit unit) {
-    final amountController = TextEditingController(text: "0.1");
-
     showDialog<void>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(unit.name),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Close'),
           ),
-          TextButton(
-            onPressed: () {esp32.send(
-                'cmd: cali_snsr, soil_pin: ${unit.sensorName}, '
-                'cali_type: air'
-              );
-              Navigator.pop(context);
-            },
-            child: const Text('Air'),
-          ),
-          TextButton(
-            onPressed: () {esp32.send(
-                'cmd: cali_snsr, soil_pin: ${unit.sensorName}, '
-                'cali_type: water'
-              );
-              Navigator.pop(context);
-            },
-            child: const Text('Water'),
-          ),
+          for (final type in ['air', 'water'])
+            TextButton(
+              onPressed: () {
+                esp32.send(Esp32Commands.calibrate(unit.sensorName, type));
+                Navigator.of(dialogContext).pop();
+              },
+              child: Text(type == 'air' ? 'Air' : 'Water'),
+            ),
         ],
       ),
-    ).whenComplete(() {
-      amountController.dispose();
-    });
+    );
   }
 
-
   void _openSplash(BuildContext context, IrrigationUnit unit) {
-    final amountController = TextEditingController(text: "0.1");
+    final amountController = TextEditingController(text: '0.1');
 
     showDialog<void>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(unit.name),
         content: SingleChildScrollView(
           child: Column(
@@ -388,16 +411,14 @@ class PageHome extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Close'),
           ),
           FilledButton(
             onPressed: () {
               esp32.send(
-                'cmd: man_irr, pump: ${unit.pumpName}, '
-                'amount: ${amountController.text.trim()}, '
+                Esp32Commands.irrigate(unit.pumpName, amountController.text),
               );
-              Navigator.pop(context);
             },
             child: const Text('Send'),
           ),
@@ -446,10 +467,12 @@ class PageHome extends StatelessWidget {
           FilledButton(
             onPressed: () {
               esp32.send(
-                'cmd: config, pump: ${unit.pumpName}, '
-                'set_mode: ${modeController.text.trim()}, '
-                'chg_dly_ltr: ${maxLitersController.text.trim()}, '
-                'chg_moi_thr: ${thresholdController.text.trim()}',
+                Esp32Commands.configure(
+                  pumpPin: unit.pumpName,
+                  mode: modeController.text,
+                  maxDailyLiters: maxLitersController.text,
+                  moistureThreshold: thresholdController.text,
+                ),
               );
 
               Navigator.of(dialogContext).pop();
@@ -473,7 +496,7 @@ class PageHome extends StatelessWidget {
         Text('Irrigation Units', style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 16),
         FilledButton.icon(
-          onPressed: () => esp32.send('cmd: telem'),
+          onPressed: () => esp32.send(Esp32Commands.telemetry),
           icon: const Icon(Icons.refresh),
           label: const Text('Refresh telemetry'),
         ),
@@ -482,12 +505,12 @@ class PageHome extends StatelessWidget {
           valueListenable: esp32.units,
           builder: (_, units, __) {
             final visibleUnits = units.isEmpty
-                ? [
+                ? const [
                     IrrigationUnit(
                       name: 'Pump -1',
                       pumpName: '-1',
                       sensorName: '-1',
-                      pumpStatus:-1,
+                      pumpStatus: -1,
                       soilHumidity: 0,
                       moistureThreshold: 0,
                       waterFlowDaily: 0,
@@ -587,7 +610,16 @@ class _NumberField extends StatelessWidget {
   }
 }
 
-enum ChartRange { hour, day, week, month }
+enum ChartRange {
+  hour(Duration(hours: 1)),
+  day(Duration(days: 1)),
+  week(Duration(days: 7)),
+  month(Duration(days: 30));
+
+  const ChartRange(this.duration);
+
+  final Duration duration;
+}
 
 class PageCharts extends StatefulWidget {
   const PageCharts({super.key});
@@ -599,29 +631,22 @@ class PageCharts extends StatefulWidget {
 class _PageChartsState extends State<PageCharts> {
   ChartRange selectedRange = ChartRange.day;
 
-  Duration get selectedDuration {
-    switch (selectedRange) {
-      case ChartRange.hour:
-        return const Duration(hours: 1);
-      case ChartRange.day:
-        return const Duration(days: 1);
-      case ChartRange.week:
-        return const Duration(days: 7);
-      case ChartRange.month:
-        return const Duration(days: 30);
-    }
-  }
+  Duration get selectedDuration => selectedRange.duration;
 
   double get maxX => selectedDuration.inMinutes.toDouble();
 
-  List<ChartReading> _filteredReadings(List<ChartReading> readings) {
-    final from = DateTime.now().subtract(selectedDuration);
+  List<ChartReading> _filteredReadings(
+    List<ChartReading> readings,
+    DateTime from,
+  ) {
     return readings.where((reading) => reading.time.isAfter(from)).toList();
   }
 
-  List<FlSpot> _humiditySpots(List<ChartReading> readings, int sensorIndex) {
-    final from = DateTime.now().subtract(selectedDuration);
-
+  List<FlSpot> _humiditySpots(
+    List<ChartReading> readings,
+    int sensorIndex,
+    DateTime from,
+  ) {
     return readings.where((reading) => reading.humidities.length > sensorIndex).map((reading) {
       final x = reading.time.difference(from).inMinutes.toDouble();
       return FlSpot(x, reading.humidities[sensorIndex]);
@@ -651,7 +676,8 @@ class _PageChartsState extends State<PageCharts> {
             child: ValueListenableBuilder<List<ChartReading>>(
               valueListenable: esp32.readings,
               builder: (_, allReadings, __) {
-                final readings = _filteredReadings(allReadings);
+                final from = DateTime.now().subtract(selectedDuration);
+                final readings = _filteredReadings(allReadings, from);
 
                 if (readings.isEmpty) {
                   return const Center(child: Text('No chart data yet. Refresh telemetry first.'));
@@ -681,7 +707,7 @@ class _PageChartsState extends State<PageCharts> {
                     ),
                     lineBarsData: List.generate(4, (index) {
                       return LineChartBarData(
-                        spots: _humiditySpots(readings, index),
+                        spots: _humiditySpots(readings, index, from),
                         isCurved: true,
                         barWidth: 3,
                         dotData: const FlDotData(show: false),
@@ -738,6 +764,8 @@ class _PageSettingsState extends State<PageSettings> {
   final wifiSsidController = TextEditingController();
   final wifiPasswordController = TextEditingController();
 
+  final _wifiProvisioning = const WifiProvisioningService();
+
   bool provisioning = false;
   String provisioningStatus = '';
 
@@ -746,7 +774,9 @@ class _PageSettingsState extends State<PageSettings> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      esp32.connect(ipController.text.trim());
+      if (mounted) {
+        esp32.connect(ipController.text.trim());
+      }
     });
   }
 
@@ -759,42 +789,29 @@ class _PageSettingsState extends State<PageSettings> {
   }
 
   Future<void> provisionWifi() async {
+    if (provisioning) return;
+
     setState(() {
       provisioning = true;
       provisioningStatus = 'Sending Wi-Fi credentials...';
     });
 
+    String result;
     try {
-      final response = await http
-          .post(
-            Uri.parse('http://192.168.4.1/wifi'),
-            body: {
-              'ssid': wifiSsidController.text.trim(),
-              'pass': wifiPasswordController.text,
-            },
-          )
-          .timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        setState(() {
-          provisioningStatus =
-              'Credentials sent. ESP32 will connect to your home Wi-Fi and restart.';
-        });
-      } else {
-        setState(() {
-          provisioningStatus = 'Failed: ${response.body}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        provisioningStatus =
-            'Could not reach ESP32. Connect your phone to ESP32-Setup Wi-Fi first.';
-      });
-    } finally {
-      setState(() {
-        provisioning = false;
-      });
+      result = await _wifiProvisioning.provision(
+        ssid: wifiSsidController.text,
+        password: wifiPasswordController.text,
+      );
+    } catch (_) {
+      result =
+          'Could not reach ESP32. Connect your phone to ESP32-Setup Wi-Fi first.';
     }
+
+    if (!mounted) return;
+    setState(() {
+      provisioningStatus = result;
+      provisioning = false;
+    });
   }
 
   @override
@@ -806,7 +823,7 @@ class _PageSettingsState extends State<PageSettings> {
           'Wi-Fi ESP32 Connection',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
-        
+
         ValueListenableBuilder<String?>(
           valueListenable: esp32.firmwareVersion,
           builder: (_, value, __) => Text('Firmware Version: $value'),
@@ -887,30 +904,19 @@ class _PageSettingsState extends State<PageSettings> {
           child: const Text('Disconnect'),
         ),
         const SizedBox(height: 12),
-        OutlinedButton(
-          onPressed: () => esp32.send('cmd: telem'),
-          child: const Text('Request telemetry'),
-        ),
-        const SizedBox(height: 12),
-        OutlinedButton(
-          onPressed: () => esp32.send('cmd: updt_firm'),
-          child: const Text('Update Firmware'),
-        ),
-        const SizedBox(height: 12),
-        OutlinedButton(
-          onPressed: () => esp32.send('cmd: sav_eep'),
-          child: const Text('Save to EEPROM'),
-        ),
-        const SizedBox(height: 12),
-        OutlinedButton(
-          onPressed: () => esp32.send('cmd: rst_eep'),
-          child: const Text('Reset EEPROM'),
-        ),
-        const SizedBox(height: 12),
-        OutlinedButton(
-          onPressed: () => esp32.send('cmd: rstrt'),
-          child: const Text('Restart'),
-        ),
+        for (final action in (const <String, String>{
+          'Request telemetry': Esp32Commands.telemetry,
+          'Update Firmware': Esp32Commands.updateFirmware,
+          'Save to EEPROM': Esp32Commands.saveSettings,
+          'Reset EEPROM': Esp32Commands.resetSettings,
+          'Restart': Esp32Commands.restart,
+        }).entries) ...[
+          OutlinedButton(
+            onPressed: () => esp32.send(action.value),
+            child: Text(action.key),
+          ),
+          const SizedBox(height: 12),
+        ],
 
         const SizedBox(height: 24),
 
