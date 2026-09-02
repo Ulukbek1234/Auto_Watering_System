@@ -688,7 +688,7 @@ class PageCharts extends StatefulWidget {
 }
 
 class _PageChartsState extends State<PageCharts> {
-  ChartRange selectedRange = ChartRange.day;
+  ChartRange selectedRange = ChartRange.hour;
 
   Duration get selectedDuration => selectedRange.duration;
 
@@ -735,7 +735,7 @@ class _PageChartsState extends State<PageCharts> {
             child: ValueListenableBuilder<List<ChartReading>>(
               valueListenable: esp32.readings,
               builder: (_, allReadings, __) {
-                final from = DateTime.now().subtract(selectedDuration);
+                final from = DateTime.now().toUtc().subtract(selectedRange.duration);
                 final readings = _filteredReadings(allReadings, from);
 
                 if (readings.isEmpty) {
