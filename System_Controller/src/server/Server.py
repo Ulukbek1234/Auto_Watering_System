@@ -22,7 +22,7 @@ LATEST_JPG = os.path.join(STATIC_DIR, "latest.jpg")
 
 # ---- Camera settings ----
 CAM_DEVICE = "/dev/video0"
-CAPTURE_INTERVAL_SEC = 10.0
+CAPTURE_INTERVAL_SEC = 60.0
 CAPTURE_RESOLUTION = "1280x720"  # e.g. "640x480"
 FSWEBCAM_TIMEOUT_SEC = CAPTURE_INTERVAL_SEC + 3
 
