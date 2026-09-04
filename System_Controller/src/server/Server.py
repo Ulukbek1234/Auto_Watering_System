@@ -41,7 +41,7 @@ DATA_BUS_PATH = ROOT / "data_bus"
 
 # ---- Chart points ----
 chart_points_count = 8640  # 8640 for 24h of 1-min data
-chart_data_delay = 10.0  # seconds between data points (matches metrics_loop sleep)
+chart_data_delay = 3.0  # seconds between data points (matches metrics_loop sleep)
 
 
 app = Flask(__name__)
