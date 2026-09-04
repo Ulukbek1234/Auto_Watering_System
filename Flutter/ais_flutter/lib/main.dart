@@ -698,7 +698,15 @@ class _PageChartsState extends State<PageCharts> {
     List<ChartReading> readings,
     DateTime from,
   ) {
-    return readings.where((reading) => reading.time.isAfter(from)).toList();
+    return readings.where((reading)  {
+      debugPrint(
+        'reading=${reading.time.toIso8601String()} '
+        'from=${from.toIso8601String()} '
+        'difference=${reading.time.difference(from)} '
+        'included=${reading.time.isAfter(from)}',
+      );
+      return reading.time.isAfter(from);
+    }).toList();
   }
 
   List<FlSpot> _humiditySpots(
@@ -735,7 +743,7 @@ class _PageChartsState extends State<PageCharts> {
             child: ValueListenableBuilder<List<ChartReading>>(
               valueListenable: esp32.readings,
               builder: (_, allReadings, __) {
-                final from = DateTime.now().toUtc().subtract(selectedRange.duration);
+                final from = DateTime.now().subtract(selectedRange.duration);
                 final readings = _filteredReadings(allReadings, from);
 
                 if (readings.isEmpty) {
