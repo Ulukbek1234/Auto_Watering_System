@@ -10,6 +10,7 @@ class SoilSensor
 {
 private:
     uint8_t pin;
+    const uint8_t POWER_PIN = 13;
     int moisture_raw = 0;
     long moisture_percent = 0;
     int cali_water_raw = -1;

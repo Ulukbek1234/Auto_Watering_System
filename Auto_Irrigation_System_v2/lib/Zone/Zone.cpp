@@ -118,6 +118,7 @@ String Zone::getData()
     data_names[index] = "moisture_threshold";
     data_values[index++] = MOISTURE_THRESHOLD;
 
+    pinMode(13, HIGH);
     for (int i = 0; i < nr_soil_sensors; i++)
     {
         soil_sensors[i]->checkRawValues();
@@ -127,6 +128,8 @@ String Zone::getData()
         data_names[index] = "moisture_raw_" + soil_pin;
         data_values[index++] = soil_sensors[i]->getMoistureRaw(); 
     }
+    pinMode(13, LOW);
+
 
     for (int i = 0; i < nr_pumps; i++)
     {

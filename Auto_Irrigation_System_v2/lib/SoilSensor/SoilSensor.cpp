@@ -4,6 +4,7 @@ SoilSensor::SoilSensor(uint8_t pin, int cali_air = -1, int cali_water = -1) : ca
 {
     // Construct SoilSensor
     pinMode(pin, INPUT);
+    pinMode(POWER_PIN, OUTPUT);
     this->pin = pin;
 }
 
