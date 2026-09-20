@@ -70,6 +70,17 @@ void Web::startProvisioningPortal()
   });
 
   config_server->begin();
+
+  // Wait here until valid WiFi credentials are received
+  while (!connected) {
+      config_server->handleClient();
+      delay(10);
+  }
+
+  // Should never reach here
+  config_server->stop();
+  delay(1000);
+  ESP.restart();
 }
 
 bool Web::connectWiFi(String ssid, String password)
@@ -108,7 +119,7 @@ String Web::read()
 {
   // Provisioning has to be finished, otherwise this wouldnt run
   if (WiFi.status() != WL_CONNECTED) {
-    connectSavedWiFi();
+    initConnection();
   }
 
   if (config_server != nullptr) {
@@ -250,7 +261,7 @@ bool Web::checkFirmwareVersion()
 }
 
 void Web::initConnection() {
-  bool connected = connectSavedWiFi();
+  connected = connectSavedWiFi();
 
   if (!connected) {
     startProvisioningPortal();

@@ -24,6 +24,7 @@ private:
     String newVersion = "";
     String newFirmwareUrl = "";
 
+    bool connected = false;
     WebServer* config_server = nullptr;
     WebSocketsServer *web_socket = nullptr;
     String last_message = "";
